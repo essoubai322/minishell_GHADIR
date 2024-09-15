@@ -160,7 +160,7 @@ t_lexer tokenize(char *input)
     // Check for unclosed quotes
     if (in_quote || in_dquote) 
     {
-        error_message = strdup("Error: Unclosed quote detected");
+        error_message = strdup("bash: unclosed quote detected");
     }
 
     // Check for mismatched redirections
@@ -171,11 +171,26 @@ t_lexer tokenize(char *input)
              current->type == REDIRECT_APPEND || current->type == HEREDOC) && 
             (current->next->type != WORD))
         {
-            error_message = strdup("Error: Redirection syntax error");
+            error_message = strdup("bash: syntax error near unexpected token");
             break;
         }
         current = current->next;
     } 
+
+    // Check for syntax redirection errors
+    current = head;
+    while (current != NULL)
+    {
+        if (current->type == REDIRECT_APPEND || current->type == REDIRECT_IN || current->type == REDIRECT_OUT || current->type == HEREDOC)
+        {
+            if (current->next == NULL || current->next->type != WORD)
+            {
+                error_message = strdup("bash: syntax error near unexpected token `newline'");
+                break;
+            }
+        }
+        current = current->next;
+    }
 
     // Check for pipe errors
     current = head;
@@ -234,8 +249,6 @@ void print_tokens(t_token *head)
 int main() {
     char *input;
 
-    // Initialize readline
-    using_history();
     while (1) 
     {
         // Use readline to get input
@@ -254,7 +267,7 @@ int main() {
         // Tokenize the input
         t_lexer result = tokenize(input);
 
-        if (result.error_message) 
+        if (result.error_message)
         {
             printf("%s\n", result.error_message);
             free(result.error_message);
@@ -271,7 +284,7 @@ int main() {
     }
 
     // Clean up readline history
-    clear_history();
+    rl_clear_history();
 
     return 0;
 }
