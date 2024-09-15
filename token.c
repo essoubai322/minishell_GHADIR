@@ -65,9 +65,9 @@ t_lexer tokenize(char *input)
     int in_dquote = 0;
     char *error_message = NULL;
 
-    while (input[i] != '\0') 
+    while (input[i] != '\0')
     {
-        if (!in_quote && !in_dquote) 
+        if (!in_quote && !in_dquote)
         {
             if (input[i] == '|' || input[i] == '<' || input[i] == '>' || 
                 input[i] == '\'' || input[i] == '"' || isspace(input[i]))
@@ -185,7 +185,7 @@ t_lexer tokenize(char *input)
         if (current->type == PIPE) 
         {
             pipe_count++;
-            if (pipe_count > 1 && current->next != NULL && current->next->type == PIPE) 
+            if (pipe_count > 0 && current->next != NULL && current->next->type == PIPE) 
             {
                 error_message = strdup("Error: Multiple consecutive pipes");
                 break;
