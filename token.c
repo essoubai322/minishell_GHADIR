@@ -169,7 +169,7 @@ t_lexer tokenize(char *input)
     {
         if ((current->type == REDIRECT_IN || current->type == REDIRECT_OUT || 
              current->type == REDIRECT_APPEND || current->type == HEREDOC) && 
-            (current->next->type != WORD)) 
+            (current->next->type != WORD))
         {
             error_message = strdup("Error: Redirection syntax error");
             break;
@@ -187,12 +187,12 @@ t_lexer tokenize(char *input)
             pipe_count++;
             if (pipe_count > 0 && current->next != NULL && current->next->type == PIPE) 
             {
-                error_message = strdup("Error: Multiple consecutive pipes");
+                error_message = strdup("bash: syntax error near unexpected token `|'");
                 break;
             }
             if (current == head || current->next == NULL) 
             {
-                error_message = strdup("Error: Pipe at beginning or end of command");
+                error_message = strdup("bash: syntax error near unexpected token `|'");
                 break;
             }
         } 
