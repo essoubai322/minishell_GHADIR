@@ -30,6 +30,13 @@ typedef struct LexerResult {
     char *error_message;
 } t_lexer;
 
+int	ft_strlen(char *str)
+{
+	int i = 0;
+	while (str && str[i])
+		i++;
+	return(i);
+}
 t_token *create_token(enum TokenType type, const char *value) 
 {
     t_token *new_token = malloc(sizeof(t_token));
@@ -59,15 +66,29 @@ t_lexer tokenize(char *input)
 {
     t_token *head = NULL;
     int i = 0;
-    char current_token[MAX_TOKEN_LENGTH] = "";
+    char *current_token;
     int current_token_length = 0;
     int in_quote = 0;
     int in_dquote = 0;
     char *error_message = NULL;
 
+	current_token = calloc(ft_strlen(input),sizeof(current_token));
+
     while (input[i] != '\0')
     {
-        if (!in_quote && !in_dquote)
+		if (input[i] == '$')
+		{
+			char tmp[MAX_TOKEN_LENGTH] = "";
+			int k = 0;
+			i++;
+			while (isalnum(input[i]) || input[i] == '_')
+				tmp[k++] = input[i++];
+			tmp[k] = '\0';
+			char *env = getenv(tmp);
+			strncat(current_token, env, ft_strlen(env));
+			current_token_length += ft_strlen(env);
+		}
+        else if (!in_quote && !in_dquote)
         {
             if (input[i] == '|' || input[i] == '<' || input[i] == '>' || 
                 input[i] == '\'' || input[i] == '"' || isspace(input[i]))
