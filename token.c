@@ -47,9 +47,42 @@ t_token *create_token(enum TokenType type, const char *value)
     return (new_token);
 }
 
-void add_token(t_token **head, enum TokenType type, const char *value) 
+void add_token(t_token **head, enum TokenType type, char *value) 
 {
-    t_token *new_token = create_token(type, value);
+	char *stripped_value = NULL;
+    if (type == QUOTE || type == DQUOTE) 
+	{
+        int len = ft_strlen(value);
+        if (len > 2)
+		{
+            stripped_value = malloc(len - 1);
+            strncpy(stripped_value, value + 1, len - 2);
+            stripped_value[len - 2] = '\0';
+        } 
+		else 
+            stripped_value = strdup("");
+    }
+	else if (type == WORD) 
+	{
+		if (value && value[0] == '$') 
+		{
+			// Handle environment variable
+			char *env_name = strdup(value + 1);  // Skip the '$'
+			char *env_value = getenv(env_name);
+			if (env_value) 
+				stripped_value = strdup(env_value);
+			else
+				stripped_value = strdup("");
+			free(env_name);
+		} 
+		else
+			stripped_value = strdup(value);
+    }
+	else 
+        stripped_value = strdup(value);
+
+    t_token *new_token = create_token(type, stripped_value);
+	free(stripped_value);
 
     if (*head == NULL) 
         *head = new_token;
@@ -107,7 +140,6 @@ t_lexer tokenize(char *input)
                     current_token_length = 0;
                     memset(current_token, 0, ft_strlen(input));
                 }
-
                 if (input[i] == '|')
                 {
                     add_token(&head, PIPE, "|");
@@ -179,11 +211,34 @@ t_lexer tokenize(char *input)
         }
         else
         {
+			if (input[i] == '$' && in_dquote == 1)
+			{
+				char var_name[1000] = "";
+				int k = 0;
+
+				i++;  // Skip the '$'
+				while (isalnum(input[i]) || input[i] == '_')
+					var_name[k++] = input[i++];
+				var_name[k] = '\0';
+				
+				char *env_value = getenv(var_name);
+				if (env_value)
+				{
+					strcat(current_token, env_value);
+					current_token_length += strlen(env_value);
+				}
+				else if (input[i - 1] == '\'')
+				{
+					current_token[current_token_length++] = '$';
+					strcat(current_token, var_name);
+					current_token_length += strlen(var_name);
+				}
+				continue;
+			}
             current_token[current_token_length++] = input[i];
             i++;
         }
     }
-
     if (current_token_length > 0) 
     {
 		if (input[i - 1] == '"')
@@ -298,7 +353,6 @@ int main() {
         }
         add_history(input);
         t_lexer result = tokenize(input);
-
         if (result.error_message)
         {
             printf("%s\n", result.error_message);
