@@ -5,8 +5,6 @@
 #include <readline/readline.h>
 #include <readline/history.h>
 
-#define MAX_TOKEN_LENGTH 1000
-
 enum TokenType {
     WORD,
     PIPE,
@@ -16,12 +14,14 @@ enum TokenType {
     HEREDOC,
     QUOTE,
     DQUOTE,
+	DOLLAR,
     END
 };
 
 typedef struct Token {
     enum TokenType type;
     char *value;
+	char *out;
     struct Token *next;
 } t_token;
 
@@ -42,6 +42,7 @@ t_token *create_token(enum TokenType type, const char *value)
     t_token *new_token = malloc(sizeof(t_token));
     new_token->type = type;
     new_token->value = strdup(value);
+	new_token->out = NULL;
     new_token->next = NULL;
     return (new_token);
 }
@@ -76,28 +77,35 @@ t_lexer tokenize(char *input)
 
     while (input[i] != '\0')
     {
-		if (input[i] == '$')
-		{
-			char tmp[MAX_TOKEN_LENGTH] = "";
-			int k = 0;
-			i++;
-			while (isalnum(input[i]) || input[i] == '_')
-				tmp[k++] = input[i++];
-			tmp[k] = '\0';
-			char *env = getenv(tmp);
-			strncat(current_token, env, ft_strlen(env));
-			current_token_length += ft_strlen(env);
-		}
-        else if (!in_quote && !in_dquote)
+		// if (input[i] == '$')
+		// {
+		// 	char tmp[1000] = "";
+		// 	int k = 0;
+
+		// 	i++;
+		// 	while (isalnum(input[i]) || input[i] == '_')
+		// 		tmp[k++] = input[i++];
+		// 	tmp[k] = '\0';
+		// 	char *env = getenv(tmp);
+		// 	strncat(current_token, env, ft_strlen(env));
+		// 	current_token_length += ft_strlen(env);
+		// }
+        if (!in_quote && !in_dquote)
         {
             if (input[i] == '|' || input[i] == '<' || input[i] == '>' || 
-                input[i] == '\'' || input[i] == '"' || isspace(input[i]))
+                input[i] == '\'' || input[i] == '"' || isspace(input[i])
+				||  ((input[i - 1] == '\'' || input[i - 1] == '"') &&  input[i]))
             {
                 if (current_token_length > 0) 
                 {
-                    add_token(&head, WORD, current_token);
+					if (input[i - 1] == '"')
+                    	add_token(&head, DQUOTE, current_token);
+					else if (input[i - 1] == '\'')
+            			add_token(&head, QUOTE, current_token);
+					else
+                    	add_token(&head, WORD, current_token);
                     current_token_length = 0;
-                    memset(current_token, 0, MAX_TOKEN_LENGTH);
+                    memset(current_token, 0, ft_strlen(input));
                 }
 
                 if (input[i] == '|')
@@ -144,23 +152,26 @@ t_lexer tokenize(char *input)
                     i++;
                 }
                 else if (isspace(input[i]))
-                {
                     i++;
-                }
+				else if ((input[i - 1] == '\'' || input[i - 1] == '"') &&  input[i])
+				{
+					current_token[current_token_length++] = input[i];
+					i++;
+				}
             }
             else
             {
                 current_token[current_token_length++] = input[i];
                 i++;
             }
-        } 
-        else if (in_quote && input[i] == '\'') 
+        }
+        else if (in_quote == 1 && input[i] == '\'') 
         {
             in_quote = 0;
             current_token[current_token_length++] = input[i];
             i++;
         }
-        else if (in_dquote && input[i] == '"') 
+        else if (in_dquote == 1 && input[i] == '"') 
         {
             in_dquote = 0;
             current_token[current_token_length++] = input[i];
@@ -175,7 +186,12 @@ t_lexer tokenize(char *input)
 
     if (current_token_length > 0) 
     {
-        add_token(&head, WORD, current_token);
+		if (input[i - 1] == '"')
+            add_token(&head, DQUOTE, current_token);
+		else if (input[i - 1] == '\'')
+            add_token(&head, DQUOTE, current_token);
+		else
+			add_token(&head, WORD, current_token);
     }
 
     // Check for unclosed quotes
@@ -190,7 +206,7 @@ t_lexer tokenize(char *input)
     {
         if ((current->type == REDIRECT_IN || current->type == REDIRECT_OUT || 
              current->type == REDIRECT_APPEND || current->type == HEREDOC) && 
-            (current->next->type != WORD))
+            ((current->next->type != WORD) && (current->next->type != DQUOTE) && (current->next->type = QUOTE)))
         {
             error_message = strdup("bash: syntax error near unexpected token");
             break;
@@ -204,7 +220,7 @@ t_lexer tokenize(char *input)
     {
         if (current->type == REDIRECT_APPEND || current->type == REDIRECT_IN || current->type == REDIRECT_OUT || current->type == HEREDOC)
         {
-            if (current->next == NULL || current->next->type != WORD)
+            if (current->next == NULL || ((current->next->type != WORD) && (current->next->type != DQUOTE) && (current->next->type = QUOTE)))
             {
                 error_message = strdup("bash: syntax error near unexpected token `newline'");
                 break;
@@ -239,6 +255,7 @@ t_lexer tokenize(char *input)
     }
     add_token(&head, END, "");
     t_lexer result = {head, error_message};
+	free(current_token);
     return (result);
 }
 
@@ -272,20 +289,14 @@ int main() {
 
     while (1) 
     {
-        // Use readline to get input
         input = readline("minishell> ");
 
-        // Check for EOF (Ctrl+D)
         if (!input) 
         {
             printf("\nExiting minishell...\n");
             break;
         }
-
-        // Add input to readline history
         add_history(input);
-
-        // Tokenize the input
         t_lexer result = tokenize(input);
 
         if (result.error_message)
@@ -294,18 +305,10 @@ int main() {
             free(result.error_message);
         } 
         else 
-        {
-            // Print the tokens (for debugging purposes)
             print_tokens(result.tokens);
-        }
-
-        // Free the tokens and input
         free_tokens(result.tokens);
         free(input);
     }
-
-    // Clean up readline history
     rl_clear_history();
-
-    return 0;
+    return (0);
 }
