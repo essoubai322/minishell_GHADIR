@@ -54,7 +54,6 @@ void add_token(t_token **head, enum TokenType type, char *value)
         int len = ft_strlen(value);
         if (len > 2)
 		{
-            stripped_value = malloc(len - 1);
             strncpy(stripped_value, value + 1, len - 2);
             stripped_value[len - 2] = '\0';
         } 
@@ -84,6 +83,33 @@ void add_token(t_token **head, enum TokenType type, char *value)
 				}
 			}
 		}
+		else if (strchr(value, '$') != 0)
+		{
+			char *name = calloc(ft_strlen(value) , sizeof(char *));
+			while (value[i] && value[i] != '$')
+				name[k++] = value[i++];
+			name[k] = '\0';
+			k = 0;
+			strcat(stripped_value, name);
+			free(name);
+			while (value[i] != '\0')
+			{
+				if (value[i] == '$')
+				{
+					i++;
+					char *var_name = calloc(ft_strlen(value) , sizeof(char *));
+					while (value[i] && isalnum(value[i]) || value[i] == '_')
+						var_name[k++] = value[i++];
+					var_name[k] = '\0';
+					k = 0;
+					char *env_value = getenv(var_name);
+					if (env_value)
+						strcat(stripped_value,env_value);
+					free(var_name);
+				}
+			}
+			
+		}
 		else 
         	strcpy(stripped_value,value);
     }
@@ -103,18 +129,6 @@ void add_token(t_token **head, enum TokenType type, char *value)
         
         current->next = new_token;
     }
-}
-int count_dollar(char *input)
-{
-	int i = 0;
-	int count = 0;
-	while (input[i])
-	{
-		if (input[i] == '$')
-			count++;
-		i++;
-	}
-	return(count);
 }
 
 t_lexer tokenize(char *input)
