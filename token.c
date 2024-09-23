@@ -72,13 +72,24 @@ void add_token(t_token **head, enum TokenType type, char *value)
 				{
 					char *var_name = calloc(ft_strlen(value) , sizeof(char *));
 					i++;
-					while (value[i] && isalnum(value[i]) || value[i] == '_')
+					while (value[i] && (isalnum(value[i]) || value[i] == '_'))
 						var_name[k++] = value[i++];
 					var_name[k] = '\0';
 					k = 0;
 					char *env_value = getenv(var_name);
 					if (env_value)
 						strcat(stripped_value, env_value);
+					free(var_name);
+				}
+				else
+				{
+					char *var_name = calloc(ft_strlen(value) , sizeof(char *));
+					while (value[i] && value[i] != '$')
+						var_name[k++] = value[i++];
+					var_name[k] = '\0';
+					k = 0;
+					if (var_name)
+						strcat(stripped_value, var_name);
 					free(var_name);
 				}
 			}
@@ -105,6 +116,17 @@ void add_token(t_token **head, enum TokenType type, char *value)
 					char *env_value = getenv(var_name);
 					if (env_value)
 						strcat(stripped_value,env_value);
+					free(var_name);
+				}
+				else
+				{
+					char *var_name = calloc(ft_strlen(value) , sizeof(char *));
+					while (value[i] && value[i] != '$')
+						var_name[k++] = value[i++];
+					var_name[k] = '\0';
+					k = 0;
+					if (var_name)
+						strcat(stripped_value, var_name);
 					free(var_name);
 				}
 			}
