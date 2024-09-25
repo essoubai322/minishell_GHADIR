@@ -163,7 +163,7 @@ t_lexer tokenize(char *input)
     int in_dquote = 0;
     char *error_message = NULL;
 
-	current_token = calloc(ft_strlen(input)+ 1,sizeof(current_token));
+	current_token = calloc(ft_strlen(input) + 1,sizeof(current_token));
 
     while (input[i] != '\0')
     {
