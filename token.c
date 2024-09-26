@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   token.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: amoubine <amoubine@student.1337.ma>        +#+  +:+       +#+        */
+/*   By: asebaai <asebaai@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/26 10:25:46 by amoubine          #+#    #+#             */
-/*   Updated: 2024/09/26 11:17:34 by amoubine         ###   ########.fr       */
+/*   Updated: 2024/09/26 16:22:20 by asebaai          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -205,6 +205,88 @@ void add_token(t_token **head, enum TokenType type, char *value)
     }
 }
 
+int counter_closes(char *input)
+{
+    int i = 0;
+    int count = 0;
+    while(input && input[i])
+    {
+        if (input[i] == '`')
+            count++;
+        i++;
+    }
+    return (count);
+}
+
+int check_case(char *input, int i)
+{
+    char *result = calloc(strlen(input) + 1, sizeof(char));
+    int k = 0;
+    
+    while (isspace(input[i]))
+        (i)++;
+    while (input[i] && !isspace(input[i]))
+    {
+        if (input[i] == '\'' || input[i] == '"')
+        {
+            char quote = input[i];
+            result[k++] = '`';
+            i++;
+            while (input[i] && input[i] != quote)
+                result[k++] = input[(i)++];
+            if (input[i])
+                result[k++] = '`';
+            i++;
+        }
+        else
+        {
+            while(input[i] && !isspace(input[i]) && input[i] != '\'' && input[i] != '"')
+                result[k++] = input[(i)++];
+        }
+    }
+    result[k] = '\0';
+    if (strchr(result,'`'))
+    {
+        if (counter_closes(result) == 2)
+        {
+            if (result[0] != '`' || result[k - 1] != '`')
+                return (1);
+        }
+        else if (counter_closes(result) && counter_closes(result) % 2 == 0)
+            return (1);
+    }
+    return(0);
+}
+
+char *string_command(const char *input, int *i)
+{
+    char *result = calloc(strlen(input) + 1, sizeof(char));
+    int k = 0;
+    
+    while (isspace(input[*i]))
+        (*i)++;
+    while (input[*i] && !isspace(input[*i]))
+    {
+        if (input[*i] == '\'' || input[*i] == '"')
+        {
+            char quote = input[*i];
+            (*i)++;
+            while (input[*i] && input[*i] != quote)
+                result[k++] = input[(*i)++];
+            if (input[*i])
+                (*i)++;
+        }
+        else
+        {
+            while(input[*i] && !isspace(input[*i]) && input[*i] != '\'' && input[*i] != '"')
+                result[k++] = input[(*i)++];
+        }
+    }
+    result[k] = '\0';
+    return result;
+}
+
+
 t_lexer tokenize(char *input)
 {
     t_token *head = NULL;
@@ -214,11 +296,18 @@ t_lexer tokenize(char *input)
     int in_quote = 0;
     int in_dquote = 0;
     char *error_message = NULL;
+    char *apa = NULL;
 
 	current_token = calloc(ft_strlen(input) + 1,sizeof(current_token));
 
     while (input[i] != '\0')
     {
+        if (check_case(input, i))
+        {
+            printf("1\n");
+            apa = strdup(string_command(input, &i));
+            printf("%s\n", apa);
+        }
         if (!in_quote && !in_dquote)
         {
             if (input[i] == '|' || input[i] == '<' || input[i] == '>' || 
