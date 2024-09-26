@@ -1,33 +1,16 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <ctype.h>
-#include <readline/readline.h>
-#include <readline/history.h>
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   token.c                                            :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: amoubine <amoubine@student.1337.ma>        +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2024/09/26 10:25:46 by amoubine          #+#    #+#             */
+/*   Updated: 2024/09/26 11:17:34 by amoubine         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
-enum TokenType {
-    WORD,
-    PIPE,
-    REDIRECT_IN,
-    REDIRECT_OUT,
-    REDIRECT_APPEND,
-    HEREDOC,
-    QUOTE,
-    DQUOTE,
-    END
-};
-
-typedef struct Token {
-    enum TokenType type;
-    char *value;
-	char *out;
-    struct Token *next;
-} t_token;
-
-typedef struct LexerResult {
-    t_token *tokens;
-    char *error_message;
-} t_lexer;
+#include "minishell.h"
 
 int	ft_strlen(char *str)
 {
@@ -36,7 +19,22 @@ int	ft_strlen(char *str)
 		i++;
 	return(i);
 }
-t_token *create_token(enum TokenType type, const char *value) 
+void	ft_free2(char **dest)
+{
+	size_t	i;
+
+	i = 0;
+	while (dest[i])
+	{
+		free(dest[i]);
+		dest[i] = NULL;
+		i++;
+	}
+	free(dest);
+	dest = NULL;
+}
+
+t_token *create_token(enum TokenType type, const char *value)
 {
     t_token *new_token = malloc(sizeof(t_token));
     new_token->type = type;
@@ -49,6 +47,7 @@ t_token *create_token(enum TokenType type, const char *value)
 void add_token(t_token **head, enum TokenType type, char *value)
 {
 	char *stripped_value = calloc(10000000 , sizeof(char *));
+	char **arg_space;
     if (type == QUOTE || type == DQUOTE)
 	{
         int len = ft_strlen(value);
@@ -80,6 +79,33 @@ void add_token(t_token **head, enum TokenType type, char *value)
 					if (env_value)
 						strcat(stripped_value, env_value);
 					free(var_name);
+					arg_space = ft_split(stripped_value ,' ');
+					int s = 0;
+					while (arg_space[s])
+						s++;
+					if (s > 1)
+					{
+						free(stripped_value);
+						t_token *new_token = NULL;
+						s = 0;
+						while (arg_space[s])
+						{
+							new_token = create_token(type, arg_space[s]);
+							if (*head == NULL) 
+								*head = new_token;
+							else 
+							{
+								t_token *current = *head;
+								while (current->next != NULL) 
+									current = current->next;
+								current->next = new_token;
+							}
+							s++;
+						}
+						ft_free2(arg_space);
+						return ;
+					}
+					
 				}
 				else
 				{
@@ -117,6 +143,32 @@ void add_token(t_token **head, enum TokenType type, char *value)
 					if (env_value)
 						strcat(stripped_value,env_value);
 					free(var_name);
+					arg_space = ft_split(stripped_value ,' ');
+					int s = 0;
+					while (arg_space[s])
+						s++;
+					if (s > 1)
+					{
+						free(stripped_value);
+						t_token *new_token = NULL;
+						s = 0;
+						while (arg_space[s])
+						{
+							new_token = create_token(type, arg_space[s]);
+							if (*head == NULL) 
+								*head = new_token;
+							else 
+							{
+								t_token *current = *head;
+								while (current->next != NULL) 
+									current = current->next;
+								current->next = new_token;
+							}
+							s++;
+						}
+						ft_free2(arg_space);
+						return ;
+					}
 				}
 				else
 				{

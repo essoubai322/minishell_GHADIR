@@ -5,37 +5,34 @@
 #include <readline/readline.h>
 #include <readline/history.h>
 
-char *string_command(char *input, int *i)
+char *string_command(const char *input, int *i)
 {
-    char *result = calloc(strlen(input) + 1, 8);
+    char *result = calloc(strlen(input) + 1, sizeof(char));
     int k = 0;
     
     while (isspace(input[*i]))
-        *i++;
+        (*i)++;
     while (input[*i] && !isspace(input[*i]))
     {
         if (input[*i] == '\'' || input[*i] == '"')
         {
-            if (input[*i] == '\'')
-            {
-                *i++;
-                while (input[*i] != '\'')
-                    result[k++] = input[*i++];
-                *i++;
-            }
-            else
-            {
-                *i++;
-                while (input[*i] != '"')
-                    result[k++] = input[*i++];
-                *i++;
-            }
+            char quote = input[*i];
+            (*i)++;
+            while (input[*i] && input[*i] != quote)
+                result[k++] = input[(*i)++];
+            if (input[*i])
+                (*i)++;
         }
-        while(input[*i] && !isspace(input[*i]) && (input[*i] != '\'' && input[*i] != '"'))
-            result[k++] = input[*i++];
+        else
+        {
+            while(input[*i] && !isspace(input[*i]) && input[*i] != '\'' && input[*i] != '"')
+                result[k++] = input[(*i)++];
+        }
     }
-    return (result);
+    result[k] = '\0';
+    return result;
 }
+
 int main() {
     char *input;
 
@@ -46,12 +43,12 @@ int main() {
 
         if (!input) 
         {
-            pintf("\nExiting minishell...\n");
+            printf("\nExiting minishell...\n");
             break;
         }
         add_history(input);
         char *s = string_command(input,&i);
-        pintf("%s\n", s);
+        printf("%s\n", s);
         free(input);
     }
     rl_clear_history();
