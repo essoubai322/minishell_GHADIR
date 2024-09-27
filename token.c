@@ -6,7 +6,7 @@
 /*   By: asebaai <asebaai@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/26 10:25:46 by amoubine          #+#    #+#             */
-/*   Updated: 2024/09/27 14:01:29 by asebaai          ###   ########.fr       */
+/*   Updated: 2024/09/27 15:45:36 by asebaai          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -280,6 +280,7 @@ int check_case(char *input, int i)
     return(0);
 }
 
+
 char *string_command(const char *input, int *i)
 {
     char *result = calloc(10000000, sizeof(char));
@@ -288,7 +289,8 @@ char *string_command(const char *input, int *i)
     
     while (isspace(input[*i]))
         (*i)++;
-    while (input[*i] && !isspace(input[*i]))
+    
+    while (input[*i] && !isspace(input[*i]) && input[*i] != '|' && input[*i] != '>' && input[*i] != '<')
     {
         if (input[*i] == '\'' || input[*i] == '"')
         {
@@ -329,7 +331,7 @@ char *string_command(const char *input, int *i)
         }
         else
         {
-            while(input[*i] && !isspace(input[*i]) && input[*i] != '\'' && input[*i] != '"')
+            while(input[*i] && !isspace(input[*i]) && input[*i] != '\'' && input[*i] != '"' && input[*i] != '|' && input[*i] != '>' && input[*i] != '<')
             {
                 if (input[*i] && input[*i] == '$')
                 {
@@ -370,7 +372,7 @@ t_lexer tokenize(char *input)
 
     while (input[i] != '\0')
     {
-        if (check_case(input, i))
+        if (check_case(input, i) && !current_token_length)
         {
             str_cmd = string_command(input, &i);
             apa = strdup(str_cmd);
@@ -525,10 +527,11 @@ t_lexer tokenize(char *input)
             break;
         }
         current = current->next;
-    } 
-
+    }
+   
     // Check for syntax redirection errors
     current = head;
+    
     while (current != NULL)
     {
         if (current->type == REDIRECT_APPEND || current->type == REDIRECT_IN || current->type == REDIRECT_OUT || current->type == HEREDOC)
