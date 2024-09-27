@@ -6,7 +6,7 @@
 /*   By: asebaai <asebaai@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/26 10:25:46 by amoubine          #+#    #+#             */
-/*   Updated: 2024/09/27 11:40:17 by asebaai          ###   ########.fr       */
+/*   Updated: 2024/09/27 14:01:29 by asebaai          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -255,6 +255,8 @@ int check_case(char *input, int i)
                 result[k++] = input[(i)++];
             if (input[i])
                 result[k++] = '`';
+            else
+                return (free(result),0);
             i++;
         }
         else
