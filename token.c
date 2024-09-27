@@ -6,7 +6,7 @@
 /*   By: asebaai <asebaai@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/26 10:25:46 by amoubine          #+#    #+#             */
-/*   Updated: 2024/09/26 16:22:20 by asebaai          ###   ########.fr       */
+/*   Updated: 2024/09/27 11:40:17 by asebaai          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,19 +19,21 @@ int	ft_strlen(char *str)
 		i++;
 	return(i);
 }
-void	ft_free2(char **dest)
+void ft_free2(char **dest)
 {
-	size_t	i;
+    size_t i;
 
-	i = 0;
-	while (dest[i])
-	{
-		free(dest[i]);
-		dest[i] = NULL;
-		i++;
-	}
-	free(dest);
-	dest = NULL;
+    i = 0;
+    if (!dest || !*dest)
+        return;
+    while (dest[i])
+    {
+        free(dest[i]);
+        dest[i] = NULL;
+        i++;
+    }
+    free(dest);
+    dest = NULL;
 }
 
 t_token *create_token(enum TokenType type, const char *value)
@@ -105,7 +107,7 @@ void add_token(t_token **head, enum TokenType type, char *value)
 						ft_free2(arg_space);
 						return ;
 					}
-					
+                    ft_free2(arg_space);
 				}
 				else
 				{
@@ -135,7 +137,7 @@ void add_token(t_token **head, enum TokenType type, char *value)
 				{
 					i++;
 					char *var_name = calloc(ft_strlen(value) , sizeof(char *));
-					while (value[i] && isalnum(value[i]) || value[i] == '_')
+					while (value[i] && (isalnum(value[i]) || value[i] == '_'))
 						var_name[k++] = value[i++];
 					var_name[k] = '\0';
 					k = 0;
@@ -169,6 +171,7 @@ void add_token(t_token **head, enum TokenType type, char *value)
 						ft_free2(arg_space);
 						return ;
 					}
+                    ft_free2(arg_space);
 				}
 				else
 				{
@@ -192,6 +195,22 @@ void add_token(t_token **head, enum TokenType type, char *value)
 
     t_token *new_token = create_token(type, stripped_value);
 	free(stripped_value);
+
+    if (*head == NULL) 
+        *head = new_token;
+    else 
+    {
+        t_token *current = *head;
+        while (current->next != NULL) 
+            current = current->next;
+        
+        current->next = new_token;
+    }
+}
+
+void    add_token_v2(t_token **head, enum TokenType type, const char *value)
+{
+    t_token *new_token = create_token(type, value);
 
     if (*head == NULL) 
         *head = new_token;
@@ -250,18 +269,20 @@ int check_case(char *input, int i)
         if (counter_closes(result) == 2)
         {
             if (result[0] != '`' || result[k - 1] != '`')
-                return (1);
+                return (free(result),1);
         }
         else if (counter_closes(result) && counter_closes(result) % 2 == 0)
-            return (1);
+            return (free(result),1);
     }
+    free(result);
     return(0);
 }
 
 char *string_command(const char *input, int *i)
 {
-    char *result = calloc(strlen(input) + 1, sizeof(char));
+    char *result = calloc(10000000, sizeof(char));
     int k = 0;
+    int c = 0;
     
     while (isspace(input[*i]))
         (*i)++;
@@ -271,21 +292,65 @@ char *string_command(const char *input, int *i)
         {
             char quote = input[*i];
             (*i)++;
-            while (input[*i] && input[*i] != quote)
-                result[k++] = input[(*i)++];
-            if (input[*i])
-                (*i)++;
+            
+            if (quote == '\'')
+            {
+                while (input[*i] && input[*i] != quote)
+                    result[k++] = input[(*i)++];
+                if (input[*i])
+                    (*i)++;
+            }
+            else if (quote == '"')
+            {
+                while (input[*i] && input[*i] != quote)
+                {
+                    if (input[*i] && input[*i] == '$')
+                    {
+                        (*i)++;
+                        char *var_name = calloc(strlen(input) + 1 , sizeof(char *));
+                        while (input[*i] && (isalnum(input[*i]) || input[*i] == '_'))
+                            var_name[c++] = input[(*i)++];
+                        var_name[c] = '\0';
+                        c = 0;
+                        char *env_value = getenv(var_name);
+                        if (env_value)
+                            strcat(result,env_value);
+                        free(var_name);
+                        k = strlen(result);
+                    }
+                    else
+                        result[k++] = input[(*i)++];
+                }
+                if (input[*i])
+                    (*i)++;
+            }
         }
         else
         {
             while(input[*i] && !isspace(input[*i]) && input[*i] != '\'' && input[*i] != '"')
-                result[k++] = input[(*i)++];
+            {
+                if (input[*i] && input[*i] == '$')
+                {
+                    (*i)++;
+                    char *var_name = calloc(strlen(input) + 1 , sizeof(char *));
+                    while (input[*i] && (isalnum(input[*i]) || input[*i] == '_'))
+                        var_name[c++] = input[(*i)++];
+                    var_name[c] = '\0';
+                    c = 0;
+                    char *env_value = getenv(var_name);
+                    if (env_value)
+                        strcat(result,env_value);
+                    free(var_name);
+                    k = strlen(result);
+                }
+                else
+                    result[k++] = input[(*i)++];
+            }
         }
     }
     result[k] = '\0';
-    return result;
+    return (result);
 }
-
 
 t_lexer tokenize(char *input)
 {
@@ -297,6 +362,7 @@ t_lexer tokenize(char *input)
     int in_dquote = 0;
     char *error_message = NULL;
     char *apa = NULL;
+    char *str_cmd = NULL;
 
 	current_token = calloc(ft_strlen(input) + 1,sizeof(current_token));
 
@@ -304,15 +370,17 @@ t_lexer tokenize(char *input)
     {
         if (check_case(input, i))
         {
-            printf("1\n");
-            apa = strdup(string_command(input, &i));
-            printf("%s\n", apa);
+            str_cmd = string_command(input, &i);
+            apa = strdup(str_cmd);
+            free(str_cmd);
+            add_token_v2(&head, WORD, apa);
+            free(apa);
         }
-        if (!in_quote && !in_dquote)
+        else if (!in_quote && !in_dquote)
         {
             if (input[i] == '|' || input[i] == '<' || input[i] == '>' || 
                 input[i] == '\'' || input[i] == '"' || isspace(input[i])
-				|| i > 0 && ((input[i - 1] == '\'' || input[i - 1] == '"') &&  input[i]))
+				|| (i > 0 && (input[i - 1] == '\'' || input[i - 1] == '"') &&  input[i]))
             {
                 if (current_token_length > 0) 
                 {

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: amoubine <amoubine@student.1337.ma>        +#+  +:+       +#+        */
+/*   By: asebaai <asebaai@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/26 10:22:04 by amoubine          #+#    #+#             */
-/*   Updated: 2024/09/26 10:51:00 by amoubine         ###   ########.fr       */
+/*   Updated: 2024/09/27 11:33:10 by asebaai          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,6 +52,7 @@ t_lexer tokenize(char *input);
 void free_tokens(t_token *head);
 void print_tokens(t_token *head);
 char	**ft_split(char const *s1, char c);
+void    add_token_v2(t_token **head, enum TokenType type, const char *value);
 
 
 #endif
