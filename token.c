@@ -6,7 +6,7 @@
 /*   By: asebaai <asebaai@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/26 10:25:46 by amoubine          #+#    #+#             */
-/*   Updated: 2024/09/27 15:45:36 by asebaai          ###   ########.fr       */
+/*   Updated: 2024/09/27 16:16:30 by asebaai          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,11 @@ void ft_free2(char **dest)
 
     i = 0;
     if (!dest || !*dest)
+    {
+        free(dest);
+        dest = NULL;
         return;
+    }
     while (dest[i])
     {
         free(dest[i]);
@@ -71,7 +75,7 @@ void add_token(t_token **head, enum TokenType type, char *value)
 			{
 				if (value[i] == '$')
 				{
-					char *var_name = calloc(ft_strlen(value) , sizeof(char *));
+					char *var_name = calloc(ft_strlen(value) + 1, sizeof(char *));
 					i++;
 					while (value[i] && (isalnum(value[i]) || value[i] == '_'))
 						var_name[k++] = value[i++];
@@ -169,6 +173,7 @@ void add_token(t_token **head, enum TokenType type, char *value)
 							s++;
 						}
 						ft_free2(arg_space);
+                        free(arg_space);
 						return ;
 					}
                     ft_free2(arg_space);
