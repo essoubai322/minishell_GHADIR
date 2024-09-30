@@ -6,7 +6,7 @@
 /*   By: asebaai <asebaai@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/26 10:25:46 by amoubine          #+#    #+#             */
-/*   Updated: 2024/09/27 16:16:30 by asebaai          ###   ########.fr       */
+/*   Updated: 2024/09/30 18:18:43 by asebaai          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -361,6 +361,55 @@ char *string_command(const char *input, int *i)
     return (result);
 }
 
+char *after_heredoc(char *input, int *i)
+{
+    char *result = calloc(100000,1);
+    int k = 0;
+    int flag = 0;
+    int after = *i;
+    
+    while (isspace(input[*i]))
+        (*i)++;
+    
+    while (input[*i] && !isspace(input[*i]) && input[*i] != '|' && input[*i] != '>' && input[*i] != '<')
+    {
+        if (input[*i] == '\'' || input[*i] == '"')
+        {
+            flag = 1;
+            char quote = input[*i];
+            (*i)++;
+            
+            if (quote == '\'')
+            {
+                while (input[*i] && input[*i] != quote)
+                    result[k++] = input[(*i)++];
+                if (input[*i])
+                    (*i)++;
+            }
+            else if (quote == '"')
+            {
+                while (input[*i] && input[*i] != quote)
+                        result[k++] = input[(*i)++];
+                if (input[*i])
+                    (*i)++;
+            }
+        }
+        else
+        {
+            while(input[*i] && !isspace(input[*i]) && input[*i] != '\'' && input[*i] != '"' && input[*i] != '|' && input[*i] != '>' && input[*i] != '<')
+                    result[k++] = input[(*i)++];
+        }
+    }
+    if (!flag && ft_strlen(result) == 0)
+    {
+        *i = after;
+        free(result);
+        return (NULL);
+    }
+    result[k] = '\0';
+    return (result);
+}
+
 t_lexer tokenize(char *input)
 {
     t_token *head = NULL;
@@ -413,6 +462,10 @@ t_lexer tokenize(char *input)
                     {
                         add_token(&head, HEREDOC, "<<");
                         i += 2;
+                        apa = after_heredoc(input, &i);
+                        if (apa)
+                            add_token_v2(&head, WORD, apa);
+                        free(apa);
                     } 
                     else 
                     {
