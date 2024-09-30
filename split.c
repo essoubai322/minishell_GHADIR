@@ -6,29 +6,13 @@
 /*   By: asebaai <asebaai@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/26 10:12:03 by amoubine          #+#    #+#             */
-/*   Updated: 2024/09/27 11:14:59 by asebaai          ###   ########.fr       */
+/*   Updated: 2024/09/30 20:36:41 by asebaai          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-static size_t	ft_strlcpy(char *dest, const char *src, size_t size)
-{
-	size_t	index;
-
-	index = 0;
-	if (size != 0)
-	{
-		while (*(src + index) && --size)
-			*(dest++) = *(src + index++);
-		*dest = '\0';
-	}
-	while (*(src + index))
-		index++;
-	return (index);
-}
-
-static char	*malloc_1(size_t size, char const *index)
+char	*malloc_1(size_t size, char const *index)
 {
 	char	*dest;
 
@@ -39,23 +23,6 @@ static char	*malloc_1(size_t size, char const *index)
 	return (dest);
 }
 
-static char	*ft_substr(char const *s, unsigned int start, size_t len)
-{
-	char	*dest;
-	size_t	lenght_str;
-	char	*str;
-
-	if (!s)
-		return (NULL);
-	str = (char *)s;
-	lenght_str = ft_strlen(str);
-	if (start >= lenght_str && *str != '\0')
-		return (strdup(""));
-	if (lenght_str - start - 1 >= len)
-		return (dest = malloc_1(len + 1, str + start));
-	else
-		return (dest = malloc_1(lenght_str - start + 1, str + start));
-}
 static void	*ft_free(char **dest)
 {
 	size_t	i;
