@@ -217,7 +217,6 @@ char	**ft_split(char const *s1, char c)
 		put_words(dest, s1, c, nword);
 	return (dest);
 }
-
 void add_token(t_token **head, enum TokenType type, char *value)
 {
     char *stripped_value = calloc(1200500, sizeof(char));
@@ -258,7 +257,6 @@ void add_token(t_token **head, enum TokenType type, char *value)
                     dprintf(2, "env == %s\n", env_value);
                     if (env_value)
                     {
-                        // Check if there are more environment variables to process
                         if (value[i] == '$')
                         {
                             char *temp = stripped_value;
@@ -276,7 +274,7 @@ void add_token(t_token **head, enum TokenType type, char *value)
                     }
                     free(var_name);
                     
-                    if (value[i] != '$')  // Only split if we're at the end of processing
+                    if (value[i] != '$')
                     {
                         arg_space = ft_split(stripped_value, ' ');
                         int s = 0;
@@ -348,15 +346,26 @@ void add_token(t_token **head, enum TokenType type, char *value)
                     k = 0;
                     
                     char *env_value = getenv(var_name);
-                    if (env_value)
+					if (env_value)
                     {
-                        temp = stripped_value;
-                        stripped_value = ft_strcat(stripped_value, env_value);
-                        free(temp);
+                        if (value[i] == '$')
+                        {
+                            char *temp = stripped_value;
+                            stripped_value = ft_strcat(stripped_value, env_value);
+                            free(temp);
+                        }
+                        else
+                        {
+                            char *env_value1 = ft_strcat(env_value, value + i);
+                            char *temp = stripped_value;
+                            stripped_value = ft_strcat(stripped_value, env_value1);
+                            free(temp);
+                            free(env_value1);
+                        }
                     }
                     free(var_name);
                     
-                    if (value[i] != '$')  // Only split if we're at the end of processing
+                    if (value[i] != '$')
                     {
                         arg_space = ft_split(stripped_value, ' ');
                         int s = 0;
@@ -425,17 +434,14 @@ void add_token(t_token **head, enum TokenType type, char *value)
 
 int main()
 {
-    char *input = strdup("$aa$aa");
-    t_token *result = NULL; // Change type to t_token *
-	// print add_token(&result, WORD, input); // Call add_token with &result
-	add_token(&result, WORD, input); // Call add_token with &result
-	// Print the result
+    char *input = strdup("$aa$aa.a");
+    t_token *result = NULL;
+	add_token(&result, WORD, input); 
 	t_token *current = result;
 	while (current != NULL) {
 		printf("Token: %s\n", current->value);
 		current = current->next;
 	}
-	// Free the tokens
 	current = result;
 	t_token *next;
 	while (current != NULL) {
@@ -444,6 +450,6 @@ int main()
 		free(current);
 		current = next;
 	}
-    free(input); // Free the allocated input
+    free(input);
     return (0);
 }
