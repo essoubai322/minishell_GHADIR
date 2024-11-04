@@ -258,40 +258,53 @@ void add_token(t_token **head, enum TokenType type, char *value)
                     dprintf(2, "env == %s\n", env_value);
                     if (env_value)
                     {
-                        char *env_value1 = ft_strcat(env_value, value + i);
-                        char *temp = stripped_value;
-                        stripped_value = ft_strcat(stripped_value, env_value1);
-                        free(temp);
-                        free(env_value1);
+                        // Check if there are more environment variables to process
+                        if (value[i] == '$')
+                        {
+                            char *temp = stripped_value;
+                            stripped_value = ft_strcat(stripped_value, env_value);
+                            free(temp);
+                        }
+                        else
+                        {
+                            char *env_value1 = ft_strcat(env_value, value + i);
+                            char *temp = stripped_value;
+                            stripped_value = ft_strcat(stripped_value, env_value1);
+                            free(temp);
+                            free(env_value1);
+                        }
                     }
                     free(var_name);
                     
-                    arg_space = ft_split(stripped_value, ' ');
-                    int s = 0;
-                    while (arg_space[s])
-                        s++;
-                    if (s > 1)
+                    if (value[i] != '$')  // Only split if we're at the end of processing
                     {
-                        s = 0;
+                        arg_space = ft_split(stripped_value, ' ');
+                        int s = 0;
                         while (arg_space[s])
-                        {
-                            t_token *new_token = create_token(type, arg_space[s]);
-                            if (*head == NULL)
-                                *head = new_token;
-                            else
-                            {
-                                t_token *current = *head;
-                                while (current->next != NULL)
-                                    current = current->next;
-                                current->next = new_token;
-                            }
                             s++;
+                        if (s > 1)
+                        {
+                            s = 0;
+                            while (arg_space[s])
+                            {
+                                t_token *new_token = create_token(type, arg_space[s]);
+                                if (*head == NULL)
+                                    *head = new_token;
+                                else
+                                {
+                                    t_token *current = *head;
+                                    while (current->next != NULL)
+                                        current = current->next;
+                                    current->next = new_token;
+                                }
+                                s++;
+                            }
+                            ft_free2(&arg_space);
+                            free(stripped_value);
+                            return;
                         }
                         ft_free2(&arg_space);
-                        free(stripped_value);
-                        return;
                     }
-                    ft_free2(&arg_space);
                 }
                 else
                 {
@@ -343,32 +356,35 @@ void add_token(t_token **head, enum TokenType type, char *value)
                     }
                     free(var_name);
                     
-                    arg_space = ft_split(stripped_value, ' ');
-                    int s = 0;
-                    while (arg_space[s])
-                        s++;
-                    if (s > 1)
+                    if (value[i] != '$')  // Only split if we're at the end of processing
                     {
-                        s = 0;
+                        arg_space = ft_split(stripped_value, ' ');
+                        int s = 0;
                         while (arg_space[s])
-                        {
-                            t_token *new_token = create_token(type, arg_space[s]);
-                            if (*head == NULL)
-                                *head = new_token;
-                            else
-                            {
-                                t_token *current = *head;
-                                while (current->next != NULL)
-                                    current = current->next;
-                                current->next = new_token;
-                            }
                             s++;
+                        if (s > 1)
+                        {
+                            s = 0;
+                            while (arg_space[s])
+                            {
+                                t_token *new_token = create_token(type, arg_space[s]);
+                                if (*head == NULL)
+                                    *head = new_token;
+                                else
+                                {
+                                    t_token *current = *head;
+                                    while (current->next != NULL)
+                                        current = current->next;
+                                    current->next = new_token;
+                                }
+                                s++;
+                            }
+                            ft_free2(&arg_space);
+                            free(stripped_value);
+                            return;
                         }
                         ft_free2(&arg_space);
-                        free(stripped_value);
-                        return;
                     }
-                    ft_free2(&arg_space);
                 }
                 else
                 {
@@ -407,20 +423,27 @@ void add_token(t_token **head, enum TokenType type, char *value)
     }
 }
 
-int main() 
+int main()
 {
-    char *input = strdup("$aa");
+    char *input = strdup("$aa$aa");
     t_token *result = NULL; // Change type to t_token *
-    add_token(&result, WORD, input); // Call add_token with &result
+	// print add_token(&result, WORD, input); // Call add_token with &result
+	add_token(&result, WORD, input); // Call add_token with &result
+	// Print the result
+	t_token *current = result;
+	while (current != NULL) {
+		printf("Token: %s\n", current->value);
+		current = current->next;
+	}
+	// Free the tokens
+	current = result;
+	t_token *next;
+	while (current != NULL) {
+		next = current->next;
+		free(current->value);
+		free(current);
+		current = next;
+	}
     free(input); // Free the allocated input
-    // Free the tokens
-    t_token *current = result;
-    t_token *next;
-    while (current != NULL) {
-        next = current->next;
-        free(current->value);
-        free(current);
-        current = next;
-    }
     return (0);
 }

@@ -6,13 +6,11 @@
 /*   By: amoubine <amoubine@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/26 10:25:46 by amoubine          #+#    #+#             */
-/*   Updated: 2024/11/04 09:38:11 by amoubine         ###   ########.fr       */
+/*   Updated: 2024/11/04 10:57:13 by amoubine         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
-
-// create function ft_strcat with use malloc 
 
 char *ft_strcat(char *dest, char *src)
 {
@@ -54,7 +52,7 @@ void ft_free2(char ***dest)
         i++;
     }
     free(*dest);
-    *dest = NULL; // Set the pointer to NULL after freeing
+    *dest = NULL;
 }
 
 
@@ -72,179 +70,215 @@ t_token *create_token(enum TokenType type, const char *value)
 
 void add_token(t_token **head, enum TokenType type, char *value)
 {
-	char *stripped_value = calloc(1200500 , sizeof(char));
-	char **arg_space;
+    char *stripped_value = calloc(1200500, sizeof(char));
+    char **arg_space = NULL;
+    
     if (type == QUOTE || type == DQUOTE)
-	{
+    {
         int len = ft_strlen(value);
         if (len > 2)
-		{
+        {
             strncpy(stripped_value, value + 1, len - 2);
             stripped_value[len - 2] = '\0';
-        } 
-		else 
-            strcpy(stripped_value,"");
+        }
+        else
+            strcpy(stripped_value, "");
     }
-	else if (type == WORD) 
-	{
-		int i = 0;
-		int k = 0;
-		if (value && value[0] == '$')
-		{
-			while (value[i] != '\0')
-			{
-				if (value[i] == '$')
-				{
-                    dprintf(2,"=%s=\n", value);
-					char *var_name = calloc(ft_strlen(value) + 1, sizeof(char));
-					i++;
-					while (value[i] && (isalnum(value[i]) || value[i] == '_'))
-						var_name[k++] = value[i++];
-					var_name[k] = '\0';
-					k = 0;
-                    
-					char *env_value = NULL;
+    else if (type == WORD)
+    {
+        int i = 0;
+        int k = 0;
+        if (value && value[0] == '$')
+        {
+            while (value[i] != '\0')
+            {
+                if (value[i] == '$')
+                {
+                    dprintf(2, "=%s=\n", value);
+                    char *var_name = calloc(ft_strlen(value) + 1, sizeof(char));
+                    i++;
+                    while (value[i] && (isalnum(value[i]) || value[i] == '_'))
+                        var_name[k++] = value[i++];
+                    var_name[k] = '\0';
+                    k = 0;
+
+                    char *env_value = NULL;
                     if (var_name)
                         env_value = getenv(var_name);
-                    dprintf(2,"env == %s\n", env_value);
+                    dprintf(2, "env == %s\n", env_value);
+                    if (env_value)
+                    {
+                        if (value[i] == '$')
+                        {
+                            char *temp = stripped_value;
+                            stripped_value = ft_strcat(stripped_value, env_value);
+                            free(temp);
+                        }
+                        else
+                        {
+                            char *env_value1 = ft_strcat(env_value, value + i);
+                            char *temp = stripped_value;
+                            stripped_value = ft_strcat(stripped_value, env_value1);
+                            free(temp);
+                            free(env_value1);
+                        }
+                    }
+                    free(var_name);
+                    
+                    if (value[i] != '$')
+                    {
+                        arg_space = ft_split(stripped_value, ' ');
+                        int s = 0;
+                        while (arg_space[s])
+                            s++;
+                        if (s > 1)
+                        {
+                            s = 0;
+                            while (arg_space[s])
+                            {
+                                t_token *new_token = create_token(type, arg_space[s]);
+                                if (*head == NULL)
+                                    *head = new_token;
+                                else
+                                {
+                                    t_token *current = *head;
+                                    while (current->next != NULL)
+                                        current = current->next;
+                                    current->next = new_token;
+                                }
+                                s++;
+                            }
+                            ft_free2(&arg_space);
+                            free(stripped_value);
+                            return;
+                        }
+                        ft_free2(&arg_space);
+                    }
+                }
+                else
+                {
+                    char *var_name = calloc(ft_strlen(value), sizeof(char));
+                    while (value[i] && value[i] != '$')
+                        var_name[k++] = value[i++];
+                    var_name[k] = '\0';
+                    k = 0;
+                    if (var_name)
+                    {
+                        char *temp = stripped_value;
+                        stripped_value = ft_strcat(stripped_value, var_name);
+                        free(temp);
+                    }
+                    free(var_name);
+                }
+            }
+        }
+        else if (strchr(value, '$') != 0)
+        {
+            char *name = calloc(ft_strlen(value), sizeof(char));
+            while (value[i] && value[i] != '$')
+                name[k++] = value[i++];
+            name[k] = '\0';
+            k = 0;
+            char *temp = stripped_value;
+            stripped_value = ft_strcat(stripped_value, name);
+            free(temp);
+            free(name);
+            
+            while (value[i] != '\0')
+            {
+                if (value[i] == '$')
+                {
+                    i++;
+                    dprintf(2, "APA\n");
+                    char *var_name = calloc(ft_strlen(value), sizeof(char));
+                    while (value[i] && (isalnum(value[i]) || value[i] == '_'))
+                        var_name[k++] = value[i++];
+                    var_name[k] = '\0';
+                    k = 0;
+                    
+                    char *env_value = getenv(var_name);
 					if (env_value)
                     {
-						char *env_value1;
-                        env_value1 = ft_strcat(env_value, value + i);
-						stripped_value = ft_strcat(stripped_value, env_value1);
-						free(env_value1);
+                        if (value[i] == '$')
+                        {
+                            char *temp = stripped_value;
+                            stripped_value = ft_strcat(stripped_value, env_value);
+                            free(temp);
+                        }
+                        else
+                        {
+                            char *env_value1 = ft_strcat(env_value, value + i);
+                            char *temp = stripped_value;
+                            stripped_value = ft_strcat(stripped_value, env_value1);
+                            free(temp);
+                            free(env_value1);
+                        }
                     }
-					free(var_name);
-                    // dprintf(2,"APAAAAA\n");
-					arg_space = ft_split(stripped_value ,' ');
-                    // dprintf(2,"-%s-\n", stripped_value);
-					int s = 0;
-					while (arg_space[s])
-						s++;
-					if (s > 1)
-					{
-						free(stripped_value);
-                        stripped_value = NULL;
-						t_token *new_token = NULL;
-						s = 0;
-						while (arg_space[s])
-						{
-                            // dprintf(2,"*%s*\n", arg_space[s]);
-							new_token = create_token(type, arg_space[s]);
-							if (*head == NULL) 
-								*head = new_token;
-							else 
-							{
-								t_token *current = *head;
-								while (current->next != NULL) 
-									current = current->next;
-								current->next = new_token;
-							}
-							s++;
-						}
-						ft_free2(&arg_space);
-                        free(arg_space);
-						return ;
-					}
-                    ft_free2(&arg_space);
-				}
-				else
-				{
-					char *var_name = calloc(ft_strlen(value) , sizeof(char *));
-					while (value[i] && value[i] != '$')
-						var_name[k++] = value[i++];
-					var_name[k] = '\0';
-					k = 0;
-					if (var_name)
-						strcat(stripped_value, var_name);
-					free(var_name);
-				}
-			}
-		}
-		else if (strchr(value, '$') != 0)
-		{
-			char *name = calloc(ft_strlen(value) , sizeof(char *));
-			while (value[i] && value[i] != '$')
-				name[k++] = value[i++];
-			name[k] = '\0';
-			k = 0;
-			strcat(stripped_value, name);
-			free(name);
-			while (value[i] != '\0')
-			{
-				if (value[i] == '$')
-				{
-					i++;
-                    dprintf(2,"APA\n");
-					char *var_name = calloc(ft_strlen(value) , sizeof(char *));
-					while (value[i] && (isalnum(value[i]) || value[i] == '_'))
-						var_name[k++] = value[i++];
-					var_name[k] = '\0';
-					k = 0;
-					char *env_value = getenv(var_name);
-					if (env_value)
-						strcat(stripped_value,env_value);
-					free(var_name);
-					arg_space = ft_split(stripped_value ,' ');
-					int s = 0;
-					while (arg_space[s])
-						s++;
-					if (s > 1)
-					{
-						free(stripped_value);
-						t_token *new_token = NULL;
-						s = 0;
-						while (arg_space[s])
-						{
-							new_token = create_token(type, arg_space[s]);
-							if (*head == NULL) 
-								*head = new_token;
-							else 
-							{
-								t_token *current = *head;
-								while (current->next != NULL) 
-									current = current->next;
-								current->next = new_token;
-							}
-							s++;
-						}
-						ft_free2(&arg_space);
-                        free(arg_space);
-						return ;
-					}
-                    ft_free2(&arg_space);
-				}
-				else
-				{
-					char *var_name = calloc(ft_strlen(value) , sizeof(char *));
-					while (value[i] && value[i] != '$')
-						var_name[k++] = value[i++];
-					var_name[k] = '\0';
-					k = 0;
-					if (var_name)
-						strcat(stripped_value, var_name);
-					free(var_name);
-				}
-			}
-			
-		}
-		else 
-        	strcpy(stripped_value,value);
+                    free(var_name);
+                    
+                    if (value[i] != '$')
+                    {
+                        arg_space = ft_split(stripped_value, ' ');
+                        int s = 0;
+                        while (arg_space[s])
+                            s++;
+                        if (s > 1)
+                        {
+                            s = 0;
+                            while (arg_space[s])
+                            {
+                                t_token *new_token = create_token(type, arg_space[s]);
+                                if (*head == NULL)
+                                    *head = new_token;
+                                else
+                                {
+                                    t_token *current = *head;
+                                    while (current->next != NULL)
+                                        current = current->next;
+                                    current->next = new_token;
+                                }
+                                s++;
+                            }
+                            ft_free2(&arg_space);
+                            free(stripped_value);
+                            return;
+                        }
+                        ft_free2(&arg_space);
+                    }
+                }
+                else
+                {
+                    char *var_name = calloc(ft_strlen(value), sizeof(char));
+                    while (value[i] && value[i] != '$')
+                        var_name[k++] = value[i++];
+                    var_name[k] = '\0';
+                    k = 0;
+                    if (var_name)
+                    {
+                        char *temp = stripped_value;
+                        stripped_value = ft_strcat(stripped_value, var_name);
+                        free(temp);
+                    }
+                    free(var_name);
+                }
+            }
+        }
+        else
+            strcpy(stripped_value, value);
     }
-	else 
-        strcpy(stripped_value,value);
+    else
+        strcpy(stripped_value, value);
 
     t_token *new_token = create_token(type, stripped_value);
-	free(stripped_value);
+    free(stripped_value);
 
-    if (*head == NULL) 
+    if (*head == NULL)
         *head = new_token;
-    else 
+    else
     {
         t_token *current = *head;
-        while (current->next != NULL) 
+        while (current->next != NULL)
             current = current->next;
-        
         current->next = new_token;
     }
 }
@@ -725,17 +759,6 @@ void print_tokens(t_token *head)
     }
     printf("\n");
 }
-// char *env_var(char *input)
-// {
-// 	int i = 0;
-// 	int k = 0;
-// 	char *var = calloc(ft_strlen(input),sizeof(char *));
-// 	while (input[i] && input[i] == '$' && input[i + 1] == '$')
-// 		var[k++] = input[i++];
-// 	var[k] = '\0';
-// 	printf("%s" , var);
-// 	return(var);
-// }
 
 int main() {
     char *input;
