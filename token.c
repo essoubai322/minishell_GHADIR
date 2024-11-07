@@ -106,7 +106,6 @@ void add_token(t_token **head, enum TokenType type, char *value)
             {
                 if (value[i] == '$')
                 {
-                    dprintf(2, "=%s=\n", value);
                     char *var_name = calloc(ft_strlen(value) + 1, sizeof(char));
                     i++;
                     while (value[i] && (isalnum(value[i]) || value[i] == '_'))
@@ -117,10 +116,9 @@ void add_token(t_token **head, enum TokenType type, char *value)
                     char *env_value = NULL;
                     if (var_name)
                         env_value = getenv(var_name);
-                    dprintf(2, "env == %s\n", env_value);
-                    if (env_value)
+					if (env_value)
                     {
-                        if (value[i] == '$')
+                        if (value[i] == '$' || ft_strchr(value + i, '$'))
                         {
                             char *temp = stripped_value;
                             stripped_value = ft_strcat(stripped_value, env_value);
@@ -128,12 +126,13 @@ void add_token(t_token **head, enum TokenType type, char *value)
                         }
                         else
                         {
-                            dprintf(2,"value + i = %s\n", value + i);
-                            if (ft_strchr(value + i, '\"') == 0)
+                            if (ft_strchr(env_value, ' '))
                             {
+                                char *env_value1 = ft_strcat(env_value, value + i);
                                 char *temp = stripped_value;
-                                stripped_value = ft_strcat(stripped_value, env_value);
+                                stripped_value = ft_strcat(stripped_value, env_value1);
                                 free(temp);
+                                free(env_value1);
                             }
                             else
                             {
@@ -145,7 +144,7 @@ void add_token(t_token **head, enum TokenType type, char *value)
                     }
                     free(var_name);
                     
-                    if (value[i] != '$')
+                    if (value[i] != '$' && ft_strchr(value + i, '$') == 0)
                     {
                         arg_space = ft_split(stripped_value, ' ');
                         int s = 0;
@@ -209,7 +208,6 @@ void add_token(t_token **head, enum TokenType type, char *value)
                 if (value[i] == '$')
                 {
                     i++;
-                    dprintf(2, "APA\n");
                     char *var_name = calloc(ft_strlen(value), sizeof(char));
                     while (value[i] && (isalnum(value[i]) || value[i] == '_'))
                         var_name[k++] = value[i++];
@@ -219,7 +217,7 @@ void add_token(t_token **head, enum TokenType type, char *value)
                     char *env_value = getenv(var_name);
 					if (env_value)
                     {
-                        if (value[i] == '$')
+                        if (value[i] == '$' || ft_strchr(value + i, '$'))
                         {
                             char *temp = stripped_value;
                             stripped_value = ft_strcat(stripped_value, env_value);
@@ -227,12 +225,13 @@ void add_token(t_token **head, enum TokenType type, char *value)
                         }
                         else
                         {
-                            dprintf(2,"value + i = %s\n", value + i);
-                            if (ft_strchr(value + i, '\"') == 0)
+                            if (ft_strchr(env_value, ' '))
                             {
+                                char *env_value1 = ft_strcat(env_value, value + i);
                                 char *temp = stripped_value;
-                                stripped_value = ft_strcat(stripped_value, env_value);
+                                stripped_value = ft_strcat(stripped_value, env_value1);
                                 free(temp);
+                                free(env_value1);
                             }
                             else
                             {
@@ -244,7 +243,7 @@ void add_token(t_token **head, enum TokenType type, char *value)
                     }
                     free(var_name);
                     
-                    if (value[i] != '$')
+                    if (value[i] != '$' && ft_strchr(value + i, '$') == 0)
                     {
                         arg_space = ft_split(stripped_value, ' ');
                         int s = 0;
@@ -443,7 +442,6 @@ char *string_command(const char *input, int *i)
                 if (input[*i])
                     (*i)++;
             }
-            dprintf(2, "=%s=\n", result);
         }
         else
         {
@@ -479,7 +477,6 @@ char *string_command(const char *input, int *i)
                 else
                     result[k++] = input[(*i)++];
             }
-            dprintf(2, "=%s=\n", result);
         }
     }
     result[k] = '\0';
@@ -557,7 +554,6 @@ t_lexer tokenize(char *input)
             str_cmd = string_command(input, &i);
             apa = strdup(str_cmd);
             free(str_cmd);
-            dprintf(2, "apa = %s\n", apa);
             add_token_v2(&head, WORD, apa);
             free(apa);
         }
