@@ -103,7 +103,6 @@ void    add_token_env_value(char *env_value, char **stripped_value, char *value,
         {
             char *temp = *stripped_value;
             *stripped_value = ft_strcat(*stripped_value, env_value);
-            // strcat(*stripped_value, value + (*i));
             free(temp);
         }
     }
@@ -249,9 +248,6 @@ void add_token(t_token **head, enum TokenType type, char *value)
     add_token_innit_head(head, stripped_value, type);
     free(stripped_value);
 }
-
-//////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////
 
 void    add_token_v2(t_token **head, enum TokenType type, const char *value)
 {
@@ -475,9 +471,6 @@ char *after_heredoc(char *input, int *i)
     result[k] = '\0';
     return (result);
 }
-
-//////////////////////////////////////////
-//////////////////////////////////////////
 
 void inialize_global(void)
 {
@@ -707,8 +700,6 @@ t_lexer tokenize(char *input)
 	free(global.current_token);
     return (result);
 }
-//////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////
 
 void free_tokens(t_token *head) 
 {
