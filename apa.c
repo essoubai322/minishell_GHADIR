@@ -57,6 +57,8 @@ char *ft_strcat(char *dest, char *src)
 	return (result);
 }
 
+// main
+
 void ft_free2(char ***dest)
 {
     if (!dest || !*dest)
@@ -83,6 +85,18 @@ t_token *create_token(enum TokenType type, const char *value)
     new_token->next = NULL;
     return (new_token);
 }
+
+int ft_strchr(const char *s, int c)
+{
+    while (*s)
+    {
+        if (*s == c)
+            return (1);
+        s++;
+    }
+    return (0);
+}
+
 
 static size_t	ft_strlcpy(char *dest, const char *src, size_t size)
 {
@@ -265,11 +279,20 @@ void add_token(t_token **head, enum TokenType type, char *value)
                         }
                         else
                         {
-                            char *env_value1 = ft_strcat(env_value, value + i);
-                            char *temp = stripped_value;
-                            stripped_value = ft_strcat(stripped_value, env_value1);
-                            free(temp);
-                            free(env_value1);
+                            if (ft_strchr(value + i, '\"') == 0)
+                            {
+                                char *env_value1 = ft_strcat(env_value, value + i);
+                                char *temp = stripped_value;
+                                stripped_value = ft_strcat(stripped_value, env_value1);
+                                free(temp);
+                                free(env_value1);
+                            }
+                            else
+                            {
+                                char *temp = stripped_value;
+                                stripped_value = ft_strcat(stripped_value, env_value);
+                                free(temp);
+                            }
                         }
                     }
                     free(var_name);
@@ -356,11 +379,20 @@ void add_token(t_token **head, enum TokenType type, char *value)
                         }
                         else
                         {
-                            char *env_value1 = ft_strcat(env_value, value + i);
-                            char *temp = stripped_value;
-                            stripped_value = ft_strcat(stripped_value, env_value1);
-                            free(temp);
-                            free(env_value1);
+                            if (ft_strchr(value + i, '\"') == 0)
+                            {
+                                char *env_value1 = ft_strcat(env_value, value + i);
+                                char *temp = stripped_value;
+                                stripped_value = ft_strcat(stripped_value, env_value1);
+                                free(temp);
+                                free(env_value1);
+                            }
+                            else
+                            {
+                                char *temp = stripped_value;
+                                stripped_value = ft_strcat(stripped_value, env_value);
+                                free(temp);
+                            }
                         }
                     }
                     free(var_name);
@@ -432,24 +464,132 @@ void add_token(t_token **head, enum TokenType type, char *value)
     }
 }
 
+char *string_command(const char *input, int *i)
+{
+    char *result = calloc(10000000, sizeof(char));
+    int k = 0;
+    int c = 0;
+    
+    while (isspace(input[*i]))
+        (*i)++;
+    
+    while (input[*i] && !isspace(input[*i]) && input[*i] != '|' && input[*i] != '>' && input[*i] != '<')
+    {
+        if (input[*i] == '\'' || input[*i] == '"')
+        {
+            char quote = input[*i];
+            (*i)++;
+            
+            if (quote == '\'')
+            {
+                while (input[*i] && input[*i] != quote)
+                    result[k++] = input[(*i)++];
+                if (input[*i])
+                    (*i)++;
+            }
+            else if (quote == '"')
+            {
+                while (input[*i] && input[*i] != quote)
+                {
+                    if (input[*i] && input[*i] == '$')
+                    {
+                        (*i)++;
+                        char *var_name = calloc(strlen(input) + 1 , sizeof(char));
+                        while (input[*i] && (isalnum(input[*i]) || input[*i] == '_'))
+                            var_name[c++] = input[(*i)++];
+                        var_name[c] = '\0';
+                        c = 0;
+
+                        char *env_value = getenv(var_name);  
+                        if (env_value)
+                        {
+                            char **expanded_tokens = ft_split(env_value, ' ');
+                            int s = 0;
+                            while (expanded_tokens[s])
+                            {
+                                strcat(result, expanded_tokens[s]);
+                                if (expanded_tokens[s + 1])
+                                    strcat(result, " ");
+                                s++;
+                            }
+                            ft_free2(&expanded_tokens);
+                        }
+                        free(var_name);
+                        k = strlen(result);
+                    }
+                    else
+                        result[k++] = input[(*i)++];
+                }
+                if (input[*i])
+                    (*i)++;
+            }
+            dprintf(2, "=%s=\n", result);
+        }
+        else
+        {
+            while(input[*i] && !isspace(input[*i]) && input[*i] != '\'' && input[*i] != '"' && input[*i] != '|' && input[*i] != '>' && input[*i] != '<')
+            {
+                if (input[*i] && input[*i] == '$')
+                {
+                    (*i)++;
+                    char *var_name = calloc(strlen(input) + 1 , sizeof(char));
+                    while (input[*i] && (isalnum(input[*i]) || input[*i] == '_'))
+                        var_name[c++] = input[(*i)++];
+                    var_name[c] = '\0';
+                    c = 0;
+
+                    char *env_value = getenv(var_name); 
+                    if (env_value)
+                    {
+                        char **expanded_tokens = ft_split(env_value, ' ');
+                        int s = 0;
+
+                        while (expanded_tokens[s])
+                        {
+                            strcat(result, expanded_tokens[s]);
+                            if (expanded_tokens[s + 1])
+                                strcat(result, " "); 
+                            s++;
+                        }
+                        ft_free2(&expanded_tokens);
+                    }
+                    free(var_name);
+                    k = strlen(result);
+                }
+                else
+                    result[k++] = input[(*i)++];
+            }
+            dprintf(2, "=%s=\n", result);
+        }
+    }
+    result[k] = '\0';
+    return (result);
+}
+
 int main()
 {
-    char *input = strdup("$aa$aa.a");
-    t_token *result = NULL;
-	add_token(&result, WORD, input); 
-	t_token *current = result;
-	while (current != NULL) {
-		printf("Token: %s\n", current->value);
-		current = current->next;
-	}
-	current = result;
-	t_token *next;
-	while (current != NULL) {
-		next = current->next;
-		free(current->value);
-		free(current);
-		current = next;
-	}
+    int i = 0; 
+    char *input = strdup("\"$USER$HOME.apa\"");
+    // t_token *result = NULL;
+	// add_token(&result, WORD, input); 
+	// t_token *current = result;
+	// while (current != NULL) {
+	// 	printf("Token: %s\n", current->value);
+	// 	current = current->next;
+	// }
+	// current = result;
+	// t_token *next;
+	// while (current != NULL) {
+	// 	next = current->next;
+	// 	free(current->value);
+	// 	free(current);
+	// 	current = next;
+	// }
+    // free(input);
+    char *result = string_command(input, &i);
+    printf("Result: %s\n", result);
+    free(result);
     free(input);
     return (0);
 }
+

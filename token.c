@@ -39,6 +39,17 @@ int	ft_strlen(char *str)
 		i++;
 	return(i);
 }
+
+int ft_strchr(const char *s, int c)
+{
+    while (*s)
+    {
+        if (*s == c)
+            return (1);
+        s++;
+    }
+    return (0);
+}
 void ft_free2(char ***dest)
 {
     if (!dest || !*dest)
@@ -67,6 +78,7 @@ t_token *create_token(enum TokenType type, const char *value)
     new_token->next = NULL;
     return (new_token);
 }
+
 
 void add_token(t_token **head, enum TokenType type, char *value)
 {
@@ -116,11 +128,19 @@ void add_token(t_token **head, enum TokenType type, char *value)
                         }
                         else
                         {
-                            char *env_value1 = ft_strcat(env_value, value + i);
-                            char *temp = stripped_value;
-                            stripped_value = ft_strcat(stripped_value, env_value1);
-                            free(temp);
-                            free(env_value1);
+                            dprintf(2,"value + i = %s\n", value + i);
+                            if (ft_strchr(value + i, '\"') == 0)
+                            {
+                                char *temp = stripped_value;
+                                stripped_value = ft_strcat(stripped_value, env_value);
+                                free(temp);
+                            }
+                            else
+                            {
+                                char *temp = stripped_value;
+                                stripped_value = ft_strcat(stripped_value, env_value);
+                                free(temp);
+                            }
                         }
                     }
                     free(var_name);
@@ -207,11 +227,19 @@ void add_token(t_token **head, enum TokenType type, char *value)
                         }
                         else
                         {
-                            char *env_value1 = ft_strcat(env_value, value + i);
-                            char *temp = stripped_value;
-                            stripped_value = ft_strcat(stripped_value, env_value1);
-                            free(temp);
-                            free(env_value1);
+                            dprintf(2,"value + i = %s\n", value + i);
+                            if (ft_strchr(value + i, '\"') == 0)
+                            {
+                                char *temp = stripped_value;
+                                stripped_value = ft_strcat(stripped_value, env_value);
+                                free(temp);
+                            }
+                            else
+                            {
+                                char *temp = stripped_value;
+                                stripped_value = ft_strcat(stripped_value, env_value);
+                                free(temp);
+                            }
                         }
                     }
                     free(var_name);
@@ -404,10 +432,6 @@ char *string_command(const char *input, int *i)
                                     strcat(result, " ");
                                 s++;
                             }
-                            if (input[*i] && !isspace(input[*i]))
-                            {
-                                strcat(result, input + (*i));
-                            }
                             ft_free2(&expanded_tokens);
                         }
                         free(var_name);
@@ -419,6 +443,7 @@ char *string_command(const char *input, int *i)
                 if (input[*i])
                     (*i)++;
             }
+            dprintf(2, "=%s=\n", result);
         }
         else
         {
@@ -446,8 +471,6 @@ char *string_command(const char *input, int *i)
                                 strcat(result, " "); 
                             s++;
                         }
-                        if (input[*i] && !isspace(input[*i]))
-                            strcat(result, input + (*i)); 
                         ft_free2(&expanded_tokens);
                     }
                     free(var_name);
@@ -456,6 +479,7 @@ char *string_command(const char *input, int *i)
                 else
                     result[k++] = input[(*i)++];
             }
+            dprintf(2, "=%s=\n", result);
         }
     }
     result[k] = '\0';
@@ -533,6 +557,7 @@ t_lexer tokenize(char *input)
             str_cmd = string_command(input, &i);
             apa = strdup(str_cmd);
             free(str_cmd);
+            dprintf(2, "apa = %s\n", apa);
             add_token_v2(&head, WORD, apa);
             free(apa);
         }
