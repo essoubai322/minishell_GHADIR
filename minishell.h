@@ -20,6 +20,18 @@
 #include <readline/readline.h>
 #include <readline/history.h>
 
+typedef struct global 
+{
+    int i;
+    char *current_token;
+    int current_token_length;
+    int in_quote;
+    int in_dquote;
+    char *error_message;
+    char *apa;
+    char *str_cmd;
+    int k;
+} g_global;
 
 enum TokenType {
     WORD,
@@ -44,6 +56,8 @@ typedef struct LexerResult {
     t_token *tokens;
     char *error_message;
 } t_lexer;
+
+g_global global;
 
 int	ft_strlen(char *str);
 t_token *create_token(enum TokenType type, const char *value);

@@ -42,6 +42,8 @@ int	ft_strlen(char *str)
 
 int ft_strchr(const char *s, int c)
 {
+    if (!s)
+        return (0);
     while (*s)
     {
         if (*s == c)
@@ -79,12 +81,108 @@ t_token *create_token(enum TokenType type, const char *value)
     return (new_token);
 }
 
+void    add_token_env_value(char *env_value, char **stripped_value, char *value, int *i)
+{
+    if (value[*i] == '$' || ft_strchr(value + *i, '$'))
+    {
+        char *temp = *stripped_value;
+        *stripped_value = ft_strcat(*stripped_value, env_value);
+        free(temp);
+    }
+    else
+    {
+        if (ft_strchr(env_value, ' '))
+        {
+            char *env_value1 = ft_strcat(env_value, value + *i);
+            char *temp = *stripped_value;
+            *stripped_value = ft_strcat(*stripped_value, env_value1);
+            free(temp);
+            free(env_value1);
+        }
+        else
+        {
+            char *temp = *stripped_value;
+            *stripped_value = ft_strcat(*stripped_value, env_value);
+            // strcat(*stripped_value, value + (*i));
+            free(temp);
+        }
+    }
+}
 
-void add_token(t_token **head, enum TokenType type, char *value)
+void add_token_innit_head(t_token **head, char *stripped_value, enum TokenType type)
+{
+    t_token *new_token;
+
+    new_token = create_token(type, stripped_value);
+    if (*head == NULL)
+        *head = new_token;
+    else
+    {
+        t_token *current = *head;
+        while (current->next != NULL)
+            current = current->next;
+        current->next = new_token;
+    }
+}
+
+int add_token_check(t_token **head, char *stripped_value,enum TokenType type)
+{
+    char    **arg_space;
+
+    arg_space = ft_split(stripped_value, ' ');
+    int s = 0;
+    while (arg_space[s])
+        s++;
+    if (s > 1)
+    {
+        s = 0;
+        while (arg_space[s])
+        {
+            add_token_innit_head(head, arg_space[s], type);
+            s++;
+        }
+        ft_free2(&arg_space);
+        free(stripped_value);
+        return (1);
+    }
+    return (0);
+}
+char    *ft_get_value(int *i, char *value)
+{
+    char *env_value = NULL;
+    char *var_name = calloc(ft_strlen(value) + 1, sizeof(char));
+    (*i)++;
+    int k = 0;
+    while (value[*i] && (isalnum(value[*i]) || value[*i] == '_'))
+        var_name[k++] = value[(*i)++];
+    var_name[k] = '\0';
+    if (var_name)
+        env_value = getenv(var_name);
+    free(var_name);
+    return (env_value);
+}
+void    add_token_else(char *value, int *i, char **stripped_value, int *k)
+{
+    char *var_name = calloc(ft_strlen(value), sizeof(char));
+    while (value[*i] && value[*i] != '$')
+    {
+        var_name[*k] = value[(*i)++];
+        (*k)++;
+    }
+    *k = 0;
+
+    if (var_name)
+    {
+        char *temp = *stripped_value;
+        *stripped_value = ft_strcat(*stripped_value, var_name);
+        free(temp);
+    }
+    free(var_name);
+}
+
+char    *get_stripped_value(enum TokenType type, char *value)
 {
     char *stripped_value = calloc(1200500, sizeof(char));
-    char **arg_space = NULL;
-    
     if (type == QUOTE || type == DQUOTE)
     {
         int len = ft_strlen(value);
@@ -97,218 +195,63 @@ void add_token(t_token **head, enum TokenType type, char *value)
             strcpy(stripped_value, "");
     }
     else if (type == WORD)
+        return (stripped_value);
+    else
+        strcpy(stripped_value, value);
+    return (stripped_value);
+}
+
+void    add_token_v0(char *value, int *i, char **stripped_value, int *k)
+{
+    if (value[0] != '$')
+    {
+        char *name = calloc(ft_strlen(value), sizeof(char));
+        while (value[*i] && value[*i] != '$')
+            name[(*k)++] = value[(*i)++];
+        name[*k] = '\0';
+        *k = 0;
+        char *temp = *stripped_value;
+        *stripped_value = ft_strcat(*stripped_value, name);
+        free(temp);
+        free(name);
+    }
+}
+
+void add_token(t_token **head, enum TokenType type, char *value)
+{
+    char *stripped_value;
+    
+    stripped_value = get_stripped_value(type, value);
+    if (type == WORD)
     {
         int i = 0;
         int k = 0;
-        if (value && value[0] == '$')
+        if (value && strchr(value, '$') != 0)
         {
+            add_token_v0(value, &i, &stripped_value, &k);
             while (value[i] != '\0')
             {
                 if (value[i] == '$')
                 {
-                    char *var_name = calloc(ft_strlen(value) + 1, sizeof(char));
-                    i++;
-                    while (value[i] && (isalnum(value[i]) || value[i] == '_'))
-                        var_name[k++] = value[i++];
-                    var_name[k] = '\0';
-                    k = 0;
-
-                    char *env_value = NULL;
-                    if (var_name)
-                        env_value = getenv(var_name);
-					if (env_value)
-                    {
-                        if (value[i] == '$' || ft_strchr(value + i, '$'))
-                        {
-                            char *temp = stripped_value;
-                            stripped_value = ft_strcat(stripped_value, env_value);
-                            free(temp);
-                        }
-                        else
-                        {
-                            if (ft_strchr(env_value, ' '))
-                            {
-                                char *env_value1 = ft_strcat(env_value, value + i);
-                                char *temp = stripped_value;
-                                stripped_value = ft_strcat(stripped_value, env_value1);
-                                free(temp);
-                                free(env_value1);
-                            }
-                            else
-                            {
-                                char *temp = stripped_value;
-                                stripped_value = ft_strcat(stripped_value, env_value);
-                                free(temp);
-                            }
-                        }
-                    }
-                    free(var_name);
-                    
+                    char *env_value = ft_get_value(&i, value);
+                    add_token_env_value(env_value, &stripped_value, value, &i);
                     if (value[i] != '$' && ft_strchr(value + i, '$') == 0)
-                    {
-                        arg_space = ft_split(stripped_value, ' ');
-                        int s = 0;
-                        while (arg_space[s])
-                            s++;
-                        if (s > 1)
-                        {
-                            s = 0;
-                            while (arg_space[s])
-                            {
-                                t_token *new_token = create_token(type, arg_space[s]);
-                                if (*head == NULL)
-                                    *head = new_token;
-                                else
-                                {
-                                    t_token *current = *head;
-                                    while (current->next != NULL)
-                                        current = current->next;
-                                    current->next = new_token;
-                                }
-                                s++;
-                            }
-                            ft_free2(&arg_space);
-                            free(stripped_value);
-                            return;
-                        }
-                        ft_free2(&arg_space);
-                    }
+                        if (add_token_check(head, stripped_value, type))
+                            return ;
                 }
                 else
-                {
-                    char *var_name = calloc(ft_strlen(value), sizeof(char));
-                    while (value[i] && value[i] != '$')
-                        var_name[k++] = value[i++];
-                    var_name[k] = '\0';
-                    k = 0;
-                    if (var_name)
-                    {
-                        char *temp = stripped_value;
-                        stripped_value = ft_strcat(stripped_value, var_name);
-                        free(temp);
-                    }
-                    free(var_name);
-                }
+                    add_token_else(value, &i, &stripped_value, &k);
             }
         }
-        else if (strchr(value, '$') != 0)
-        {
-            char *name = calloc(ft_strlen(value), sizeof(char));
-            while (value[i] && value[i] != '$')
-                name[k++] = value[i++];
-            name[k] = '\0';
-            k = 0;
-            char *temp = stripped_value;
-            stripped_value = ft_strcat(stripped_value, name);
-            free(temp);
-            free(name);
-            
-            while (value[i] != '\0')
-            {
-                if (value[i] == '$')
-                {
-                    i++;
-                    char *var_name = calloc(ft_strlen(value), sizeof(char));
-                    while (value[i] && (isalnum(value[i]) || value[i] == '_'))
-                        var_name[k++] = value[i++];
-                    var_name[k] = '\0';
-                    k = 0;
-                    
-                    char *env_value = getenv(var_name);
-					if (env_value)
-                    {
-                        if (value[i] == '$' || ft_strchr(value + i, '$'))
-                        {
-                            char *temp = stripped_value;
-                            stripped_value = ft_strcat(stripped_value, env_value);
-                            free(temp);
-                        }
-                        else
-                        {
-                            if (ft_strchr(env_value, ' '))
-                            {
-                                char *env_value1 = ft_strcat(env_value, value + i);
-                                char *temp = stripped_value;
-                                stripped_value = ft_strcat(stripped_value, env_value1);
-                                free(temp);
-                                free(env_value1);
-                            }
-                            else
-                            {
-                                char *temp = stripped_value;
-                                stripped_value = ft_strcat(stripped_value, env_value);
-                                free(temp);
-                            }
-                        }
-                    }
-                    free(var_name);
-                    
-                    if (value[i] != '$' && ft_strchr(value + i, '$') == 0)
-                    {
-                        arg_space = ft_split(stripped_value, ' ');
-                        int s = 0;
-                        while (arg_space[s])
-                            s++;
-                        if (s > 1)
-                        {
-                            s = 0;
-                            while (arg_space[s])
-                            {
-                                t_token *new_token = create_token(type, arg_space[s]);
-                                if (*head == NULL)
-                                    *head = new_token;
-                                else
-                                {
-                                    t_token *current = *head;
-                                    while (current->next != NULL)
-                                        current = current->next;
-                                    current->next = new_token;
-                                }
-                                s++;
-                            }
-                            ft_free2(&arg_space);
-                            free(stripped_value);
-                            return;
-                        }
-                        ft_free2(&arg_space);
-                    }
-                }
-                else
-                {
-                    char *var_name = calloc(ft_strlen(value), sizeof(char));
-                    while (value[i] && value[i] != '$')
-                        var_name[k++] = value[i++];
-                    var_name[k] = '\0';
-                    k = 0;
-                    if (var_name)
-                    {
-                        char *temp = stripped_value;
-                        stripped_value = ft_strcat(stripped_value, var_name);
-                        free(temp);
-                    }
-                    free(var_name);
-                }
-            }
-        }
-        else
-            strcpy(stripped_value, value);
     }
     else
         strcpy(stripped_value, value);
-
-    t_token *new_token = create_token(type, stripped_value);
+    add_token_innit_head(head, stripped_value, type);
     free(stripped_value);
-
-    if (*head == NULL)
-        *head = new_token;
-    else
-    {
-        t_token *current = *head;
-        while (current->next != NULL)
-            current = current->next;
-        current->next = new_token;
-    }
 }
+
+//////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////
 
 void    add_token_v2(t_token **head, enum TokenType type, const char *value)
 {
@@ -533,167 +476,176 @@ char *after_heredoc(char *input, int *i)
     return (result);
 }
 
+//////////////////////////////////////////
+//////////////////////////////////////////
+
+void inialize_global(void)
+{
+    global.i = 0;
+    global.current_token = NULL;
+    global.current_token_length = 0;
+    global.in_quote = 0;
+    global.in_dquote = 0;
+    global.error_message = NULL;
+    global.apa = NULL;
+    global.str_cmd = NULL;
+    global.k = 0;
+}
+
 t_lexer tokenize(char *input)
 {
     t_token *head = NULL;
-    int i = 0;
-    char *current_token;
-    int current_token_length = 0;
-    int in_quote = 0;
-    int in_dquote = 0;
-    char *error_message = NULL;
-    char *apa = NULL;
-    char *str_cmd = NULL;
+    inialize_global();
 
-	current_token = calloc(ft_strlen(input) + 1,sizeof(current_token));
+	global.current_token = calloc(ft_strlen(input) + 1,sizeof(global.current_token));
 
-    while (input[i] != '\0')
+    while (input[global.i] != '\0')
     {
-        if (check_case(input, i) && !current_token_length)
+        if (check_case(input, global.i) && !global.current_token_length)
         {
-            str_cmd = string_command(input, &i);
-            apa = strdup(str_cmd);
-            free(str_cmd);
-            add_token_v2(&head, WORD, apa);
-            free(apa);
+            global.str_cmd = string_command(input, &global.i);
+            global.apa = strdup(global.str_cmd);
+            free(global.str_cmd);
+            add_token_v2(&head, WORD, global.apa);
+            free(global.apa);
         }
-        else if (!in_quote && !in_dquote)
+        else if (!global.in_quote && !global.in_dquote)
         {
-            if (input[i] == '|' || input[i] == '<' || input[i] == '>' || 
-                input[i] == '\'' || input[i] == '"' || isspace(input[i])
-				|| (i > 0 && (input[i - 1] == '\'' || input[i - 1] == '"') &&  input[i]))
+            if (input[global.i] == '|' || input[global.i] == '<' || input[global.i] == '>' || 
+                input[global.i] == '\'' || input[global.i] == '"' || isspace(input[global.i])
+				|| (global.i > 0 && (input[global.i - 1] == '\'' || input[global.i - 1] == '"') &&  input[global.i]))
             {
-                if (current_token_length > 0) 
+                if (global.current_token_length > 0) 
                 {
-					if (input[i - 1] == '"')
-                    	add_token(&head, DQUOTE, current_token);
-					else if (input[i - 1] == '\'')
-            			add_token(&head, QUOTE, current_token);
+					if (input[global.i - 1] == '"')
+                    	add_token(&head, DQUOTE, global.current_token);
+					else if (input[global.i - 1] == '\'')
+            			add_token(&head, QUOTE, global.current_token);
 					else
-                    	add_token(&head, WORD, current_token);
-                    current_token_length = 0;
-                    memset(current_token, 0, ft_strlen(input));
+                    	add_token(&head, WORD, global.current_token);
+                    global.current_token_length = 0;
+                    memset(global.current_token, 0, ft_strlen(input));
                 }
-                if (input[i] == '|')
+                if (input[global.i] == '|')
                 {
                     add_token(&head, PIPE, "|");
-                    i++;
+                    global.i++;
                 }
-                else if (input[i] == '<')
+                else if (input[global.i] == '<')
                 {
-                    if (input[i + 1] == '<') 
+                    if (input[global.i + 1] == '<') 
                     {
                         add_token(&head, HEREDOC, "<<");
-                        i += 2;
-                        apa = after_heredoc(input, &i);
-                        if (apa)
-                            add_token_v2(&head, WORD, apa);
-                        free(apa);
+                        global.i += 2;
+                        global.apa = after_heredoc(input, &global.i);
+                        if (global.apa)
+                            add_token_v2(&head, WORD, global.apa);
+                        free(global.apa);
                     } 
                     else 
                     {
                         add_token(&head, REDIRECT_IN, "<");
-                        i++;
+                        global.i++;
                     }
                 }
-                else if (input[i] == '>')
+                else if (input[global.i] == '>')
                 {
-                    if (input[i + 1] == '>') 
+                    if (input[global.i + 1] == '>') 
                     {
                         add_token(&head, REDIRECT_APPEND, ">>");
-                        i += 2;
+                        global.i += 2;
                     } 
                     else 
                     {
                         add_token(&head, REDIRECT_OUT, ">");
-                        i++;
+                        global.i++;
                     }
                 }
-                else if (input[i] == '\'')
+                else if (input[global.i] == '\'')
                 {
-                    in_quote = 1;
-                    current_token[current_token_length++] = input[i];
-                    i++;
+                    global.in_quote = 1;
+                    global.current_token[global.current_token_length++] = input[global.i];
+                    global.i++;
                 }
-                else if (input[i] == '"')
+                else if (input[global.i] == '"')
                 {
-                    in_dquote = 1;
-                    current_token[current_token_length++] = input[i];
-                    i++;
+                    global.in_dquote = 1;
+                    global.current_token[global.current_token_length++] = input[global.i];
+                    global.i++;
                 }
-                else if (isspace(input[i]))
-                    i++;
-				else if ((input[i - 1] == '\'' || input[i - 1] == '"') &&  input[i])
+                else if (isspace(input[global.i]))
+                    global.i++;
+				else if ((input[global.i - 1] == '\'' || input[global.i - 1] == '"') &&  input[global.i])
 				{
-					current_token[current_token_length++] = input[i];
-					i++;
+					global.current_token[global.current_token_length++] = input[global.i];
+					global.i++;
 				}
             }
             else
             {
-                current_token[current_token_length++] = input[i];
-                i++;
+                global.current_token[global.current_token_length++] = input[global.i];
+                global.i++;
             }
         }
-        else if (in_quote == 1 && input[i] == '\'') 
+        else if (global.in_quote == 1 && input[global.i] == '\'') 
         {
-            in_quote = 0;
-            current_token[current_token_length++] = input[i];
-            i++;
+            global.in_quote = 0;
+            global.current_token[global.current_token_length++] = input[global.i];
+            global.i++;
         }
-        else if (in_dquote == 1 && input[i] == '"') 
+        else if (global.in_dquote == 1 && input[global.i] == '"') 
         {
-            in_dquote = 0;
-            current_token[current_token_length++] = input[i];
-            i++;
+            global.in_dquote = 0;
+            global.current_token[global.current_token_length++] = input[global.i];
+            global.i++;
         }
         else
         {
-			if (input[i] == '$' && in_dquote == 1)
+			if (input[global.i] == '$' && global.in_dquote == 1)
 			{
 				char *var_name = calloc(ft_strlen(input) , sizeof(char *));
 				int k = 0;
 
-				i++;
-				while (isalnum(input[i]) || input[i] == '_')
-					var_name[k++] = input[i++];
+				global.i++;
+				while (isalnum(input[global.i]) || input[global.i] == '_')
+					var_name[k++] = input[global.i++];
 				var_name[k] = '\0';
 				
 				char *env_value = getenv(var_name);
 				if (env_value)
 				{
-					strcat(current_token, env_value);
-					current_token_length += ft_strlen(env_value);
+					strcat(global.current_token, env_value);
+					global.current_token_length += ft_strlen(env_value);
 				}
-				else if (input[i - 1] == '\'')
+				else if (input[global.i - 1] == '\'')
 				{
-					current_token[current_token_length++] = '$';
-					strcat(current_token, var_name);
-					current_token_length += ft_strlen(var_name);
+					global.current_token[global.current_token_length++] = '$';
+					strcat(global.current_token, var_name);
+					global.current_token_length += ft_strlen(var_name);
 				}
 				free(var_name);
 			}
 			else
 			{
-            	current_token[current_token_length++] = input[i];
-            	i++;
+            	global.current_token[global.current_token_length++] = input[global.i];
+            	global.i++;
 			}
         }
     }
-    if (current_token_length > 0) 
+    if (global.current_token_length > 0) 
     {
-		if (input[i - 1] == '"')
-            add_token(&head, DQUOTE, current_token);
-		else if (input[i - 1] == '\'')
-            add_token(&head, DQUOTE, current_token);
+		if (input[global.i - 1] == '"')
+            add_token(&head, DQUOTE, global.current_token);
+		else if (input[global.i - 1] == '\'')
+            add_token(&head, DQUOTE, global.current_token);
 		else
-			add_token(&head, WORD, current_token);
+			add_token(&head, WORD, global.current_token);
     }
 
     // Check for unclosed quotes
-    if (in_quote || in_dquote) 
+    if (global.in_quote || global.in_dquote) 
     {
-        error_message = strdup("bash: unclosed quote detected");
+        global.error_message = strdup("bash: unclosed quote detected");
     }
 
     // Check for mismatched redirections
@@ -704,7 +656,7 @@ t_lexer tokenize(char *input)
              current->type == REDIRECT_APPEND || current->type == HEREDOC) && 
             ((current->next->type != WORD) && (current->next->type != DQUOTE) && (current->next->type = QUOTE)))
         {
-            error_message = strdup("bash: syntax error near unexpected token");
+            global.error_message = strdup("bash: syntax error near unexpected token");
             break;
         }
         current = current->next;
@@ -719,7 +671,7 @@ t_lexer tokenize(char *input)
         {
             if (current->next == NULL || ((current->next->type != WORD) && (current->next->type != DQUOTE) && (current->next->type = QUOTE)))
             {
-                error_message = strdup("bash: syntax error near unexpected token `newline'");
+                global.error_message = strdup("bash: syntax error near unexpected token `newline'");
                 break;
             }
         }
@@ -736,12 +688,12 @@ t_lexer tokenize(char *input)
             pipe_count++;
             if (pipe_count > 0 && current->next != NULL && current->next->type == PIPE) 
             {
-                error_message = strdup("bash: syntax error near unexpected token `|'");
+                global.error_message = strdup("bash: syntax error near unexpected token `|'");
                 break;
             }
             if (current == head || current->next == NULL) 
             {
-                error_message = strdup("bash: syntax error near unexpected token `|'");
+                global.error_message = strdup("bash: syntax error near unexpected token `|'");
                 break;
             }
         } 
@@ -751,10 +703,12 @@ t_lexer tokenize(char *input)
         current = current->next;
     }
     add_token(&head, END, "");
-    t_lexer result = {head, error_message};
-	free(current_token);
+    t_lexer result = {head, global.error_message};
+	free(global.current_token);
     return (result);
 }
+//////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////
 
 void free_tokens(t_token *head) 
 {
