@@ -12,6 +12,23 @@
 
 #include "minishell.h"
 
+g_global global;
+
+void inialize_global(void)
+{
+    global.i = 0;
+    global.current_token = NULL;
+    global.current_token_length = 0;
+    global.in_quote = 0;
+    global.in_dquote = 0;
+    global.error_message = NULL;
+    global.apa = NULL;
+    global.str_cmd = NULL;
+    global.k = 0;
+    global.stripped_value = NULL;
+    global.env_value = NULL;
+}
+
 char *ft_strcat(char *dest, char *src)
 {
 	int i = 0;
@@ -179,9 +196,12 @@ void    add_token_else(char *value, int *i, char **stripped_value, int *k)
     free(var_name);
 }
 
-char    *get_stripped_value(enum TokenType type, char *value)
+char    *get_stripped_value(enum TokenType type, char *value, char *stripped_value)
 {
-    char *stripped_value = calloc(1200500, sizeof(char));
+    global.o = 0;
+    global.k = 0;
+    stripped_value = calloc(1200500, sizeof(char));
+    
     if (type == QUOTE || type == DQUOTE)
     {
         int len = ft_strlen(value);
@@ -217,36 +237,32 @@ void    add_token_v0(char *value, int *i, char **stripped_value, int *k)
 }
 
 void add_token(t_token **head, enum TokenType type, char *value)
-{
-    char *stripped_value;
-    
-    stripped_value = get_stripped_value(type, value);
+{   
+    global.stripped_value = get_stripped_value(type, value, global.stripped_value);
     if (type == WORD)
     {
-        int i = 0;
-        int k = 0;
         if (value && strchr(value, '$') != 0)
         {
-            add_token_v0(value, &i, &stripped_value, &k);
-            while (value[i] != '\0')
+            add_token_v0(value, &global.o, &global.stripped_value, &global.k);
+            while (value[global.o] != '\0')
             {
-                if (value[i] == '$')
+                if (value[global.o] == '$')
                 {
-                    char *env_value = ft_get_value(&i, value);
-                    add_token_env_value(env_value, &stripped_value, value, &i);
-                    if (value[i] != '$' && ft_strchr(value + i, '$') == 0)
-                        if (add_token_check(head, stripped_value, type))
+                    global.env_value = ft_get_value(&global.o, value);
+                    add_token_env_value(global.env_value, &global.stripped_value, value, &global.o);
+                    if (value[global.o] != '$' && ft_strchr(value + global.o, '$') == 0)
+                        if (add_token_check(head, global.stripped_value, type))
                             return ;
                 }
                 else
-                    add_token_else(value, &i, &stripped_value, &k);
+                    add_token_else(value, &global.o, &global.stripped_value, &global.k);
             }
         }
+        else
+            strcpy(global.stripped_value, value);
     }
-    else
-        strcpy(stripped_value, value);
-    add_token_innit_head(head, stripped_value, type);
-    free(stripped_value);
+    add_token_innit_head(head, global.stripped_value, type);
+    free(global.stripped_value);
 }
 
 void    add_token_v2(t_token **head, enum TokenType type, const char *value)
@@ -472,18 +488,6 @@ char *after_heredoc(char *input, int *i)
     return (result);
 }
 
-void inialize_global(void)
-{
-    global.i = 0;
-    global.current_token = NULL;
-    global.current_token_length = 0;
-    global.in_quote = 0;
-    global.in_dquote = 0;
-    global.error_message = NULL;
-    global.apa = NULL;
-    global.str_cmd = NULL;
-    global.k = 0;
-}
 
 t_lexer tokenize(char *input)
 {

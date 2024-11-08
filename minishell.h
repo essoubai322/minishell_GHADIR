@@ -10,8 +10,8 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef MINISHELL_H
-#define MINISHELL_H
+#ifndef MINISHELL_GLOBAL_H
+#define MINISHELL_GLOBAL_H
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -19,6 +19,7 @@
 #include <ctype.h>
 #include <readline/readline.h>
 #include <readline/history.h>
+
 
 typedef struct global 
 {
@@ -31,6 +32,9 @@ typedef struct global
     char *apa;
     char *str_cmd;
     int k;
+    char *stripped_value;
+    int o;
+    char *env_value;
 } g_global;
 
 enum TokenType {
@@ -57,7 +61,6 @@ typedef struct LexerResult {
     char *error_message;
 } t_lexer;
 
-g_global global;
 
 int	ft_strlen(char *str);
 t_token *create_token(enum TokenType type, const char *value);
