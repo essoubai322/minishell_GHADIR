@@ -294,35 +294,40 @@ int counter_closes(char *input)
     return (count);
 }
 
-int check_case(char *input, int i)
+char *check_case_v1(char **input, int *i, int *k, char *result)
 {
-    char *result = calloc(strlen(input) + 1, sizeof(char));
-    int k = 0;
-    
-    while (isspace(input[i]))
-        (i)++;
-    while (input[i] && !isspace(input[i]))
+    result = calloc(strlen(*input) + 1, sizeof(char));
+
+    while (isspace((*input)[*i]))
+        (*i)++;
+    while ((*input)[*i] && !isspace((*input)[*i]))
     {
-        if (input[i] == '\'' || input[i] == '"')
+        if ((*input)[*i] == '\'' || (*input)[*i] == '"')
         {
-            char quote = input[i];
-            result[k++] = '`';
-            i++;
-            while (input[i] && input[i] != quote)
-                result[k++] = input[(i)++];
-            if (input[i])
-                result[k++] = '`';
+            char quote = (*input)[*i];
+            result[(*k)++] = '`';
+            (*i)++;
+            while ((*input)[*i] && (*input)[*i] != quote)
+                result[(*k)++] = (*input)[(*i)++];
+            if ((*input)[*i])
+                result[(*k)++] = '`';
             else
-                return (free(result),0);
-            i++;
+                return (free(result),NULL);
+            (*i)++;
         }
         else
-        {
-            while(input[i] && !isspace(input[i]) && input[i] != '\'' && input[i] != '"')
-                result[k++] = input[(i)++];
-        }
+            while((*input)[*i] && !isspace((*input)[*i]) && (*input)[*i] != '\'' && (*input)[*i] != '"')
+                result[(*k)++] = (*input)[(*i)++];
     }
-    result[k] = '\0';
+    return (result);
+}
+
+int check_case(char *input, int i)
+{
+    char *result = NULL;
+    int k = 0;
+    
+    result = check_case_v1(&input, &i, &k, result);
     if (strchr(result,'`'))
     {
         if (counter_closes(result) == 2)
@@ -337,155 +342,145 @@ int check_case(char *input, int i)
     return(0);
 }
 
+int expand_variable(const char *input, int *i, char *result, int *k)
+{
+    int c = 0;
+    (*i)++;
+    char *var_name = calloc(strlen(input) + 1, sizeof(char));
+    while (input[*i] && (isalnum(input[*i]) || input[*i] == '_'))
+        var_name[c++] = input[(*i)++];
+    var_name[c] = '\0';
+    char *env_value = getenv(var_name);
+    if (env_value)
+    {
+        char **expanded_tokens = ft_split(env_value, ' ');
+        int s = 0;
+        while (expanded_tokens[s])
+        {
+            strcat(result, expanded_tokens[s]);
+            if (expanded_tokens[s + 1])
+                strcat(result, " ");
+            s++;
+        }
+        ft_free2(&expanded_tokens);
+    }
+    free(var_name);
+    *k = strlen(result);
+    return c;
+}
+
+void parse_quoted(const char *input, int *i, char *result, int *k, char quote)
+{
+    (*i)++;
+    while (input[*i] && input[*i] != quote)
+    {
+        if (quote == '"' && input[*i] == '$')
+            expand_variable(input, i, result, k);
+        else
+            result[(*k)++] = input[(*i)++];
+    }
+    if (input[*i]) (*i)++;
+}
+
+void parse_unquoted(const char *input, int *i, char *result, int *k)
+{
+    while (input[*i] && !isspace(input[*i]) && input[*i] != '\'' && input[*i] != '"' &&
+           input[*i] != '|' && input[*i] != '>' && input[*i] != '<')
+    {
+        if (input[*i] == '$')
+            expand_variable(input, i, result, k);
+        else
+            result[(*k)++] = input[(*i)++];
+    }
+}
 
 char *string_command(const char *input, int *i)
 {
     char *result = calloc(10000000, sizeof(char));
     int k = 0;
-    int c = 0;
-    
     while (isspace(input[*i]))
         (*i)++;
     
     while (input[*i] && !isspace(input[*i]) && input[*i] != '|' && input[*i] != '>' && input[*i] != '<')
     {
         if (input[*i] == '\'' || input[*i] == '"')
-        {
-            char quote = input[*i];
-            (*i)++;
-            
-            if (quote == '\'')
-            {
-                while (input[*i] && input[*i] != quote)
-                    result[k++] = input[(*i)++];
-                if (input[*i])
-                    (*i)++;
-            }
-            else if (quote == '"')
-            {
-                while (input[*i] && input[*i] != quote)
-                {
-                    if (input[*i] && input[*i] == '$')
-                    {
-                        (*i)++;
-                        char *var_name = calloc(strlen(input) + 1 , sizeof(char));
-                        while (input[*i] && (isalnum(input[*i]) || input[*i] == '_'))
-                            var_name[c++] = input[(*i)++];
-                        var_name[c] = '\0';
-                        c = 0;
-
-                        char *env_value = getenv(var_name);  
-                        if (env_value)
-                        {
-                            char **expanded_tokens = ft_split(env_value, ' ');
-                            int s = 0;
-                            while (expanded_tokens[s])
-                            {
-                                strcat(result, expanded_tokens[s]);
-                                if (expanded_tokens[s + 1])
-                                    strcat(result, " ");
-                                s++;
-                            }
-                            ft_free2(&expanded_tokens);
-                        }
-                        free(var_name);
-                        k = strlen(result);
-                    }
-                    else
-                        result[k++] = input[(*i)++];
-                }
-                if (input[*i])
-                    (*i)++;
-            }
-        }
+            parse_quoted(input, i, result, &k, input[*i]);
         else
-        {
-            while(input[*i] && !isspace(input[*i]) && input[*i] != '\'' && input[*i] != '"' && input[*i] != '|' && input[*i] != '>' && input[*i] != '<')
-            {
-                if (input[*i] && input[*i] == '$')
-                {
-                    (*i)++;
-                    char *var_name = calloc(strlen(input) + 1 , sizeof(char));
-                    while (input[*i] && (isalnum(input[*i]) || input[*i] == '_'))
-                        var_name[c++] = input[(*i)++];
-                    var_name[c] = '\0';
-                    c = 0;
-
-                    char *env_value = getenv(var_name); 
-                    if (env_value)
-                    {
-                        char **expanded_tokens = ft_split(env_value, ' ');
-                        int s = 0;
-
-                        while (expanded_tokens[s])
-                        {
-                            strcat(result, expanded_tokens[s]);
-                            if (expanded_tokens[s + 1])
-                                strcat(result, " "); 
-                            s++;
-                        }
-                        ft_free2(&expanded_tokens);
-                    }
-                    free(var_name);
-                    k = strlen(result);
-                }
-                else
-                    result[k++] = input[(*i)++];
-            }
-        }
+            parse_unquoted(input, i, result, &k);
     }
     result[k] = '\0';
-    return (result);
+    return result;
 }
 
+#include <stdlib.h>
+#include <ctype.h>
+#include <string.h>
 
-char *after_heredoc(char *input, int *i)
+// Helper function to skip whitespace
+void skip_whitespace(const char *input, int *i)
 {
-    char *result = calloc(100000,1);
-    int k = 0;
-    int flag = 0;
-    int after = *i;
-    
     while (isspace(input[*i]))
         (*i)++;
-    
+}
+
+// Helper function to parse a single-quoted string
+int parse_single_quote(const char *input, int *i, char *result, int *k)
+{
+    (*i)++;
+    while (input[*i] && input[*i] != '\'')
+        result[(*k)++] = input[(*i)++];
+    if (input[*i])
+        (*i)++;
+    return 1;
+}
+
+// Helper function to parse a double-quoted string
+int parse_double_quote(const char *input, int *i, char *result, int *k)
+{
+    (*i)++;
+    while (input[*i] && input[*i] != '"')
+        result[(*k)++] = input[(*i)++];
+    if (input[*i])
+        (*i)++;
+    return 1;
+}
+
+// Helper function to parse unquoted text
+void parse_unquoted_heredoc(const char *input, int *i, char *result, int *k)
+{
+    while (input[*i] && !isspace(input[*i]) && input[*i] != '\'' &&
+           input[*i] != '"' && input[*i] != '|' && input[*i] != '>' && input[*i] != '<')
+    {
+        result[(*k)++] = input[(*i)++];
+    }
+}
+
+// Main function that handles the overall parsing after heredoc
+char *after_heredoc(char *input, int *i)
+{
+    char *result = calloc(100000, 1);
+    int k = 0, flag = 0;
+    int after = *i;
+
+    skip_whitespace(input, i);
     while (input[*i] && !isspace(input[*i]) && input[*i] != '|' && input[*i] != '>' && input[*i] != '<')
     {
-        if (input[*i] == '\'' || input[*i] == '"')
-        {
-            flag = 1;
-            char quote = input[*i];
-            (*i)++;
-            
-            if (quote == '\'')
-            {
-                while (input[*i] && input[*i] != quote)
-                    result[k++] = input[(*i)++];
-                if (input[*i])
-                    (*i)++;
-            }
-            else if (quote == '"')
-            {
-                while (input[*i] && input[*i] != quote)
-                        result[k++] = input[(*i)++];
-                if (input[*i])
-                    (*i)++;
-            }
-        }
+        if (input[*i] == '\'')
+            flag = parse_single_quote(input, i, result, &k);
+        else if (input[*i] == '"')
+            flag = parse_double_quote(input, i, result, &k);
         else
-        {
-            while(input[*i] && !isspace(input[*i]) && input[*i] != '\'' && input[*i] != '"' && input[*i] != '|' && input[*i] != '>' && input[*i] != '<')
-                    result[k++] = input[(*i)++];
-        }
+            parse_unquoted_heredoc(input, i, result, &k);
     }
-    if (!flag && ft_strlen(result) == 0)
+    
+    if (!flag && strlen(result) == 0)
     {
         *i = after;
         free(result);
-        return (NULL);
+        return NULL;
     }
     result[k] = '\0';
-    return (result);
+    return result;
 }
 
 
@@ -730,7 +725,8 @@ void print_tokens(t_token *head)
     printf("\n");
 }
 
-int main() {
+int main() 
+{
     char *input;
 
     while (1) 
@@ -758,3 +754,4 @@ int main() {
     rl_clear_history();
     return (0);
 }
+
