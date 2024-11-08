@@ -66,6 +66,4 @@ The key here is to bridge the gap between the parsed input and the actual execut
    - Implement robust error handling and reporting mechanisms to provide meaningful feedback to the user.
    - Use the `perror()` and `strerror()` functions to handle and report system-level errors.
 
-Remember, the key to successfully implementing the Command Execution step is to seamlessly integrate the parsed input with the appropriate system calls and internal logic to execute the user's commands. Take it step by step, and refer to the provided external function list and the Bash shell behavior as a reference.
 
-Let me know if you have any questions or need further assistance as you work through this part of the Minishell project.
