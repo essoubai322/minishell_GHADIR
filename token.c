@@ -328,7 +328,7 @@ int check_case(char *input, int i)
     int k = 0;
     
     result = check_case_v1(&input, &i, &k, result);
-    if (strchr(result,'`'))
+    if (ft_strchr(result,'`'))
     {
         if (counter_closes(result) == 2)
         {
@@ -412,18 +412,12 @@ char *string_command(const char *input, int *i)
     return result;
 }
 
-#include <stdlib.h>
-#include <ctype.h>
-#include <string.h>
-
-// Helper function to skip whitespace
 void skip_whitespace(const char *input, int *i)
 {
     while (isspace(input[*i]))
         (*i)++;
 }
 
-// Helper function to parse a single-quoted string
 int parse_single_quote(const char *input, int *i, char *result, int *k)
 {
     (*i)++;
@@ -434,7 +428,6 @@ int parse_single_quote(const char *input, int *i, char *result, int *k)
     return 1;
 }
 
-// Helper function to parse a double-quoted string
 int parse_double_quote(const char *input, int *i, char *result, int *k)
 {
     (*i)++;
@@ -445,7 +438,6 @@ int parse_double_quote(const char *input, int *i, char *result, int *k)
     return 1;
 }
 
-// Helper function to parse unquoted text
 void parse_unquoted_heredoc(const char *input, int *i, char *result, int *k)
 {
     while (input[*i] && !isspace(input[*i]) && input[*i] != '\'' &&
@@ -455,7 +447,6 @@ void parse_unquoted_heredoc(const char *input, int *i, char *result, int *k)
     }
 }
 
-// Main function that handles the overall parsing after heredoc
 char *after_heredoc(char *input, int *i)
 {
     char *result = calloc(100000, 1);
@@ -699,6 +690,8 @@ t_lexer tokenize(char *input)
 	free(global.current_token);
     return (result);
 }
+
+
 
 void free_tokens(t_token *head) 
 {
