@@ -93,7 +93,6 @@ t_token *create_token(enum TokenType type, const char *value)
         return NULL;	
 	new_token->type = type;
     new_token->value = strdup(value);
-	new_token->out = NULL;
     new_token->next = NULL;
     return (new_token);
 }
@@ -161,6 +160,7 @@ int add_token_check(t_token **head, char *stripped_value,enum TokenType type)
         free(stripped_value);
         return (1);
     }
+    ft_free2(&arg_space);
     return (0);
 }
 char    *ft_get_value(int *i, char *value)
@@ -474,6 +474,210 @@ char *after_heredoc(char *input, int *i)
     return result;
 }
 
+void while_loop(char *input, t_token **head)
+{
+    if (check_case(input, global.i) && !global.current_token_length)
+    {
+        global.str_cmd = string_command(input, &global.i);
+        global.apa = strdup(global.str_cmd);
+        free(global.str_cmd);
+        if (ft_strchr(global.apa, ' '))
+        {
+            char **arg_space = ft_split(global.apa, ' ');
+            int s = 0;
+            while (arg_space[s])
+            {
+                add_token_v2(head, WORD, arg_space[s]);
+                s++;
+            }
+            ft_free2(&arg_space);
+            free(global.apa);
+            return ;
+        }
+        add_token_v2(head, WORD, global.apa);
+        free(global.apa);
+    }
+    else if (!global.in_quote && !global.in_dquote)
+    {
+        if (input[global.i] == '|' || input[global.i] == '<' || input[global.i] == '>' || 
+            input[global.i] == '\'' || input[global.i] == '"' || isspace(input[global.i])
+            || (global.i > 0 && (input[global.i - 1] == '\'' || input[global.i - 1] == '"') &&  input[global.i]))
+        {
+            if (global.current_token_length > 0) 
+            {
+                if (input[global.i - 1] == '"')
+                    add_token(head, DQUOTE, global.current_token);
+                else if (input[global.i - 1] == '\'')
+                    add_token(head, QUOTE, global.current_token);
+                else
+                    add_token(head, WORD, global.current_token);
+                global.current_token_length = 0;
+                memset(global.current_token, 0, ft_strlen(input));
+            }
+            if (input[global.i] == '|')
+            {
+                add_token(head, PIPE, "|");
+                global.i++;
+            }
+            else if (input[global.i] == '<')
+            {
+                if (input[global.i + 1] == '<') 
+                {
+                    add_token(head, HEREDOC, "<<");
+                    global.i += 2;
+                    global.apa = after_heredoc(input, &global.i);
+                    if (global.apa)
+                        add_token_v2(head, WORD, global.apa);
+                    free(global.apa);
+                } 
+                else 
+                {
+                    add_token(head, REDIRECT_IN, "<");
+                    global.i++;
+                }
+            }
+            else if (input[global.i] == '>')
+            {
+                if (input[global.i + 1] == '>') 
+                {
+                    add_token(head, REDIRECT_APPEND, ">>");
+                    global.i += 2;
+                } 
+                else 
+                {
+                    add_token(head, REDIRECT_OUT, ">");
+                    global.i++;
+                }
+            }
+            else if (input[global.i] == '\'')
+            {
+                global.in_quote = 1;
+                global.current_token[global.current_token_length++] = input[global.i];
+                global.i++;
+            }
+            else if (input[global.i] == '"')
+            {
+                global.in_dquote = 1;
+                global.current_token[global.current_token_length++] = input[global.i];
+                global.i++;
+            }
+            else if (isspace(input[global.i]))
+                global.i++;
+            else if ((input[global.i - 1] == '\'' || input[global.i - 1] == '"') &&  input[global.i])
+            {
+                global.current_token[global.current_token_length++] = input[global.i];
+                global.i++;
+            }
+        }
+        else
+        {
+            global.current_token[global.current_token_length++] = input[global.i];
+            global.i++;
+        }
+    }
+    else if (global.in_quote == 1 && input[global.i] == '\'') 
+    {
+        global.in_quote = 0;
+        global.current_token[global.current_token_length++] = input[global.i];
+        global.i++;
+    }
+    else if (global.in_dquote == 1 && input[global.i] == '"') 
+    {
+        global.in_dquote = 0;
+        global.current_token[global.current_token_length++] = input[global.i];
+        global.i++;
+    }
+    else
+    {
+        if (input[global.i] == '$' && global.in_dquote == 1)
+        {
+            char *var_name = calloc(ft_strlen(input) , sizeof(char *));
+            int k = 0;
+
+            global.i++;
+            while (isalnum(input[global.i]) || input[global.i] == '_')
+                var_name[k++] = input[global.i++];
+            var_name[k] = '\0';
+            
+            char *env_value = getenv(var_name);
+            if (env_value)
+            {
+                strcat(global.current_token, env_value);
+                global.current_token_length += ft_strlen(env_value);
+            }
+            else if (input[global.i - 1] == '\'')
+            {
+                global.current_token[global.current_token_length++] = '$';
+                strcat(global.current_token, var_name);
+                global.current_token_length += ft_strlen(var_name);
+            }
+            free(var_name);
+        }
+        else
+        {
+            global.current_token[global.current_token_length++] = input[global.i];
+            global.i++;
+        }
+    }
+}
+
+char *check_syntax_errors(t_token *head, char *error_message)
+{
+    t_token *current;
+    int pipe_count;
+
+    pipe_count = 0;
+    current = head;
+    if (global.in_quote || global.in_dquote) 
+        error_message = strdup("bash: unclosed quote detected");
+    while (current != NULL && current->next != NULL) 
+    {
+        if ((current->type == REDIRECT_IN || current->type == REDIRECT_OUT || 
+             current->type == REDIRECT_APPEND || current->type == HEREDOC) && 
+            ((current->next->type != WORD) && (current->next->type != DQUOTE) && (current->next->type = QUOTE)))
+        {
+            error_message = strdup("bash: syntax error near unexpected token");
+            break;
+        }
+        current = current->next;
+    }   
+    current = head;
+    while (current != NULL)
+    {
+        if (current->type == REDIRECT_APPEND || current->type == REDIRECT_IN || current->type == REDIRECT_OUT || current->type == HEREDOC)
+        {
+            if (current->next == NULL || ((current->next->type != WORD) && (current->next->type != DQUOTE) && (current->next->type = QUOTE)))
+            {
+                error_message = strdup("bash: syntax error near unexpected token `newline'");
+                break;
+            }
+        }
+        current = current->next;
+    }
+    current = head;
+    while (current != NULL) 
+    {
+        if (current->type == PIPE) 
+        {
+            pipe_count++;
+            if (pipe_count > 0 && current->next != NULL && current->next->type == PIPE) 
+            {
+                error_message = strdup("bash: syntax error near unexpected token `|'");
+                break;
+            }
+            if (current == head || current->next == NULL) 
+            {
+                error_message = strdup("bash: syntax error near unexpected token `|'");
+                break;
+            }
+        } 
+        else 
+            pipe_count = 0;
+
+        current = current->next;
+    }
+    return error_message;
+}
 
 t_lexer tokenize(char *input)
 {
@@ -481,140 +685,9 @@ t_lexer tokenize(char *input)
     inialize_global();
 
 	global.current_token = calloc(ft_strlen(input) + 1,sizeof(global.current_token));
-
+    
     while (input[global.i] != '\0')
-    {
-        if (check_case(input, global.i) && !global.current_token_length)
-        {
-            global.str_cmd = string_command(input, &global.i);
-            global.apa = strdup(global.str_cmd);
-            free(global.str_cmd);
-            add_token_v2(&head, WORD, global.apa);
-            free(global.apa);
-        }
-        else if (!global.in_quote && !global.in_dquote)
-        {
-            if (input[global.i] == '|' || input[global.i] == '<' || input[global.i] == '>' || 
-                input[global.i] == '\'' || input[global.i] == '"' || isspace(input[global.i])
-				|| (global.i > 0 && (input[global.i - 1] == '\'' || input[global.i - 1] == '"') &&  input[global.i]))
-            {
-                if (global.current_token_length > 0) 
-                {
-					if (input[global.i - 1] == '"')
-                    	add_token(&head, DQUOTE, global.current_token);
-					else if (input[global.i - 1] == '\'')
-            			add_token(&head, QUOTE, global.current_token);
-					else
-                    	add_token(&head, WORD, global.current_token);
-                    global.current_token_length = 0;
-                    memset(global.current_token, 0, ft_strlen(input));
-                }
-                if (input[global.i] == '|')
-                {
-                    add_token(&head, PIPE, "|");
-                    global.i++;
-                }
-                else if (input[global.i] == '<')
-                {
-                    if (input[global.i + 1] == '<') 
-                    {
-                        add_token(&head, HEREDOC, "<<");
-                        global.i += 2;
-                        global.apa = after_heredoc(input, &global.i);
-                        if (global.apa)
-                            add_token_v2(&head, WORD, global.apa);
-                        free(global.apa);
-                    } 
-                    else 
-                    {
-                        add_token(&head, REDIRECT_IN, "<");
-                        global.i++;
-                    }
-                }
-                else if (input[global.i] == '>')
-                {
-                    if (input[global.i + 1] == '>') 
-                    {
-                        add_token(&head, REDIRECT_APPEND, ">>");
-                        global.i += 2;
-                    } 
-                    else 
-                    {
-                        add_token(&head, REDIRECT_OUT, ">");
-                        global.i++;
-                    }
-                }
-                else if (input[global.i] == '\'')
-                {
-                    global.in_quote = 1;
-                    global.current_token[global.current_token_length++] = input[global.i];
-                    global.i++;
-                }
-                else if (input[global.i] == '"')
-                {
-                    global.in_dquote = 1;
-                    global.current_token[global.current_token_length++] = input[global.i];
-                    global.i++;
-                }
-                else if (isspace(input[global.i]))
-                    global.i++;
-				else if ((input[global.i - 1] == '\'' || input[global.i - 1] == '"') &&  input[global.i])
-				{
-					global.current_token[global.current_token_length++] = input[global.i];
-					global.i++;
-				}
-            }
-            else
-            {
-                global.current_token[global.current_token_length++] = input[global.i];
-                global.i++;
-            }
-        }
-        else if (global.in_quote == 1 && input[global.i] == '\'') 
-        {
-            global.in_quote = 0;
-            global.current_token[global.current_token_length++] = input[global.i];
-            global.i++;
-        }
-        else if (global.in_dquote == 1 && input[global.i] == '"') 
-        {
-            global.in_dquote = 0;
-            global.current_token[global.current_token_length++] = input[global.i];
-            global.i++;
-        }
-        else
-        {
-			if (input[global.i] == '$' && global.in_dquote == 1)
-			{
-				char *var_name = calloc(ft_strlen(input) , sizeof(char *));
-				int k = 0;
-
-				global.i++;
-				while (isalnum(input[global.i]) || input[global.i] == '_')
-					var_name[k++] = input[global.i++];
-				var_name[k] = '\0';
-				
-				char *env_value = getenv(var_name);
-				if (env_value)
-				{
-					strcat(global.current_token, env_value);
-					global.current_token_length += ft_strlen(env_value);
-				}
-				else if (input[global.i - 1] == '\'')
-				{
-					global.current_token[global.current_token_length++] = '$';
-					strcat(global.current_token, var_name);
-					global.current_token_length += ft_strlen(var_name);
-				}
-				free(var_name);
-			}
-			else
-			{
-            	global.current_token[global.current_token_length++] = input[global.i];
-            	global.i++;
-			}
-        }
-    }
+        while_loop(input, &head);
     if (global.current_token_length > 0) 
     {
 		if (input[global.i - 1] == '"')
@@ -624,67 +697,7 @@ t_lexer tokenize(char *input)
 		else
 			add_token(&head, WORD, global.current_token);
     }
-
-    // Check for unclosed quotes
-    if (global.in_quote || global.in_dquote) 
-    {
-        global.error_message = strdup("bash: unclosed quote detected");
-    }
-
-    // Check for mismatched redirections
-    t_token *current = head;
-    while (current != NULL && current->next != NULL) 
-    {
-        if ((current->type == REDIRECT_IN || current->type == REDIRECT_OUT || 
-             current->type == REDIRECT_APPEND || current->type == HEREDOC) && 
-            ((current->next->type != WORD) && (current->next->type != DQUOTE) && (current->next->type = QUOTE)))
-        {
-            global.error_message = strdup("bash: syntax error near unexpected token");
-            break;
-        }
-        current = current->next;
-    }
-   
-    // Check for syntax redirection errors
-    current = head;
-    
-    while (current != NULL)
-    {
-        if (current->type == REDIRECT_APPEND || current->type == REDIRECT_IN || current->type == REDIRECT_OUT || current->type == HEREDOC)
-        {
-            if (current->next == NULL || ((current->next->type != WORD) && (current->next->type != DQUOTE) && (current->next->type = QUOTE)))
-            {
-                global.error_message = strdup("bash: syntax error near unexpected token `newline'");
-                break;
-            }
-        }
-        current = current->next;
-    }
-
-    // Check for pipe errors
-    current = head;
-    int pipe_count = 0;
-    while (current != NULL) 
-    {
-        if (current->type == PIPE) 
-        {
-            pipe_count++;
-            if (pipe_count > 0 && current->next != NULL && current->next->type == PIPE) 
-            {
-                global.error_message = strdup("bash: syntax error near unexpected token `|'");
-                break;
-            }
-            if (current == head || current->next == NULL) 
-            {
-                global.error_message = strdup("bash: syntax error near unexpected token `|'");
-                break;
-            }
-        } 
-        else 
-            pipe_count = 0;
-
-        current = current->next;
-    }
+    global.error_message = check_syntax_errors(head, global.error_message);
     add_token(&head, END, "");
     t_lexer result = {head, global.error_message};
 	free(global.current_token);

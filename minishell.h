@@ -52,7 +52,6 @@ enum TokenType {
 typedef struct Token {
     enum TokenType type;
     char *value;
-	char *out;
     struct Token *next;
 } t_token;
 
@@ -60,6 +59,18 @@ typedef struct LexerResult {
     t_token *tokens;
     char *error_message;
 } t_lexer;
+
+typedef struct s_redict{
+    char *file;
+    int redict_type;
+    struct s_redict *next;
+} t_redict;
+
+typedef struct s_mini {
+    char **cmd;
+    t_redict redi;
+    struct s_mini *next;
+} t_mini;
 
 
 int	ft_strlen(char *str);
