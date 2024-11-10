@@ -37,17 +37,28 @@ typedef struct global
     char *env_value;
 } g_global;
 
+typedef enum e_type
+{
+	PIPE = 1,
+	RED,
+	CMD,
+	HEREDOC,
+	FILE_N
+}					t_type;
+
+
 enum TokenType {
     WORD,
-    PIPE,
+    PIPE1,
     REDIRECT_IN,
     REDIRECT_OUT,
     REDIRECT_APPEND,
-    HEREDOC,
+    HEREDOC1,
     QUOTE,
     DQUOTE,
     END
 };
+
 
 typedef struct Token {
     enum TokenType type;
@@ -60,17 +71,25 @@ typedef struct LexerResult {
     char *error_message;
 } t_lexer;
 
-typedef struct s_redict{
-    char *file;
-    int redict_type;
-    struct s_redict *next;
-} t_redict;
+typedef struct s_token
+{
+	char			**args;
+	t_type			type;
+	int				arg_size;
+	struct s_token	*next;
+}					t_token2;
 
-typedef struct s_mini {
-    char **cmd;
-    t_redict redi;
-    struct s_mini *next;
-} t_mini;
+// typedef struct s_redict{
+//     char *file;
+//     int redict_type;
+//     struct s_redict *next;
+// } t_redict;
+
+// typedef struct s_mini {
+//     char **cmd;
+//     t_redict redi;
+//     struct s_mini *next;
+// } t_mini;
 
 
 int	ft_strlen(char *str);

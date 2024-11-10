@@ -438,7 +438,7 @@ int parse_double_quote(const char *input, int *i, char *result, int *k)
     return 1;
 }
 
-void parse_unquoted_heredoc(const char *input, int *i, char *result, int *k)
+void parse_unquoted_heredoc1(const char *input, int *i, char *result, int *k)
 {
     while (input[*i] && !isspace(input[*i]) && input[*i] != '\'' &&
            input[*i] != '"' && input[*i] != '|' && input[*i] != '>' && input[*i] != '<')
@@ -447,7 +447,7 @@ void parse_unquoted_heredoc(const char *input, int *i, char *result, int *k)
     }
 }
 
-char *after_heredoc(char *input, int *i)
+char *after_heredoc1(char *input, int *i)
 {
     char *result = calloc(100000, 1);
     int k = 0, flag = 0;
@@ -461,7 +461,7 @@ char *after_heredoc(char *input, int *i)
         else if (input[*i] == '"')
             flag = parse_double_quote(input, i, result, &k);
         else
-            parse_unquoted_heredoc(input, i, result, &k);
+            parse_unquoted_heredoc1(input, i, result, &k);
     }
     
     if (!flag && strlen(result) == 0)
@@ -516,16 +516,16 @@ void while_loop(char *input, t_token **head)
             }
             if (input[global.i] == '|')
             {
-                add_token(head, PIPE, "|");
+                add_token(head, PIPE1, "|");
                 global.i++;
             }
             else if (input[global.i] == '<')
             {
                 if (input[global.i + 1] == '<') 
                 {
-                    add_token(head, HEREDOC, "<<");
+                    add_token(head, HEREDOC1, "<<");
                     global.i += 2;
-                    global.apa = after_heredoc(input, &global.i);
+                    global.apa = after_heredoc1(input, &global.i);
                     if (global.apa)
                         add_token_v2(head, WORD, global.apa);
                     free(global.apa);
@@ -624,16 +624,16 @@ void while_loop(char *input, t_token **head)
 char *check_syntax_errors(t_token *head, char *error_message)
 {
     t_token *current;
-    int pipe_count;
+    int pipe1_count;
 
-    pipe_count = 0;
+    pipe1_count = 0;
     current = head;
     if (global.in_quote || global.in_dquote) 
         error_message = strdup("bash: unclosed quote detected");
     while (current != NULL && current->next != NULL) 
     {
         if ((current->type == REDIRECT_IN || current->type == REDIRECT_OUT || 
-             current->type == REDIRECT_APPEND || current->type == HEREDOC) && 
+             current->type == REDIRECT_APPEND || current->type == HEREDOC1) && 
             ((current->next->type != WORD) && (current->next->type != DQUOTE) && (current->next->type = QUOTE)))
         {
             error_message = strdup("bash: syntax error near unexpected token");
@@ -644,7 +644,7 @@ char *check_syntax_errors(t_token *head, char *error_message)
     current = head;
     while (current != NULL)
     {
-        if (current->type == REDIRECT_APPEND || current->type == REDIRECT_IN || current->type == REDIRECT_OUT || current->type == HEREDOC)
+        if (current->type == REDIRECT_APPEND || current->type == REDIRECT_IN || current->type == REDIRECT_OUT || current->type == HEREDOC1)
         {
             if (current->next == NULL || ((current->next->type != WORD) && (current->next->type != DQUOTE) && (current->next->type = QUOTE)))
             {
@@ -657,10 +657,10 @@ char *check_syntax_errors(t_token *head, char *error_message)
     current = head;
     while (current != NULL) 
     {
-        if (current->type == PIPE) 
+        if (current->type == PIPE1) 
         {
-            pipe_count++;
-            if (pipe_count > 0 && current->next != NULL && current->next->type == PIPE) 
+            pipe1_count++;
+            if (pipe1_count > 0 && current->next != NULL && current->next->type == PIPE1) 
             {
                 error_message = strdup("bash: syntax error near unexpected token `|'");
                 break;
@@ -672,7 +672,7 @@ char *check_syntax_errors(t_token *head, char *error_message)
             }
         } 
         else 
-            pipe_count = 0;
+            pipe1_count = 0;
 
         current = current->next;
     }
@@ -705,7 +705,6 @@ t_lexer tokenize(char *input)
 }
 
 
-
 void free_tokens(t_token *head) 
 {
     t_token *current = head;
@@ -720,6 +719,89 @@ void free_tokens(t_token *head)
     }
 }
 
+/*
+create function print_tokens_v2
+
+ Token type: 3
+Argument 0: cat
+Argument 1: -e
+Token type: 1
+Argument 0: |
+Token type: 3
+Argument 0: wc
+Argument 1: -l
+Token type: 2
+Argument 0: >
+Token type: 3
+Argument 0: file.txt
+*/ 
+
+void print_tokens_v2(t_token2 *head) 
+{
+    t_token2 *current = head;
+    while (current != NULL) 
+    {
+        if (current->type == CMD) 
+        {
+            printf("CMD : args= ");
+            for (int i = 0; i < current->arg_size; i++) 
+            {
+                printf("[%d] '%s'", i,current->args[i]);
+                if (i < current->arg_size - 1) 
+                    printf(" ");
+            }
+            printf("\n");
+        } 
+        else if (current->type == PIPE) 
+        {
+            printf("PIPE : args= ");
+            for (int i = 0; i < current->arg_size; i++) 
+            {
+                printf("[%d] '%s'", i,current->args[i]);
+                if (i < current->arg_size - 1) 
+                    printf(" ");
+            }
+            printf("\n");
+        } 
+        else if (current->type == RED) 
+        {
+            printf("RED : args= ");
+            for (int i = 0; i < current->arg_size; i++) 
+            {
+                printf("[%d] '%s'", i, current->args[i]);
+                if (i < current->arg_size - 1) 
+                    printf(" ");
+            }
+            printf("\n");
+        } 
+        else if (current->type == HEREDOC) 
+        {
+            printf("HEREDOC : args= ");
+            for (int i = 0; i < current->arg_size; i++) 
+            {
+                printf("[%d] '%s'", i, current->args[i]);
+                if (i < current->arg_size - 1) 
+                    printf(" ");
+            }
+            printf("\n");
+        } 
+        else if (current->type == FILE_N) 
+        {
+            printf("FILE : args= ");
+            for (int i = 0; i < current->arg_size; i++) 
+            {
+                printf("[%d] '%s'", i, current->args[i]);
+                if (i < current->arg_size - 1) 
+                    printf(" ");
+            }
+            printf("\n");
+        }
+        current = current->next;
+    }
+    printf("\n");
+}
+
+
 void print_tokens(t_token *head) 
 {
     t_token *current = head;
@@ -729,6 +811,158 @@ void print_tokens(t_token *head)
         current = current->next;
     }
     printf("\n");
+}
+
+
+t_type check_last_token(t_token2 *current)
+{
+    if (current == NULL)
+        return (0);
+    while (current->next != NULL)
+        current = current->next;
+    return (current->type);
+}
+
+t_token2 *convert_data(t_token *head)
+{
+    t_token *current = head;
+    t_token2 *new_head = NULL;
+    t_token2 *current2 = NULL;
+
+    while (current != NULL && current->type != END) 
+    {
+        if (current->type == PIPE1) 
+        {
+            t_token2 *new_token = malloc(sizeof(t_token2));
+            new_token->type = PIPE;
+            new_token->arg_size = 1;
+            new_token->args = malloc(sizeof(char *));
+            new_token->args[0] = strdup("|");
+            new_token->next = NULL;
+            if (new_head == NULL) 
+            {
+                new_head = new_token;
+                current2 = new_head;
+            } 
+            else 
+            {
+                current2->next = new_token;
+                current2 = current2->next;
+            }
+        } 
+        else if (current->type == REDIRECT_IN || current->type == REDIRECT_OUT || current->type == REDIRECT_APPEND) 
+        {
+            t_token2 *new_token = malloc(sizeof(t_token2));
+            new_token->type = RED;
+            new_token->arg_size = 1;
+            new_token->args = malloc(sizeof(char *));
+            new_token->args[0] = strdup(current->value);
+            new_token->next = NULL;
+            if (new_head == NULL) 
+            {
+                new_head = new_token;
+                current2 = new_head;
+            } 
+            else 
+            {
+                current2->next = new_token;
+                current2 = current2->next;
+            }
+        } 
+        else if (current->type == HEREDOC1) 
+        {
+            t_token2 *new_token = malloc(sizeof(t_token2));
+            new_token->type = HEREDOC;
+            new_token->arg_size = 1;
+            new_token->args = malloc(sizeof(char *));
+            new_token->args[0] = strdup("<<");
+            new_token->next = NULL;
+            if (new_head == NULL) 
+            {
+                new_head = new_token;
+                current2 = new_head;
+            } 
+            else 
+            {
+                current2->next = new_token;
+                current2 = current2->next;
+            }
+        }
+        else if ((current->type == WORD || current->type == QUOTE || current->type == DQUOTE) &&  check_last_token(new_head) == RED)
+        {
+            t_token2 *new_token = malloc(sizeof(t_token2));
+            new_token->type = FILE_N;
+            new_token->arg_size = 1;
+            new_token->args = malloc(sizeof(char *));
+            new_token->args[0] = strdup(current->value);
+            new_token->next = NULL;
+            if (new_head == NULL) 
+            {
+                new_head = new_token;
+                current2 = new_head;
+            } 
+            else 
+            {
+                current2->next = new_token;
+                current2 = current2->next;
+            }
+        }
+        else if (current->type == WORD || current->type == QUOTE || current->type == DQUOTE) 
+        {
+            if (current2 == NULL) 
+            {
+                t_token2 *new_token = malloc(sizeof(t_token2));
+                new_token->type = CMD;
+                new_token->arg_size = 1;
+                new_token->args = malloc(sizeof(char *));
+                new_token->args[0] = strdup(current->value);
+                new_token->next = NULL;
+                new_head = new_token;
+                current2 = new_head;
+            } 
+            else 
+            {
+                if (current2->type == CMD) 
+                {
+                    current2->arg_size++;
+                    current2->args = realloc(current2->args, current2->arg_size * sizeof(char *));
+                    current2->args[current2->arg_size - 1] = strdup(current->value);
+                } 
+                else 
+                {
+                    t_token2 *new_token = malloc(sizeof(t_token2));
+                    new_token->type = CMD;
+                    new_token->arg_size = 1;
+                    new_token->args = malloc(sizeof(char *));
+                    new_token->args[0] = strdup(current->value);
+                    new_token->next = NULL;
+                    current2->next = new_token;
+                    current2 = current2->next;
+                }
+            }
+        }
+        else if (current->type == END) 
+        {
+            t_token2 *new_token = malloc(sizeof(t_token2));
+            new_token->type = FILE_N;
+            new_token->arg_size = 1;
+            new_token->args = malloc(sizeof(char *));
+            new_token->args[0] = strdup(current->value);
+            new_token->next = NULL;
+            if (new_head == NULL) 
+            {
+                new_head = new_token;
+                current2 = new_head;
+            } 
+            else 
+            {
+                current2->next = new_token;
+                current2 = current2->next;
+            }
+        }
+        current = current->next;
+    }
+    return new_head;
 }
 
 int main() 
@@ -753,11 +987,14 @@ int main()
             free(result.error_message);
         } 
         else 
+        {
             print_tokens(result.tokens);
+            t_token2 *new_head = convert_data(result.tokens);
+            print_tokens_v2(new_head);
+        }
         free_tokens(result.tokens);
         free(input);
     }
     rl_clear_history();
     return (0);
 }
-
