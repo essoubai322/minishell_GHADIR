@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "../minishell.h"
 
 g_global global;
 
@@ -49,26 +49,6 @@ char *ft_strcat(char *dest, char *src)
 	return (result);
 }
 
-int	ft_strlen(char *str)
-{
-	int i = 0;
-	while (str && str[i])
-		i++;
-	return(i);
-}
-
-int ft_strchr(const char *s, int c)
-{
-    if (!s)
-        return (0);
-    while (*s)
-    {
-        if (*s == c)
-            return (1);
-        s++;
-    }
-    return (0);
-}
 void ft_free2(char ***dest)
 {
     if (!dest || !*dest)
@@ -86,9 +66,9 @@ void ft_free2(char ***dest)
 }
 
 
-t_token *create_token(enum TokenType type, const char *value)
+t_token2 *create_token(enum TokenType type, const char *value)
 {
-	t_token *new_token = malloc(sizeof(t_token));
+	t_token2 *new_token = malloc(sizeof(t_token));
 	if (!new_token)
         return NULL;	
 	new_token->type = type;
@@ -124,29 +104,29 @@ void    add_token_env_value(char *env_value, char **stripped_value, char *value,
     }
 }
 
-void add_token_innit_head(t_token **head, char *stripped_value, enum TokenType type)
+void add_token_innit_head(t_token2 **head, char *stripped_value, enum TokenType type)
 {
-    t_token *new_token;
+    t_token2 *new_token;
 
     new_token = create_token(type, stripped_value);
     if (*head == NULL)
         *head = new_token;
     else
     {
-        t_token *current = *head;
+        t_token2 *current = *head;
         while (current->next != NULL)
             current = current->next;
         current->next = new_token;
     }
 }
 
-int add_token_check(t_token **head, char *stripped_value,enum TokenType type)
+int add_token_check(t_token2 **head, char *stripped_value,enum TokenType type)
 {
     char    **arg_space;
 
     arg_space = ft_split(stripped_value, ' ');
     int s = 0;
-    while (arg_space[s])
+    while (arg_space && arg_space[s])
         s++;
     if (s > 1)
     {
@@ -236,7 +216,7 @@ void    add_token_v0(char *value, int *i, char **stripped_value, int *k)
     }
 }
 
-void add_token(t_token **head, enum TokenType type, char *value)
+void add_token(t_token2 **head, enum TokenType type, char *value)
 {   
     global.stripped_value = get_stripped_value(type, value, global.stripped_value);
     if (type == WORD)
@@ -265,15 +245,15 @@ void add_token(t_token **head, enum TokenType type, char *value)
     free(global.stripped_value);
 }
 
-void    add_token_v2(t_token **head, enum TokenType type, const char *value)
+void    add_token_v2(t_token2 **head, enum TokenType type, const char *value)
 {
-    t_token *new_token = create_token(type, value);
+    t_token2 *new_token = create_token(type, value);
 
     if (*head == NULL) 
         *head = new_token;
     else 
     {
-        t_token *current = *head;
+        t_token2 *current = *head;
         while (current->next != NULL) 
             current = current->next;
         
@@ -474,7 +454,7 @@ char *after_heredoc1(char *input, int *i)
     return result;
 }
 
-void while_loop(char *input, t_token **head)
+void while_loop(char *input, t_token2 **head)
 {
     if (check_case(input, global.i) && !global.current_token_length)
     {
@@ -621,9 +601,9 @@ void while_loop(char *input, t_token **head)
     }
 }
 
-char *check_syntax_errors(t_token *head, char *error_message)
+char *check_syntax_errors(t_token2 *head, char *error_message)
 {
-    t_token *current;
+    t_token2 *current;
     int pipe1_count;
 
     pipe1_count = 0;
@@ -681,7 +661,7 @@ char *check_syntax_errors(t_token *head, char *error_message)
 
 t_lexer tokenize(char *input)
 {
-    t_token *head = NULL;
+    t_token2 *head = NULL;
     inialize_global();
 
 	global.current_token = calloc(ft_strlen(input) + 1,sizeof(global.current_token));
@@ -705,10 +685,10 @@ t_lexer tokenize(char *input)
 }
 
 
-void free_tokens(t_token *head) 
+void free_tokens(t_token2 *head) 
 {
-    t_token *current = head;
-    t_token *next;
+    t_token2 *current = head;
+    t_token2 *next;
 
     while (current != NULL) 
     {
@@ -719,26 +699,9 @@ void free_tokens(t_token *head)
     }
 }
 
-/*
-create function print_tokens_v2
-
- Token type: 3
-Argument 0: cat
-Argument 1: -e
-Token type: 1
-Argument 0: |
-Token type: 3
-Argument 0: wc
-Argument 1: -l
-Token type: 2
-Argument 0: >
-Token type: 3
-Argument 0: file.txt
-*/ 
-
-void print_tokens_v2(t_token2 *head) 
+void print_tokens_v2(t_token *head) 
 {
-    t_token2 *current = head;
+    t_token *current = head;
     while (current != NULL) 
     {
         if (current->type == CMD) 
@@ -802,9 +765,9 @@ void print_tokens_v2(t_token2 *head)
 }
 
 
-void print_tokens(t_token *head) 
+void print_tokens(t_token2 *head) 
 {
-    t_token *current = head;
+    t_token2 *current = head;
     while (current != NULL && current->type != END) 
     {
         printf("Token type: %d, value: %s\n", current->type, current->value);
@@ -814,7 +777,7 @@ void print_tokens(t_token *head)
 }
 
 
-t_type check_last_token(t_token2 *current)
+t_type check_last_token(t_token *current)
 {
     if (current == NULL)
         return (0);
@@ -823,21 +786,22 @@ t_type check_last_token(t_token2 *current)
     return (current->type);
 }
 
-t_token2 *convert_data(t_token *head)
+t_token *convert_data(t_token2 *head)
 {
-    t_token *current = head;
-    t_token2 *new_head = NULL;
-    t_token2 *current2 = NULL;
+    t_token2 *current = head;
+    t_token *new_head = NULL;
+    t_token *current2 = NULL;
 
     while (current != NULL && current->type != END) 
     {
         if (current->type == PIPE1) 
         {
-            t_token2 *new_token = malloc(sizeof(t_token2));
+            t_token *new_token = malloc(sizeof(t_token));
             new_token->type = PIPE;
             new_token->arg_size = 1;
-            new_token->args = malloc(sizeof(char *));
+            new_token->args = malloc(sizeof(char *) * 2);
             new_token->args[0] = strdup("|");
+            new_token->args[1] = NULL;
             new_token->next = NULL;
             if (new_head == NULL) 
             {
@@ -852,11 +816,12 @@ t_token2 *convert_data(t_token *head)
         } 
         else if (current->type == REDIRECT_IN || current->type == REDIRECT_OUT || current->type == REDIRECT_APPEND) 
         {
-            t_token2 *new_token = malloc(sizeof(t_token2));
+            t_token *new_token = malloc(sizeof(t_token));
             new_token->type = RED;
             new_token->arg_size = 1;
-            new_token->args = malloc(sizeof(char *));
+            new_token->args = malloc(sizeof(char *) * 2);
             new_token->args[0] = strdup(current->value);
+            new_token->args[1] = NULL;
             new_token->next = NULL;
             if (new_head == NULL) 
             {
@@ -871,11 +836,12 @@ t_token2 *convert_data(t_token *head)
         } 
         else if (current->type == HEREDOC1) 
         {
-            t_token2 *new_token = malloc(sizeof(t_token2));
+            t_token *new_token = malloc(sizeof(t_token));
             new_token->type = HEREDOC;
             new_token->arg_size = 1;
-            new_token->args = malloc(sizeof(char *));
+            new_token->args = malloc(sizeof(char *) * 2);
             new_token->args[0] = strdup("<<");
+            new_token->args[1] = NULL;
             new_token->next = NULL;
             if (new_head == NULL) 
             {
@@ -890,11 +856,12 @@ t_token2 *convert_data(t_token *head)
         }
         else if ((current->type == WORD || current->type == QUOTE || current->type == DQUOTE) &&  check_last_token(new_head) == RED)
         {
-            t_token2 *new_token = malloc(sizeof(t_token2));
+            t_token *new_token = malloc(sizeof(t_token));
             new_token->type = FILE_N;
             new_token->arg_size = 1;
-            new_token->args = malloc(sizeof(char *));
+            new_token->args = malloc(sizeof(char *) * 2);
             new_token->args[0] = strdup(current->value);
+            new_token->args[1] = NULL;
             new_token->next = NULL;
             if (new_head == NULL) 
             {
@@ -911,11 +878,12 @@ t_token2 *convert_data(t_token *head)
         {
             if (current2 == NULL) 
             {
-                t_token2 *new_token = malloc(sizeof(t_token2));
+                t_token *new_token = malloc(sizeof(t_token));
                 new_token->type = CMD;
                 new_token->arg_size = 1;
-                new_token->args = malloc(sizeof(char *));
+                new_token->args = malloc(sizeof(char *) * 2);
                 new_token->args[0] = strdup(current->value);
+                new_token->args[1] = NULL;
                 new_token->next = NULL;
                 new_head = new_token;
                 current2 = new_head;
@@ -927,14 +895,16 @@ t_token2 *convert_data(t_token *head)
                     current2->arg_size++;
                     current2->args = realloc(current2->args, current2->arg_size * sizeof(char *));
                     current2->args[current2->arg_size - 1] = strdup(current->value);
+                    current2->args[current2->arg_size] = NULL;
                 } 
                 else 
                 {
-                    t_token2 *new_token = malloc(sizeof(t_token2));
+                    t_token *new_token = malloc(sizeof(t_token));
                     new_token->type = CMD;
                     new_token->arg_size = 1;
-                    new_token->args = malloc(sizeof(char *));
+                    new_token->args = malloc(sizeof(char *) * 2);
                     new_token->args[0] = strdup(current->value);
+                    new_token->args[1] = NULL;
                     new_token->next = NULL;
                     current2->next = new_token;
                     current2 = current2->next;
@@ -943,11 +913,12 @@ t_token2 *convert_data(t_token *head)
         }
         else if (current->type == END) 
         {
-            t_token2 *new_token = malloc(sizeof(t_token2));
+            t_token *new_token = malloc(sizeof(t_token));
             new_token->type = FILE_N;
             new_token->arg_size = 1;
-            new_token->args = malloc(sizeof(char *));
+            new_token->args = malloc(sizeof(char *) * 2);
             new_token->args[0] = strdup(current->value);
+            new_token->args[1] = NULL;
             new_token->next = NULL;
             if (new_head == NULL) 
             {
@@ -965,10 +936,20 @@ t_token2 *convert_data(t_token *head)
     return new_head;
 }
 
-int main() 
+int		g_status;
+
+
+
+int	loop(int argc, char **argv, char **env)
 {
     char *input;
+	// t_token	*head;
+        (void)argc;
+    (void)argv;
 
+    t_list	*lists[2];
+
+    set_up_env_exp(&lists[0], &lists[1], env);
     while (1) 
     {
         input = readline("minishell> ");
@@ -988,13 +969,23 @@ int main()
         } 
         else 
         {
-            print_tokens(result.tokens);
-            t_token2 *new_head = convert_data(result.tokens);
+            t_token *new_head = convert_data(result.tokens);
             print_tokens_v2(new_head);
+            if (!new_head)
+                continue;
+		    excution(&new_head, &lists[0], &lists[1]);
         }
+        
         free_tokens(result.tokens);
         free(input);
     }
     rl_clear_history();
     return (0);
+}
+
+int	main(int argc, char **argv, char **env)
+{
+    (void)argc;
+    (void)argv;
+	return (loop(argc, argv,  env));
 }
