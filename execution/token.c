@@ -27,6 +27,7 @@ void inialize_global(void)
     global.k = 0;
     global.stripped_value = NULL;
     global.env_value = NULL;
+    global.o = 0;
 }
 
 char *ft_strcat(char *dest, char *src)
@@ -153,7 +154,7 @@ char    *ft_get_value(int *i, char *value)
         var_name[k++] = value[(*i)++];
     var_name[k] = '\0';
     if (var_name)
-        env_value = getenv(var_name);
+        env_value = ft_get_env(var_name, global.env);
     free(var_name);
     return (env_value);
 }
@@ -216,6 +217,13 @@ void    add_token_v0(char *value, int *i, char **stripped_value, int *k)
     }
 }
 
+void add_token_v1(t_token2 **head, enum TokenType type)
+{
+    add_token_innit_head(head, global.stripped_value, type);
+    free(global.stripped_value);
+}
+
+
 void add_token(t_token2 **head, enum TokenType type, char *value)
 {   
     global.stripped_value = get_stripped_value(type, value, global.stripped_value);
@@ -241,8 +249,7 @@ void add_token(t_token2 **head, enum TokenType type, char *value)
         else
             strcpy(global.stripped_value, value);
     }
-    add_token_innit_head(head, global.stripped_value, type);
-    free(global.stripped_value);
+    add_token_v1(head, type);
 }
 
 void    add_token_v2(t_token2 **head, enum TokenType type, const char *value)
@@ -330,7 +337,7 @@ int expand_variable(const char *input, int *i, char *result, int *k)
     while (input[*i] && (isalnum(input[*i]) || input[*i] == '_'))
         var_name[c++] = input[(*i)++];
     var_name[c] = '\0';
-    char *env_value = getenv(var_name);
+    char *env_value = ft_get_env(var_name, global.env);
     if (env_value)
     {
         char **expanded_tokens = ft_split(env_value, ' ');
@@ -579,7 +586,7 @@ void while_loop(char *input, t_token2 **head)
                 var_name[k++] = input[global.i++];
             var_name[k] = '\0';
             
-            char *env_value = getenv(var_name);
+            char *env_value = ft_get_env(var_name, global.env);
             if (env_value)
             {
                 strcat(global.current_token, env_value);
@@ -938,22 +945,46 @@ t_token *convert_data(t_token2 *head)
 
 int		g_status;
 
+// create function ft_get_env but **en, global.env);v
+
+char	*ft_get_env(char *name, char **env)
+{
+    int	i;
+    int	j;
+    int	len;
+
+    i = 0;
+    if (!name || !env || !*env)
+        return (NULL);
+    while (env[i])
+    {
+        j = 0;
+        while (env[i][j] && env[i][j] != '=')
+            j++;
+        len = j;
+        if (ft_strncmp(name, env[i], len) == 0)
+            return (env[i] + len + 1);
+        i++;
+    }
+    return (NULL);
+}
+
 
 
 int	loop(int argc, char **argv, char **env)
 {
     char *input;
-	// t_token	*head;
-        (void)argc;
+    (void)argc;
     (void)argv;
 
     t_list	*lists[2];
 
     set_up_env_exp(&lists[0], &lists[1], env);
+
     while (1) 
     {
+        global.env = convert_to_array(lists[0]);
         input = readline("minishell> ");
-
         if (!input) 
         {
             printf("\nExiting minishell...\n");

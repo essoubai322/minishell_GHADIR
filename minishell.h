@@ -52,6 +52,7 @@ typedef struct global
     char *stripped_value;
     int o;
     char *env_value;
+    char **env;
 } g_global;
 
 typedef enum e_type
@@ -197,6 +198,7 @@ int	check_builtin(char *cmd);
 void	list_clear(t_token **head);
 char	*get_path(t_list *envl);
 char	**split_paths(char *paths);
+char	*ft_get_env(char *name, char **env);
 
 # ifndef DEFAULT_PATH_VALUE
 #  define DEFAULT_PATH_VALUE \
