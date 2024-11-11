@@ -94,6 +94,7 @@ typedef struct s_token
 	char			**args;
 	t_type			type;
 	int				arg_size;
+    int heredoc;
 	struct s_token	*next;
 }					t_token;
 
@@ -195,7 +196,6 @@ void	error_and_exit(int exit_num);
 void	error_func(int errnum, int exit_num);
 void	error_exit(char *str, int exit_num);
 int	check_builtin(char *cmd);
-void	list_clear(t_token **head);
 char	*get_path(t_list *envl);
 char	**split_paths(char *paths);
 char	*ft_get_env(char *name, char **env);

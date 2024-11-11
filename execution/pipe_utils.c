@@ -63,7 +63,7 @@ void	excution(t_token **head, t_list **envl, t_list **exp_list)
 		redirection(*head, envl, exp_list);
 	else
 		run_cmd(*head, envl, exp_list, split_paths(get_path(*envl)));
-	//list_clear(head);
+	list_clear(head);
 	*head = NULL;
 }
 

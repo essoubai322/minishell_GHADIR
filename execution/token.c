@@ -945,8 +945,6 @@ t_token *convert_data(t_token2 *head)
 
 int		g_status;
 
-// create function ft_get_env but **en, global.env);v
-
 char	*ft_get_env(char *name, char **env)
 {
     int	i;
@@ -969,8 +967,6 @@ char	*ft_get_env(char *name, char **env)
     return (NULL);
 }
 
-
-
 int	loop(int argc, char **argv, char **env)
 {
     char *input;
@@ -983,13 +979,16 @@ int	loop(int argc, char **argv, char **env)
 
     while (1) 
     {
+        signal_setup(2);
         global.env = convert_to_array(lists[0]);
         input = readline("minishell> ");
         if (!input) 
         {
-            printf("\nExiting minishell...\n");
+            printf("exit\n");
             break;
         }
+        if (ft_strlen(input) == 0)
+            continue;
         add_history(input);
 
         t_lexer result = tokenize(input);
