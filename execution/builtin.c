@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   builtin.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rbenmakh <rbenmakh@student.42.fr>          +#+  +:+       +#+        */
+/*   By: asebaai <asebaai@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/07/03 14:43:12 by rbenmakh          #+#    #+#             */
-/*   Updated: 2024/09/16 16:08:48 by rbenmakh         ###   ########.fr       */
+/*   Created: 2024/07/03 14:43:12 by asebaai          #+#    #+#             */
+/*   Updated: 2024/09/16 16:08:48 by asebaai         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,7 +51,6 @@ void	echo(char **cmd)
 	}
 	if (!flag)
 		printf("\n");
-	rl_redisplay();
 }
 
 void	printf_export(char *str, int is_equal)

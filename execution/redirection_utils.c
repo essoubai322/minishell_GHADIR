@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   redirection_utils.c                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rbenmakh <rbenmakh@student.42.fr>          +#+  +:+       +#+        */
+/*   By: asebaai <asebaai@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/09/16 09:49:01 by rbenmakh          #+#    #+#             */
-/*   Updated: 2024/09/16 16:11:07 by rbenmakh         ###   ########.fr       */
+/*   Created: 2024/09/16 09:49:01 by asebaai          #+#    #+#             */
+/*   Updated: 2024/09/16 16:11:07 by asebaai         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,8 +39,8 @@ int	check_while_input_redirection(t_token *list)
 			}
 			if (access(filename, F_OK))
 				return (1);
-			else if (!access(filename, F_OK) && \
-						access(filename, F_OK | R_OK) == -1)
+			else if (!access(filename, F_OK) && access(filename, F_OK | R_OK)
+				== -1)
 			{
 				return (1);
 			}

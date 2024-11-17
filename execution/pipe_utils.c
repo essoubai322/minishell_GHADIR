@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   pipe_utils.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rbenmakh <rbenmakh@student.42.fr>          +#+  +:+       +#+        */
+/*   By: asebaai <asebaai@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/09/10 09:53:02 by rbenmakh          #+#    #+#             */
-/*   Updated: 2024/09/16 09:47:42 by rbenmakh         ###   ########.fr       */
+/*   Created: 2024/09/10 09:53:02 by asebaai          #+#    #+#             */
+/*   Updated: 2024/09/16 09:47:42 by asebaai         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,6 +55,7 @@ char	**convert_to_array(t_list *envl)
 void	excution(t_token **head, t_list **envl, t_list **exp_list)
 {
 	t_token	*list[2];
+
 	list[0] = *head;
 	list[1] = *head;
 	if (check_pipe(*head))
@@ -70,6 +71,7 @@ void	excution(t_token **head, t_list **envl, t_list **exp_list)
 void	clear_child(t_token *head, t_list **envl, t_list **exp_list,
 		char **paths)
 {
+	(void)head;
 	free_arr(paths);
 	ft_lstclear(envl, &del);
 	ft_lstclear(exp_list, &del);

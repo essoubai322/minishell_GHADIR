@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: amoubine <amoubine@student.1337.ma>        +#+  +:+       +#+         #
+#    By: asebaai <asebaai@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/09/26 10:12:54 by amoubine          #+#    #+#              #
-#    Updated: 2024/11/04 09:29:47 by amoubine         ###   ########.fr        #
+#    Updated: 2024/11/17 18:28:27 by asebaai          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -24,7 +24,7 @@ LIBFT_DIR = libft
 EXEC_SRCS = token.c builtin.c builtin1.c builtin2.c builtin3.c builtin_utils.c \
 		exec.c exec1.c pipes.c pipe1.c pipe_utils.c redirection.c \
 		exec_utils.c exec_utiles.c builtin4.c redirection_utils.c utiles.c \
-		signals.c
+		signals.c token_utils.c token_utils1.c token_utils2.c token_utils3.c \
 
 # Create full paths for source and object files
 SRCS = $(addprefix $(SRC_DIR_E)/, $(EXEC_SRCS))

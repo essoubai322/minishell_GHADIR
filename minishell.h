@@ -6,7 +6,7 @@
 /*   By: asebaai <asebaai@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/26 10:22:04 by amoubine          #+#    #+#             */
-/*   Updated: 2024/09/27 11:33:10 by asebaai          ###   ########.fr       */
+/*   Updated: 2024/11/17 17:54:52 by asebaai          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,9 +34,7 @@
 # include <sys/types.h>
 # include <sys/wait.h>
 # include <unistd.h>
-
-
-extern int	g_status;
+# include <malloc.h>
 
 typedef struct global 
 {
@@ -99,18 +97,41 @@ typedef struct s_token
 }					t_token;
 
 
-
+/*token with utils*/
 t_token2 *create_token(enum TokenType type, const char *value);
 void add_token(t_token2 **head, enum TokenType type, char *value);
 t_lexer tokenize(char *input);
 void free_tokens(t_token2 *head);
 void print_tokens(t_token2 *head);
+void inialize_global(void);
+char *ft_strcat(char *dest, char *src);
+void ft_free2(char ***dest);
+t_token2 *create_token(enum TokenType type, const char *value);
+void    add_token_env_value(char *env_value, char **stripped_value, char *value, int *i);
+void add_token_innit_head(t_token2 **head, char *stripped_value, enum TokenType type);
+int add_token_check(t_token2 **head, char *stripped_value,enum TokenType type);
+char    *ft_get_value(int *i, char *value);
+void    add_token_else(char *value, int *i, char **stripped_value, int *k);
+char    *get_stripped_value(enum TokenType type, char *value, char *stripped_value);
+void    add_token_v0(char *value, int *i, char **stripped_value, int *k);
+void add_token_v1(t_token2 **head, enum TokenType type);
+void add_token(t_token2 **head, enum TokenType type, char *value);
 void    add_token_v2(t_token2 **head, enum TokenType type, const char *value);
+int counter_closes(char *input);
+char *check_case_v1(char **input, int *i, int *k, char *result);
+int check_case(char *input, int i);
+int expand_variable(const char *input,  char *result, int *arr);
+void parse_quoted(const char *input, int *i, char *result, int *k, char quote);
+void parse_unquoted(const char *input, int *i, char *result, int *k);
+
+
+
 
 
 
 /*global variable*/
 extern int	g_status;
+extern g_global global;
 /*error.c*/
 void		error_func(int errnum, int exit_num);
 void		error_exit(char *str, int exit_num);
@@ -199,11 +220,13 @@ int	check_builtin(char *cmd);
 char	*get_path(t_list *envl);
 char	**split_paths(char *paths);
 char	*ft_get_env(char *name, char **env);
+void free_list(t_list *list);
+
 
 # ifndef DEFAULT_PATH_VALUE
 #  define DEFAULT_PATH_VALUE \
-	"PATH=/nfs/homes/rbenmakh/.local/bin:\
-	/nfs/homes/rbenmakh/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:\
-	/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin"
+	"PATH=/home/asebaai/bin:/usr/local/sbin:/usr/local/bin:\
+    /usr/sbin:/usr/bin:/sbin:/bin:/usr/games:\
+    /usr/local/games:/snap/bin"
 # endif
 #endif

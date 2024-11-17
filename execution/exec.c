@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rbenmakh <rbenmakh@student.42.fr>          +#+  +:+       +#+        */
+/*   By: asebaai <asebaai@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/08/07 12:38:20 by ysahraou          #+#    #+#             */
-/*   Updated: 2024/09/23 11:30:24 by rbenmakh         ###   ########.fr       */
+/*   Created: 2024/08/07 12:38:20 by asebaai          #+#    #+#             */
+/*   Updated: 2024/09/23 11:30:24 by asebaai         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -144,5 +144,5 @@ void	run_cmd(t_token *head, t_list **envl, t_list **exp_list, char **paths)
 	else
 		wait(&num[0]);
 	exit_status(num[0]);
-	//cleanup_run_cmd(&env, &cmd, paths, head);
+	cleanup_run_cmd(&env, &cmd, paths, head);
 }

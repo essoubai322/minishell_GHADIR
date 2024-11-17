@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   utiles.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ysahraou <ysahraou@student.42.fr>          +#+  +:+       +#+        */
+/*   By: asebaai <asebaai@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/08/11 11:16:11 by ysahraou          #+#    #+#             */
-/*   Updated: 2024/09/11 14:23:49 by ysahraou         ###   ########.fr       */
+/*   Created: 2024/08/11 11:16:11 by asebaai          #+#    #+#             */
+/*   Updated: 2024/09/11 14:23:49 by asebaai         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -102,7 +102,6 @@ int	check_builtin(char *cmd)
 		return (0);
 	return (1);
 }
-
 
 void	list_clear(t_token **head)
 {
