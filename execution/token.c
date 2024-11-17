@@ -6,7 +6,7 @@
 /*   By: asebaai <asebaai@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/26 10:25:46 by amoubine          #+#    #+#             */
-/*   Updated: 2024/11/17 18:29:04 by asebaai          ###   ########.fr       */
+/*   Updated: 2024/11/17 18:57:53 by asebaai          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -647,10 +647,9 @@ char	**convert_to_array_v2(t_list *envl,char **global_env)
 	char	**cenv;
 	t_list	*tmp;
 
-    (void)global_env;   
 	i = 0;
 	tmp = envl;
-    
+    (void)global_env;
 	while (tmp)
 	{
 		i++;
