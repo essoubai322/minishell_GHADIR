@@ -6,7 +6,7 @@
 /*   By: asebaai <asebaai@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/17 17:19:35 by asebaai           #+#    #+#             */
-/*   Updated: 2024/11/17 17:59:34 by asebaai          ###   ########.fr       */
+/*   Updated: 2024/11/18 17:10:40 by asebaai          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,12 +63,22 @@ int check_case(char *input, int i)
 int expand_variable(const char *input,  char *result, int *arr)
 {
     int c = 0;
-    (arr[0])++;
     char *var_name = calloc(strlen(input) + 1, sizeof(char));
-    while (input[arr[0]] && (isalnum(input[arr[0]]) || input[arr[0]] == '_'))
-        var_name[c++] = input[(arr[0])++];
-    var_name[c] = '\0';
-    char *env_value = ft_get_env(var_name, global.env);
+    char *env_value = NULL;
+    
+    (arr[0])++;
+    if (ft_strncmp(input + arr[0] , "?", 1) == 0)
+    {
+        arr[0]++;
+        env_value = ft_itoa(g_status);
+    }
+    else
+    {
+        while (input[arr[0]] && (isalnum(input[arr[0]]) || input[arr[0]] == '_'))
+            var_name[c++] = input[(arr[0])++];
+        var_name[c] = '\0';
+        env_value = ft_get_env(var_name, global.env);
+    }
     if (env_value)
     {
         char **expanded_tokens = ft_split(env_value, ' ');
@@ -84,6 +94,7 @@ int expand_variable(const char *input,  char *result, int *arr)
         }
         ft_free2(&expanded_tokens);
     }
+    free(env_value);
     free(var_name);
     arr[1] = strlen(result);
     return c;
@@ -97,7 +108,6 @@ void parse_quoted(const char *input, int *i, char *result, int *k, char quote)
     arr[0] = *i;
     arr[1] = *k;
     arr[2] = 0;
-    printf("arr[0]= %d arr[1] = %d\n", arr[0], arr[1]);
     while (input[arr[0]] && input[arr[0]] != quote)
     {
         if (quote == '"' && input[arr[0]] == '$')
@@ -106,7 +116,6 @@ void parse_quoted(const char *input, int *i, char *result, int *k, char quote)
             result[(arr[1])++] = input[(arr[0])++];
     }
     if (input[arr[0]]) (arr[0])++;
-    printf("arr[0]= %d arr[1] = %d\n", arr[0], arr[1]);
     *i = arr[0];
     *k = arr[1];
 }

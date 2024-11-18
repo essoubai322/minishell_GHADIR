@@ -6,7 +6,7 @@
 /*   By: asebaai <asebaai@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/17 17:13:57 by asebaai           #+#    #+#             */
-/*   Updated: 2024/11/17 18:24:00 by asebaai          ###   ########.fr       */
+/*   Updated: 2024/11/18 17:17:06 by asebaai          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -101,5 +101,6 @@ void    add_token_env_value(char *env_value, char **stripped_value, char *value,
             free(temp);
         }
     }
+    free(env_value);
 }
 

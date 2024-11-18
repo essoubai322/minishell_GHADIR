@@ -6,7 +6,7 @@
 /*   By: asebaai <asebaai@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/26 10:25:46 by amoubine          #+#    #+#             */
-/*   Updated: 2024/11/18 15:52:54 by asebaai          ###   ########.fr       */
+/*   Updated: 2024/11/18 17:11:20 by asebaai          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -102,7 +102,6 @@ void while_loop(char *input, t_token2 **head)
         global.str_cmd = string_command(input, &global.i);
         global.apa = strdup(global.str_cmd);
         free(global.str_cmd);
-        printf("apa = %s\n", global.apa);
         if (ft_strchr(global.apa, '`'))
         {
             char **arg_space = ft_split(global.apa, '`');
@@ -213,15 +212,24 @@ void while_loop(char *input, t_token2 **head)
     {
         if (input[global.i] == '$' && global.in_dquote == 1)
         {
+            char *env_value = NULL;
             char *var_name = calloc(ft_strlen(input) , sizeof(char *));
             int k = 0;
 
             global.i++;
-            while (isalnum(input[global.i]) || input[global.i] == '_')
-                var_name[k++] = input[global.i++];
-            var_name[k] = '\0';
+            if (ft_strncmp(input + global.i, "?", 1) == 0)
+            {
+                global.i++;
+                env_value = ft_itoa(g_status);
+            }
+            else
+            {
+                while (isalnum(input[global.i]) || input[global.i] == '_')
+                    var_name[k++] = input[global.i++];
+                var_name[k] = '\0';
+                env_value = ft_get_env(var_name, global.env);
+            }
             
-            char *env_value = ft_get_env(var_name, global.env);
             if (env_value)
             {
                 strcat(global.current_token, env_value);
@@ -233,6 +241,7 @@ void while_loop(char *input, t_token2 **head)
                 strcat(global.current_token, var_name);
                 global.current_token_length += ft_strlen(var_name);
             }
+            free(env_value);
             free(var_name);
         }
         else
@@ -584,6 +593,7 @@ char	*ft_get_env(char *name, char **env)
     i = 0;
     if (!name || !env || !*env)
         return (NULL);
+    
     while (env[i])
     {
         j = 0;
@@ -680,6 +690,8 @@ int	loop(int argc, char **argv, char **env)
     set_up_env_exp(&lists[0], &lists[1], env);
     while (1) 
     {
+        // print g_status
+        printf("g_status = %d\n", g_status);
         global.env = convert_to_array_v2(lists[0],global.env);
         signal_setup(2);
         input = readline("APA@GOVOS> ");

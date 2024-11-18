@@ -6,7 +6,7 @@
 /*   By: asebaai <asebaai@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/17 17:18:04 by asebaai           #+#    #+#             */
-/*   Updated: 2024/11/17 17:18:32 by asebaai          ###   ########.fr       */
+/*   Updated: 2024/11/18 16:59:24 by asebaai          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,6 +57,13 @@ char    *ft_get_value(int *i, char *value)
     char *var_name = calloc(ft_strlen(value) + 1, sizeof(char));
     (*i)++;
     int k = 0;
+    if (ft_strncmp(value + *i, "?", 1) == 0)
+    {
+        (*i)++;
+        env_value = ft_itoa(g_status);
+        free(var_name);
+        return (env_value);
+    }
     while (value[*i] && (isalnum(value[*i]) || value[*i] == '_'))
         var_name[k++] = value[(*i)++];
     var_name[k] = '\0';

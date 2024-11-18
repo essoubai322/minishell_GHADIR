@@ -13,44 +13,58 @@
 #include "libft.h"
 #include <stdlib.h>
 
-static int	ft_strint(long *n)
+static	int	len_num(long num)
 {
-	int		len;
-	long	nb;
+	int	i;
 
-	len = 0;
-	if (*n == 0)
-		return (1);
-	len += (*n < 0);
-	if (len)
-		*n = *n * -1;
-	nb = *n;
-	while (nb)
+	i = 0;
+	if (num == 0 || num < 0)
+		i++;
+	while (num)
 	{
-		nb /= 10;
-		len++;
+		num /= 10;
+		i++;
 	}
-	return (len);
+	return (i);
 }
 
-char	*ft_itoa(int nb)
+static	void	ft_creat(char *dest, int len, long number)
 {
-	int		len;
-	char	*ptr;
-	long	n;
+	int	i;
 
-	n = nb;
-	len = ft_strint(&n);
-	ptr = (char *)malloc((len + 1) * sizeof(char));
-	if (!ptr)
-		return (NULL);
-	ptr[len--] = 0;
-	*ptr = (nb < 0) * '-' + (!n) * '0';
-	while (n)
+	i = 0;
+	if (number < 0)
 	{
-		ptr[len] = n % 10 + '0';
-		len--;
-		n /= 10;
+		number *= -1;
+		dest[i] = '-';
+		i++;
 	}
-	return (ptr);
+	while (len - i > 0)
+	{
+		dest[len - 1] = (number % 10) + 48;
+		len--;
+		number /= 10;
+	}
+}
+
+char	*ft_itoa(int n)
+{
+	long	number;
+	int		len;
+	char	*dest;
+
+	number = (long)n;
+	len = len_num(number);
+	dest = malloc(len + 1);
+	if (!dest)
+		return (NULL);
+	if (number == 0)
+	{
+		dest[0] = '0';
+		dest[1] = '\0';
+		return (dest);
+	}
+	ft_creat(dest, len, number);
+	dest[len] = '\0';
+	return (dest);
 }
