@@ -6,7 +6,7 @@
 /*   By: asebaai <asebaai@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/26 10:25:46 by amoubine          #+#    #+#             */
-/*   Updated: 2024/11/18 14:51:43 by asebaai          ###   ########.fr       */
+/*   Updated: 2024/11/18 15:52:54 by asebaai          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -622,8 +622,8 @@ void loop_v2(char *input, t_list **lists)
     else 
     {
         t_token *new_head = convert_data(result.tokens);
-        print_tokens(result.tokens);
-        print_tokens_v2(new_head);
+        // print_tokens(result.tokens);
+        // print_tokens_v2(new_head);
         if (!new_head)
             return;
         excution(&new_head, &lists[0], &lists[1]);
@@ -638,7 +638,7 @@ void loop_free(char *input, t_list **lists)
     free(input);
     free_list(lists[0]);
     free_list(lists[1]);
-    // free(env);
+    free_arr(global.env);
 }
 
 char	**convert_to_array_v2(t_list *envl,char **global_env)
@@ -649,6 +649,7 @@ char	**convert_to_array_v2(t_list *envl,char **global_env)
 
 	i = 0;
 	tmp = envl;
+    free_arr(global_env);
     (void)global_env;
 	while (tmp)
 	{
@@ -688,10 +689,12 @@ int	loop(int argc, char **argv, char **env)
             exit(0);
         }
         if (ft_strlen(input) == 0)
+        {
+            free(input);
             continue;
+        }
         add_history(input);
         loop_v2(input, lists);
-        free_arr(global.env);
     }
     loop_free(input, lists);
     return (0);
