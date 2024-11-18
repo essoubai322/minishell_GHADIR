@@ -6,7 +6,7 @@
 /*   By: asebaai <asebaai@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/26 10:25:46 by amoubine          #+#    #+#             */
-/*   Updated: 2024/11/17 18:57:53 by asebaai          ###   ########.fr       */
+/*   Updated: 2024/11/18 14:51:43 by asebaai          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -661,7 +661,7 @@ char	**convert_to_array_v2(t_list *envl,char **global_env)
 	i = 0;
 	while (envl)
 	{
-		cenv[i++] = (char *)envl->content;
+		cenv[i++] = ft_strdup((char *)envl->content);
 		envl = envl->next;
 	}
 	cenv[i] = 0;
@@ -677,9 +677,9 @@ int	loop(int argc, char **argv, char **env)
     t_list	*lists[2];
 
     set_up_env_exp(&lists[0], &lists[1], env);
-    global.env = convert_to_array_v2(lists[0],global.env);
     while (1) 
     {
+        global.env = convert_to_array_v2(lists[0],global.env);
         signal_setup(2);
         input = readline("APA@GOVOS> ");
         if (!input) 
@@ -691,6 +691,7 @@ int	loop(int argc, char **argv, char **env)
             continue;
         add_history(input);
         loop_v2(input, lists);
+        free_arr(global.env);
     }
     loop_free(input, lists);
     return (0);
