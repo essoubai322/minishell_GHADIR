@@ -6,7 +6,7 @@
 /*   By: asebaai <asebaai@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/26 10:25:46 by amoubine          #+#    #+#             */
-/*   Updated: 2024/11/18 17:11:20 by asebaai          ###   ########.fr       */
+/*   Updated: 2024/11/19 17:54:51 by asebaai          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -227,7 +227,13 @@ void while_loop(char *input, t_token2 **head)
                 while (isalnum(input[global.i]) || input[global.i] == '_')
                     var_name[k++] = input[global.i++];
                 var_name[k] = '\0';
-                env_value = ft_get_env(var_name, global.env);
+                if (k == 0)
+                {
+                    env_value = calloc(2, sizeof(char));
+                    env_value[0] = input[global.i - 1];
+                }
+                else
+                    env_value = ft_get_env(var_name, global.env);
             }
             
             if (env_value)
@@ -660,7 +666,6 @@ char	**convert_to_array_v2(t_list *envl,char **global_env)
 	i = 0;
 	tmp = envl;
     free_arr(global_env);
-    (void)global_env;
 	while (tmp)
 	{
 		i++;
@@ -668,7 +673,7 @@ char	**convert_to_array_v2(t_list *envl,char **global_env)
 	}
 	cenv = (char **)malloc(sizeof(char *) * (i + 1));
 	if (!cenv)
-		return (0);
+		return (NULL);
 	i = 0;
 	while (envl)
 	{
@@ -690,8 +695,6 @@ int	loop(int argc, char **argv, char **env)
     set_up_env_exp(&lists[0], &lists[1], env);
     while (1) 
     {
-        // print g_status
-        printf("g_status = %d\n", g_status);
         global.env = convert_to_array_v2(lists[0],global.env);
         signal_setup(2);
         input = readline("APA@GOVOS> ");

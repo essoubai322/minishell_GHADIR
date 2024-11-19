@@ -6,7 +6,7 @@
 /*   By: asebaai <asebaai@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/17 17:18:04 by asebaai           #+#    #+#             */
-/*   Updated: 2024/11/18 16:59:24 by asebaai          ###   ########.fr       */
+/*   Updated: 2024/11/19 17:26:33 by asebaai          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,6 +67,15 @@ char    *ft_get_value(int *i, char *value)
     while (value[*i] && (isalnum(value[*i]) || value[*i] == '_'))
         var_name[k++] = value[(*i)++];
     var_name[k] = '\0';
+    dprintf(2, "value + *i = %s\n", value + *i);
+    dprintf(2, "k == %d\n", k);
+    if (k == 0)
+    {
+        env_value = calloc(2, sizeof(char));
+        env_value[0] = value[*i - 1];
+        free(var_name);
+        return (env_value);
+    }
     if (var_name)
         env_value = ft_get_env(var_name, global.env);
     free(var_name);

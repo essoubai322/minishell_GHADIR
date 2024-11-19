@@ -6,7 +6,7 @@
 /*   By: asebaai <asebaai@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/17 17:19:35 by asebaai           #+#    #+#             */
-/*   Updated: 2024/11/18 17:10:40 by asebaai          ###   ########.fr       */
+/*   Updated: 2024/11/19 16:28:09 by asebaai          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,7 +77,13 @@ int expand_variable(const char *input,  char *result, int *arr)
         while (input[arr[0]] && (isalnum(input[arr[0]]) || input[arr[0]] == '_'))
             var_name[c++] = input[(arr[0])++];
         var_name[c] = '\0';
-        env_value = ft_get_env(var_name, global.env);
+        if (c == 0)
+        {
+            env_value = ft_calloc(2, sizeof(char));
+            env_value[0] = input[arr[0] - 1];
+        }
+        else
+            env_value = ft_get_env(var_name, global.env);
     }
     if (env_value)
     {
@@ -114,6 +120,8 @@ void parse_quoted(const char *input, int *i, char *result, int *k, char quote)
             expand_variable(input,result, arr);
         else
             result[(arr[1])++] = input[(arr[0])++];
+        *i = arr[0];
+        *k = arr[1];
     }
     if (input[arr[0]]) (arr[0])++;
     *i = arr[0];
@@ -133,6 +141,8 @@ void parse_unquoted(const char *input, int *i, char *result, int *k)
             expand_variable(input,result, arr);
         else
             result[arr[1]++] = input[arr[0]++];
+        *i = arr[0];
+        *k = arr[1];
     }
     *i = arr[0];
     *k = arr[1];
