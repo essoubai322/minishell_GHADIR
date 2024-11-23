@@ -85,8 +85,8 @@ void	export(t_list **exp_list, t_list **envl, char *var_name,
 	int	flags[3];
 
 	flags[2] = 0;
-	g_status = export_errors(var_name);
-	if (g_status)
+	global.sts = export_errors(var_name);
+	if (global.sts)
 		return ;
 	flags[0] = search_var_replace(envl, var_name, var_value, 0);
 	flags[1] = search_var_replace(exp_list, var_name, var_value, 0);

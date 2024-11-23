@@ -20,7 +20,7 @@ void	ft_exit_pipe(t_token *head, t_list **envl, t_list **exp_list,
 	if (!head->args[1])
 	{
 		clear_child(head, envl, exp_list, paths);
-		exit(g_status);
+		exit(global.sts);
 	}
 	val = ft_atoi(head->args[1]);
 	if ((!val && head->args[1][0] != '0') || (!val && head->args[1][0] == '-')

@@ -15,13 +15,13 @@
 void	exit_status(int status)
 {
 	if (WIFEXITED(status))
-		g_status = WEXITSTATUS(status);
+		global.sts = WEXITSTATUS(status);
 	else if (WIFSIGNALED(status))
 	{
-		g_status = WTERMSIG(status) + 128;
-		if (g_status == 130)
+		global.sts = WTERMSIG(status) + 128;
+		if (global.sts == 130)
 			write(1, "\n", 1);
-		if (g_status == 131)
+		if (global.sts == 131)
 			write(1, "Quit (core dumped)\n", 20);
 	}
 }

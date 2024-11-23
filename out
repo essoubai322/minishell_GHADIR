@@ -1,0 +1,14 @@
+total 312
+drwxr-xr-x  7 asebaai 4219    178 Nov 23 17:20 .
+drwxr-xr-x 12 asebaai 4219    233 Nov 23 10:52 ..
+drwxr-xr-x  3 asebaai 4219     23 Nov 23 17:16 bin
+drwxr-xr-x  2 asebaai 4219   4096 Nov 23 17:16 execution
+-rw-r--r--  1 asebaai 4219     63 Nov 23 04:31 file.suppression
+drwxr-xr-x  8 asebaai 4219    185 Nov 23 06:19 .git
+drwxr-xr-x  2 asebaai 4219   4096 Nov 23 17:19 libft
+-rw-r--r--  1 asebaai 4219   2617 Nov 23 17:12 Makefile
+-rwxr-xr-x  1 asebaai 4219 285400 Nov 23 17:19 minishell
+-rw-r--r--  1 asebaai 4219  10029 Nov 23 17:12 minishell.h
+-rw-r--r--  1 asebaai 4219      0 Nov 23 17:20 out
+-rw-r--r--  1 asebaai 4219   3399 Nov  9 17:47 README.md
+drwxr-xr-x  2 asebaai 4219     27 Nov 23 06:10 .vscode

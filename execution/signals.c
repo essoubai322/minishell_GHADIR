@@ -20,7 +20,7 @@ void	sighandler(int signum)
 		rl_replace_line("", 0);
 		rl_on_new_line();
 		rl_redisplay();
-		g_status = 130;
+		global.sts = 130;
 	}
 }
 

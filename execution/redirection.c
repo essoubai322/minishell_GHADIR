@@ -48,7 +48,7 @@ int	redir_output(char *filename, int flag)
 	if (dup2(fd, 1) == -1)
 	{
 		write(2, "minishell: Ambiguous redirect or permission denied\n", 52);
-		g_status = 1;
+		global.sts = 1;
 		close(fd);
 		return (-1);
 	}
@@ -63,14 +63,14 @@ int	redir_input(char *filename)
 	if (!access(filename, F_OK) && access(filename, F_OK | R_OK) == -1)
 	{
 		write(2, "minishell: Permission denied\n", 29);
-		g_status = 1;
+		global.sts = 1;
 		return (-1);
 	}
 	fd = open(filename, O_RDONLY);
 	if (fd == -1)
 	{
 		write(2, "minishell: no such file or directory\n", 38);
-		g_status = 1;
+		global.sts = 1;
 		return (-1);
 	}
 	dup2(fd, STDIN_FILENO);

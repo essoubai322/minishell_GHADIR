@@ -12,55 +12,59 @@
 
 #include "../minishell.h"
 
-char *string_command(const char *input, int *i)
+char	*string_command(const char *input, int *i)
 {
-    char *result = calloc(10000000, sizeof(char));
-    int k = 0;
-    while (isspace(input[*i]))
-        (*i)++;
-    
-    while (input[*i] && !isspace(input[*i]) && input[*i] != '|' && input[*i] != '>' && input[*i] != '<')
-    {
-        if (input[*i] == '\'' || input[*i] == '"')
-            parse_quoted(input, i, result, &k, input[*i]);
-        else
-            parse_unquoted(input, i, result, &k);
-    }
-    result[k] = '\0';
-    return result;
+	char	*result;
+	int		k;
+
+	result = calloc(10000000, sizeof(char));
+	k = 0;
+	while (isspace(input[*i]))
+		(*i)++;
+	while (input[*i] && !isspace(input[*i]) && input[*i] != '|'
+		&& input[*i] != '>' && input[*i] != '<')
+	{
+		if (input[*i] == '\'' || input[*i] == '"')
+			parse_quoted(input, i, result, &k, input[*i]);
+		else
+			parse_unquoted(input, i, result, &k);
+	}
+	result[k] = '\0';
+	return (result);
 }
 
-void skip_whitespace(const char *input, int *i)
+void	skip_whitespace(const char *input, int *i)
 {
-    while (isspace(input[*i]))
-        (*i)++;
+	while (isspace(input[*i]))
+		(*i)++;
 }
 
-int parse_single_quote(const char *input, int *i, char *result, int *k)
+int	parse_single_quote(const char *input, int *i, char *result, int *k)
 {
-    (*i)++;
-    while (input[*i] && input[*i] != '\'')
-        result[(*k)++] = input[(*i)++];
-    if (input[*i])
-        (*i)++;
-    return 1;
+	(*i)++;
+	while (input[*i] && input[*i] != '\'')
+		result[(*k)++] = input[(*i)++];
+	if (input[*i])
+		(*i)++;
+	return (1);
 }
 
-int parse_double_quote(const char *input, int *i, char *result, int *k)
+int	parse_double_quote(const char *input, int *i, char *result, int *k)
 {
-    (*i)++;
-    while (input[*i] && input[*i] != '"')
-        result[(*k)++] = input[(*i)++];
-    if (input[*i])
-        (*i)++;
-    return 1;
+	(*i)++;
+	while (input[*i] && input[*i] != '"')
+		result[(*k)++] = input[(*i)++];
+	if (input[*i])
+		(*i)++;
+	return (1);
 }
 
-void parse_unquoted_heredoc1(const char *input, int *i, char *result, int *k)
+void	parse_unquoted_heredoc1(const char *input, int *i, char *result, int *k)
 {
-    while (input[*i] && !isspace(input[*i]) && input[*i] != '\'' &&
-           input[*i] != '"' && input[*i] != '|' && input[*i] != '>' && input[*i] != '<')
-    {
-        result[(*k)++] = input[(*i)++];
-    }
+	while (input[*i] && !isspace(input[*i]) && input[*i] != '\''
+		&& input[*i] != '"' && input[*i] != '|' && input[*i] != '>'
+		&& input[*i] != '<')
+	{
+		result[(*k)++] = input[(*i)++];
+	}
 }

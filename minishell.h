@@ -6,7 +6,7 @@
 /*   By: asebaai <asebaai@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/26 10:22:04 by amoubine          #+#    #+#             */
-/*   Updated: 2024/11/23 06:16:40 by asebaai          ###   ########.fr       */
+/*   Updated: 2024/11/23 17:12:57 by asebaai          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,6 +51,7 @@ typedef struct global
     int o;
     char *env_value;
     char **env;
+    int sts;
 } g_global;
 
 typedef enum e_type
@@ -96,11 +97,19 @@ typedef struct s_token
 	struct s_token	*next;
 }					t_token;
 
+typedef struct s_start
+{
+    t_token *current;
+    t_token *prev;
+    t_token *cmd_token;
+    t_token *cmd_prev;
+    t_token *pipe_section;
+}					t_start;
+
 
 /*token with utils*/
 
 void while_loop(char *input, t_token2 **head);
-char *check_syntax_errors(t_token2 *head, char *error_message);
 t_token2 *create_token(enum TokenType type, const char *value);
 void add_token(t_token2 **head, enum TokenType type, char *value);
 t_lexer tokenize(char *input);
@@ -136,6 +145,38 @@ t_lexer tokenize(char *input);
 void free_tokens(t_token2 *head);
 t_type check_last_token(t_token *current);
 char	*ft_get_env(char *name, char **env);
+char	**convert_to_array_v2(t_list *envl,char **global_env);
+void reorganize_cmd_to_start(t_token **head);
+t_token *duplicate_list(t_token *head);
+int initialize_token(t_token **new_token, t_token *current);
+void free_list(t_list *list);
+void    *ft_realloc(void *ptr, size_t size);
+char *ft_strcat_stack(char *dest, char *src);
+int while_in_string_command(char *input, t_token2 **head);
+void while_in_current_bigger_than_zero(char *input, t_token2 **head);
+void in_expand_variable(char *input, char *var_name, char **env_value, int k);
+void while_in_check_RED_HEREDOC(char *input, t_token2 **head);
+void while_in_quote_dquote(char *input, int f);
+void while_in_RED_output(char *input, t_token2 **head);
+void while_in_RED_input(char *input, t_token2 **head);
+void check_syntax_error_v1(t_token2 *current, char **error);
+void while_loop(char *input, t_token2 **head);
+void while_in_check_quote_dquote(char *input, t_token2 **head);
+void while_in_expand_variables(char *input);
+void while_in_expand_variable(char *input);
+t_token *convert_data(t_token2 *head ,t_token *current2, t_token *new_token);
+char *check_syntax_errors(t_token2 *head, char *error_message);
+void check_syntax_error_v3(t_token2 *head, t_token2 *current, char **error, int pipe1_count);
+void check_syntax_error_v2(t_token2 *current, char **error);
+t_token *handle_cmd(t_token2 *current, t_token *current2);
+int handle_cmd_args(t_token *current2, const char *value);
+t_token *handle_word_types(t_token2 *current, t_token *new_head);
+t_token *handle_pipe_and_redirects(t_token2 *current);
+void add_token_to_list(t_token **new_head, t_token **current2, 
+    t_token *new_token);
+t_token *create_and_init_token(const char *value, t_type new_type);
+
+
 
 
 /*global variable*/

@@ -76,7 +76,7 @@ int	builtin(t_token *head, t_list **envl, t_list **exp_list)
 	{
 		if (head->arg_size == 1)
 			export(exp_list, envl, NULL, NULL);
-		return (init_export(head, envl, exp_list, 0), g_status);
+		return (init_export(head, envl, exp_list, 0), global.sts);
 	}
 	else if (!ft_strncmp(head->args[0], "unset", 6))
 	{
@@ -98,19 +98,19 @@ int	essential_cmd(t_token *head, char **paths, t_list **lists[2], char **cmd)
 	if (head->args[0] && !ft_strncmp(head->args[0], "exit", 5))
 	{
 		ft_exit(head, lists, paths, 0);
-		g_status = 1;
+		global.sts = 1;
 		return (0);
 	}
 	if (!head->args[0] || (head->args[0] && head->args[0][0] == '>'))
 	{
 		free_arr(paths);
-		g_status = 0;
+		global.sts = 0;
 		return (0);
 	}
 	else if ((head->args[0] && head->args[0][0] == '<'))
 		return (free_arr(paths), 0);
-	g_status = builtin(head, lists[0], lists[1]);
-	if (!g_status)
+	global.sts = builtin(head, lists[0], lists[1]);
+	if (!global.sts)
 		return (free_arr(paths), 0);
 	*cmd = check_cmd(head->args[0], paths);
 	if (!*cmd)
