@@ -6,7 +6,7 @@
 /*   By: asebaai <asebaai@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/26 10:22:04 by amoubine          #+#    #+#             */
-/*   Updated: 2024/11/17 17:54:52 by asebaai          ###   ########.fr       */
+/*   Updated: 2024/11/23 06:16:40 by asebaai          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -98,6 +98,9 @@ typedef struct s_token
 
 
 /*token with utils*/
+
+void while_loop(char *input, t_token2 **head);
+char *check_syntax_errors(t_token2 *head, char *error_message);
 t_token2 *create_token(enum TokenType type, const char *value);
 void add_token(t_token2 **head, enum TokenType type, char *value);
 t_lexer tokenize(char *input);
@@ -123,10 +126,16 @@ int check_case(char *input, int i);
 int expand_variable(const char *input,  char *result, int *arr);
 void parse_quoted(const char *input, int *i, char *result, int *k, char quote);
 void parse_unquoted(const char *input, int *i, char *result, int *k);
-
-
-
-
+void parse_unquoted_heredoc1(const char *input, int *i, char *result, int *k);
+int parse_double_quote(const char *input, int *i, char *result, int *k);
+int parse_single_quote(const char *input, int *i, char *result, int *k);
+void skip_whitespace(const char *input, int *i);
+char *string_command(const char *input, int *i);
+char *after_heredoc1(char *input, int *i);
+t_lexer tokenize(char *input);
+void free_tokens(t_token2 *head);
+t_type check_last_token(t_token *current);
+char	*ft_get_env(char *name, char **env);
 
 
 /*global variable*/

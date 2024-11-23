@@ -6,7 +6,7 @@
 /*   By: asebaai <asebaai@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/26 10:25:46 by amoubine          #+#    #+#             */
-/*   Updated: 2024/11/22 20:14:04 by asebaai          ###   ########.fr       */
+/*   Updated: 2024/11/23 06:14:17 by asebaai          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,86 +14,6 @@
 
 g_global global;
 int		g_status;
-
-char *string_command(const char *input, int *i)
-{
-    char *result = calloc(10000000, sizeof(char));
-    int k = 0;
-    while (isspace(input[*i]))
-        (*i)++;
-    
-    while (input[*i] && !isspace(input[*i]) && input[*i] != '|' && input[*i] != '>' && input[*i] != '<')
-    {
-        if (input[*i] == '\'' || input[*i] == '"')
-            parse_quoted(input, i, result, &k, input[*i]);
-        else
-            parse_unquoted(input, i, result, &k);
-    }
-    result[k] = '\0';
-    return result;
-}
-
-void skip_whitespace(const char *input, int *i)
-{
-    while (isspace(input[*i]))
-        (*i)++;
-}
-
-int parse_single_quote(const char *input, int *i, char *result, int *k)
-{
-    (*i)++;
-    while (input[*i] && input[*i] != '\'')
-        result[(*k)++] = input[(*i)++];
-    if (input[*i])
-        (*i)++;
-    return 1;
-}
-
-int parse_double_quote(const char *input, int *i, char *result, int *k)
-{
-    (*i)++;
-    while (input[*i] && input[*i] != '"')
-        result[(*k)++] = input[(*i)++];
-    if (input[*i])
-        (*i)++;
-    return 1;
-}
-
-void parse_unquoted_heredoc1(const char *input, int *i, char *result, int *k)
-{
-    while (input[*i] && !isspace(input[*i]) && input[*i] != '\'' &&
-           input[*i] != '"' && input[*i] != '|' && input[*i] != '>' && input[*i] != '<')
-    {
-        result[(*k)++] = input[(*i)++];
-    }
-}
-
-char *after_heredoc1(char *input, int *i)
-{
-    char *result = calloc(100000, 1);
-    int k = 0, flag = 0;
-    int after = *i;
-
-    skip_whitespace(input, i);
-    while (input[*i] && !isspace(input[*i]) && input[*i] != '|' && input[*i] != '>' && input[*i] != '<')
-    {
-        if (input[*i] == '\'')
-            flag = parse_single_quote(input, i, result, &k);
-        else if (input[*i] == '"')
-            flag = parse_double_quote(input, i, result, &k);
-        else
-            parse_unquoted_heredoc1(input, i, result, &k);
-    }
-    
-    if (!flag && strlen(result) == 0)
-    {
-        *i = after;
-        free(result);
-        return NULL;
-    }
-    result[k] = '\0';
-    return result;
-}
 
 void while_loop(char *input, t_token2 **head)
 {
@@ -317,46 +237,6 @@ char *check_syntax_errors(t_token2 *head, char *error_message)
     return error_message;
 }
 
-t_lexer tokenize(char *input)
-{
-    t_token2 *head = NULL;
-    inialize_global();
-
-	global.current_token = calloc(ft_strlen(input) + 1,sizeof(global.current_token));
-    
-    while (input[global.i] != '\0')
-        while_loop(input, &head);
-    if (global.current_token_length > 0) 
-    {
-		if (input[global.i - 1] == '"')
-            add_token(&head, DQUOTE, global.current_token);
-		else if (input[global.i - 1] == '\'')
-            add_token(&head, DQUOTE, global.current_token);
-		else
-			add_token(&head, WORD, global.current_token);
-    }
-    global.error_message = check_syntax_errors(head, global.error_message);
-    add_token(&head, END, "");
-    t_lexer result = {head, global.error_message};
-	free(global.current_token);
-    return (result);
-}
-
-
-void free_tokens(t_token2 *head) 
-{
-    t_token2 *current = head;
-    t_token2 *next;
-
-    while (current != NULL) 
-    {
-        next = current->next;
-        free(current->value);
-        free(current);
-        current = next;
-    }
-}
-
 void print_tokens_v2(t_token *head) 
 {
     t_token *current = head;
@@ -432,16 +312,6 @@ void print_tokens(t_token2 *head)
         current = current->next;
     }
     printf("\n");
-}
-
-
-t_type check_last_token(t_token *current)
-{
-    if (current == NULL)
-        return (0);
-    while (current->next != NULL)
-        current = current->next;
-    return (current->type);
 }
 
 t_token *convert_data(t_token2 *head)
@@ -590,30 +460,6 @@ t_token *convert_data(t_token2 *head)
     return new_head;
 }
 
-
-char	*ft_get_env(char *name, char **env)
-{
-    int	i;
-    int	j;
-    int	len;
-
-    i = 0;
-    if (!name || !env || !*env)
-        return (NULL);
-    
-    while (env[i])
-    {
-        j = 0;
-        while (env[i][j] && env[i][j] != '=')
-            j++;
-        len = j;
-        if (ft_strncmp(name, env[i], len) == 0)
-            return (ft_strdup(env[i] + len + 1));
-        i++;
-    }
-    return (NULL);
-}
-
 void free_list(t_list *list)
 {
     t_list *tmp;
@@ -625,6 +471,75 @@ void free_list(t_list *list)
         free(tmp->content);
         free(tmp);
     }
+}
+
+int initialize_token(t_token **new_token, t_token *current)
+{
+    *new_token = malloc(sizeof(t_token));
+    if (!*new_token)
+        return 1;
+    (*new_token)->type = current->type;
+    (*new_token)->arg_size = current->arg_size;
+    (*new_token)->heredoc = current->heredoc;
+    (*new_token)->args = malloc(sizeof(char *) * (current->arg_size + 1));
+    if (!(*new_token)->args)
+        return (free(new_token), 1);
+    return (0);
+}
+
+t_token *duplicate_list(t_token *head)
+{
+    t_token *new_head;
+    t_token *current;
+    t_token *tail;
+    t_token *new_token;
+    int i;
+
+    i = -1;
+    new_head = NULL;
+    current = head;
+    tail = NULL;
+    while (current != NULL)
+    {
+        if (initialize_token(&new_token, current))
+            return (free(new_head), NULL);
+        while (current->args[++i])
+            new_token->args[i] = strdup(current->args[i]);
+        new_token->args[current->arg_size] = NULL;
+        new_token->next = NULL;
+        if (!new_head) new_head = new_token;
+        else tail->next = new_token;
+        tail = new_token;
+        current = current->next;
+    }
+    return (new_head);
+}
+
+void reorganize_cmd_to_start(t_token **head)
+{    
+    t_token *prev;
+    t_token *current;
+    t_token *first_cmd;
+    t_token *prev_cmd;
+
+    prev_cmd = NULL;
+    first_cmd = NULL;
+    prev = NULL;
+    current = *head;
+    if (!head || !*head || !(*head)->next)
+        return;
+    while (current && current->type != CMD)
+    {
+        prev = current;
+        current = current->next;
+    }
+    if (!current || current == *head)
+        return;
+    first_cmd = current;
+    prev_cmd = prev;
+    prev_cmd->next = first_cmd->next;
+    first_cmd->next = *head;
+    *head = first_cmd;    
 }
 
 void loop_v2(char *input, t_list **lists)
@@ -639,8 +554,9 @@ void loop_v2(char *input, t_list **lists)
     else 
     {
         t_token *new_head = convert_data(result.tokens);
+        reorganize_cmd_to_start(&new_head);
         // print_tokens(result.tokens);
-        // print_tokens_v2(new_head);
+        print_tokens_v2(new_head);
         if (!new_head)
             return;
         excution(&new_head, &lists[0], &lists[1]);

@@ -1,0 +1,6 @@
+{
+	IGN_READLINE
+	Memcheck:Leak
+	...
+	obj:/**/libreadline.so*
+}
