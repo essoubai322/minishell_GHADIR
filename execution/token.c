@@ -6,7 +6,7 @@
 /*   By: asebaai <asebaai@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/26 10:25:46 by amoubine          #+#    #+#             */
-/*   Updated: 2024/11/19 17:54:51 by asebaai          ###   ########.fr       */
+/*   Updated: 2024/11/22 20:14:04 by asebaai          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -247,7 +247,8 @@ void while_loop(char *input, t_token2 **head)
                 strcat(global.current_token, var_name);
                 global.current_token_length += ft_strlen(var_name);
             }
-            free(env_value);
+            if (env_value)
+                free(env_value);
             free(var_name);
         }
         else
@@ -607,7 +608,7 @@ char	*ft_get_env(char *name, char **env)
             j++;
         len = j;
         if (ft_strncmp(name, env[i], len) == 0)
-            return (env[i] + len + 1);
+            return (ft_strdup(env[i] + len + 1));
         i++;
     }
     return (NULL);
