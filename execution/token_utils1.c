@@ -6,7 +6,7 @@
 /*   By: asebaai <asebaai@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/17 17:18:04 by asebaai           #+#    #+#             */
-/*   Updated: 2024/11/23 10:50:15 by asebaai          ###   ########.fr       */
+/*   Updated: 2024/11/25 01:32:04 by asebaai          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,6 +54,7 @@ int	add_token_check(t_token2 **head, char *stripped_value, enum TokenType type)
 	ft_free2(&arg_space);
 	return (0);
 }
+
 char	*ft_get_value(int *i, char *value)
 {
 	char	*env_value;
@@ -64,18 +65,11 @@ char	*ft_get_value(int *i, char *value)
 	var_name = calloc(ft_strlen(value) + 1, sizeof(char));
 	(*i)++;
 	k = 0;
-	if (ft_strncmp(value + *i, "?", 1) == 0)
-	{
-		(*i)++;
-		env_value = ft_itoa(global.sts);
-		free(var_name);
-		return (env_value);
-	}
+	if (ft_get_endo(value, *i, &env_value, var_name))
+		return ((*i)++, env_value);
 	while (value[*i] && (isalnum(value[*i]) || value[*i] == '_'))
 		var_name[k++] = value[(*i)++];
 	var_name[k] = '\0';
-	dprintf(2, "value + *i = %s\n", value + *i);
-	dprintf(2, "k == %d\n", k);
 	if (k == 0)
 	{
 		env_value = calloc(2, sizeof(char));
@@ -84,10 +78,11 @@ char	*ft_get_value(int *i, char *value)
 		return (env_value);
 	}
 	if (var_name)
-		env_value = ft_get_env(var_name, global.env);
+		env_value = ft_get_env(var_name, g_glo.env);
 	free(var_name);
 	return (env_value);
 }
+
 void	add_token_else(char *value, int *i, char **stripped_value, int *k)
 {
 	char	*var_name;
@@ -114,8 +109,8 @@ char	*get_stripped_value(enum TokenType type, char *value,
 {
 	int	len;
 
-	global.o = 0;
-	global.k = 0;
+	g_glo.o = 0;
+	g_glo.k = 0;
 	stripped_value = calloc(1200500, sizeof(char));
 	if (type == QUOTE || type == DQUOTE)
 	{

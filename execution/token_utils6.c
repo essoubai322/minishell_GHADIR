@@ -6,7 +6,7 @@
 /*   By: asebaai <asebaai@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/23 06:21:06 by asebaai           #+#    #+#             */
-/*   Updated: 2024/11/23 17:02:22 by asebaai          ###   ########.fr       */
+/*   Updated: 2024/11/23 19:33:40 by asebaai          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -118,7 +118,7 @@ void	reorganize_cmd_to_start(t_token **head)
 	cmd_to_start(&start.current, start.pipe_section, start.prev);
 }
 
-char	**convert_to_array_v2(t_list *envl, char **global_env)
+char	**convert_to_array_v2(t_list *envl, char **g_glo_env)
 {
 	int		i;
 	char	**cenv;
@@ -126,7 +126,7 @@ char	**convert_to_array_v2(t_list *envl, char **global_env)
 
 	i = 0;
 	tmp = envl;
-	free_arr(global_env);
+	free_arr(g_glo_env);
 	while (tmp)
 	{
 		i++;

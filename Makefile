@@ -6,13 +6,13 @@
 #    By: asebaai <asebaai@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/09/26 10:12:54 by amoubine          #+#    #+#              #
-#    Updated: 2024/11/23 17:12:25 by asebaai          ###   ########.fr        #
+#    Updated: 2024/11/26 06:26:29 by asebaai          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME = minishell
 CC = cc
-CFLAGS = -Wextra -Werror -Wall -g3 #-fsanitize=address 
+CFLAGS = -Wextra -Werror -Wall -g3 -fsanitize=address 
 INCLUDE = -lreadline
 
 # Directories
@@ -26,7 +26,8 @@ EXEC_SRCS = token.c builtin.c builtin1.c builtin2.c builtin3.c builtin_utils.c \
 		exec_utils.c exec_utiles.c builtin4.c redirection_utils.c utiles.c \
 		signals.c token_utils.c token_utils1.c token_utils2.c token_utils3.c \
 		token_utils4.c token_utils5.c token_utils6.c token_utils7.c token_utils8.c \
-		token_utils9.c token_utils10.c token_utils11.c
+		token_utils9.c token_utils10.c token_utils11.c token_utils12.c heredoc.c \
+		heredoc_v2.c 
 
 # Create full paths for source and object files
 SRCS = $(addprefix $(SRC_DIR_E)/, $(EXEC_SRCS))

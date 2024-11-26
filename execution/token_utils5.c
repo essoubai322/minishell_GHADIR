@@ -6,7 +6,7 @@
 /*   By: asebaai <asebaai@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/23 06:11:35 by asebaai           #+#    #+#             */
-/*   Updated: 2024/11/23 17:23:27 by asebaai          ###   ########.fr       */
+/*   Updated: 2024/11/26 05:55:19 by asebaai          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,11 +25,6 @@ char	*after_heredoc1(char *input, int *i)
 	while (input[*i] && !isspace(input[*i]) && input[*i] != '|'
 		&& input[*i] != '>' && input[*i] != '<')
 	{
-		if (input[*i] == '\'')
-			flag = parse_single_quote(input, i, result, &k);
-		else if (input[*i] == '"')
-			flag = parse_double_quote(input, i, result, &k);
-		else
 			parse_unquoted_heredoc1(input, i, result, &k);
 	}
 	if (!flag && strlen(result) == 0)
@@ -49,24 +44,24 @@ t_lexer	tokenize(char *input)
 
 	head = NULL;
 	inialize_global();
-	global.current_token = calloc(ft_strlen(input) + 1, \
-		sizeof(global.current_token));
-	while (input[global.i] != '\0')
+	g_glo.current_token = calloc(ft_strlen(input) + 1, \
+		sizeof(g_glo.current_token));
+	while (input[g_glo.i] != '\0')
 		while_loop(input, &head);
-	if (global.current_token_length > 0)
+	if (g_glo.current_token_length > 0)
 	{
-		if (input[global.i - 1] == '"')
-			add_token(&head, DQUOTE, global.current_token);
-		else if (input[global.i - 1] == '\'')
-			add_token(&head, DQUOTE, global.current_token);
+		if (input[g_glo.i - 1] == '"')
+			add_token(&head, DQUOTE, g_glo.current_token);
+		else if (input[g_glo.i - 1] == '\'')
+			add_token(&head, DQUOTE, g_glo.current_token);
 		else
-			add_token(&head, WORD, global.current_token);
+			add_token(&head, WORD, g_glo.current_token);
 	}
-	global.error_message = check_syntax_errors(head, global.error_message);
+	g_glo.error_message = check_syntax_errors(head, g_glo.error_message);
 	add_token(&head, END, "");
 	result.tokens = head;
-	result.error_message = global.error_message;
-	free(global.current_token);
+	result.error_message = g_glo.error_message;
+	free(g_glo.current_token);
 	return (result);
 }
 

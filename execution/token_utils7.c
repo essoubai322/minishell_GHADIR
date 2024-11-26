@@ -6,7 +6,7 @@
 /*   By: asebaai <asebaai@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/23 17:02:46 by asebaai           #+#    #+#             */
-/*   Updated: 2024/11/23 17:03:16 by asebaai          ###   ########.fr       */
+/*   Updated: 2024/11/23 19:33:40 by asebaai          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,12 +63,12 @@ int	while_in_string_command(char *input, t_token2 **head)
 	char	**arg_space;
 	int		s;
 
-	global.str_cmd = string_command(input, &global.i);
-	global.apa = ft_strdup(global.str_cmd);
-	free(global.str_cmd);
-	if (ft_strchr(global.apa, '`'))
+	g_glo.str_cmd = string_command(input, &g_glo.i);
+	g_glo.apa = ft_strdup(g_glo.str_cmd);
+	free(g_glo.str_cmd);
+	if (ft_strchr(g_glo.apa, '`'))
 	{
-		arg_space = ft_split(global.apa, '`');
+		arg_space = ft_split(g_glo.apa, '`');
 		s = 0;
 		while (arg_space[s])
 		{
@@ -76,25 +76,25 @@ int	while_in_string_command(char *input, t_token2 **head)
 			s++;
 		}
 		ft_free2(&arg_space);
-		free(global.apa);
+		free(g_glo.apa);
 		return (1);
 	}
-	add_token_v2(head, WORD, global.apa);
-	free(global.apa);
+	add_token_v2(head, WORD, g_glo.apa);
+	free(g_glo.apa);
 	return (0);
 }
 
 void	while_in_current_bigger_than_zero(char *input, t_token2 **head)
 {
-	if (global.current_token_length > 0)
+	if (g_glo.current_token_length > 0)
 	{
-		if (input[global.i - 1] == '"')
-			add_token(head, DQUOTE, global.current_token);
-		else if (input[global.i - 1] == '\'')
-			add_token(head, QUOTE, global.current_token);
+		if (input[g_glo.i - 1] == '"')
+			add_token(head, DQUOTE, g_glo.current_token);
+		else if (input[g_glo.i - 1] == '\'')
+			add_token(head, QUOTE, g_glo.current_token);
 		else
-			add_token(head, WORD, global.current_token);
-		global.current_token_length = 0;
-		ft_memset(global.current_token, 0, ft_strlen(input));
+			add_token(head, WORD, g_glo.current_token);
+		g_glo.current_token_length = 0;
+		ft_memset(g_glo.current_token, 0, ft_strlen(input));
 	}
 }

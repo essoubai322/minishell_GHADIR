@@ -84,7 +84,7 @@ void	ft_exit(t_token *head, t_list **lists[2], char **paths, long val)
 	if (!head->args[1])
 	{
 		clear_child(head, lists[0], lists[1], paths);
-		exit(global.sts);
+		exit(g_glo.sts);
 	}
 	val = ft_atoi(head->args[1]);
 	if ((!val && head->args[1][0] != '0') || (!val && head->args[1][0] == '-')

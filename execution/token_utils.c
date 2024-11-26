@@ -6,7 +6,7 @@
 /*   By: asebaai <asebaai@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/17 17:13:57 by asebaai           #+#    #+#             */
-/*   Updated: 2024/11/23 17:16:51 by asebaai          ###   ########.fr       */
+/*   Updated: 2024/11/25 01:23:04 by asebaai          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,18 +14,18 @@
 
 void	inialize_global(void)
 {
-	global.i = 0;
-	global.current_token = NULL;
-	global.current_token_length = 0;
-	global.in_quote = 0;
-	global.in_dquote = 0;
-	global.error_message = NULL;
-	global.apa = NULL;
-	global.str_cmd = NULL;
-	global.k = 0;
-	global.stripped_value = NULL;
-	global.env_value = NULL;
-	global.o = 0;
+	g_glo.i = 0;
+	g_glo.current_token = NULL;
+	g_glo.current_token_length = 0;
+	g_glo.in_quote = 0;
+	g_glo.in_dquote = 0;
+	g_glo.error_message = NULL;
+	g_glo.apa = NULL;
+	g_glo.str_cmd = NULL;
+	g_glo.k = 0;
+	g_glo.sdv = NULL;
+	g_glo.env_value = NULL;
+	g_glo.o = 0;
 }
 
 char	*ft_strcat(char *dest, char *src)
@@ -82,34 +82,25 @@ t_token2	*create_token(enum TokenType type, const char *value)
 	return (new_token);
 }
 
-void	add_token_env_value(char *env_value, char **stripped_value, char *value,
-		int *i)
+int	add_token_env_value_part(char	*env_value, char	**std, char	*value,
+	int i)
 {
 	char	*temp;
 	char	*env_value1;
 
-	if (value[*i] == '$' || ft_strchr(value + *i, '$'))
+	if (ft_strchr(env_value, ' '))
 	{
-		temp = *stripped_value;
-		*stripped_value = ft_strcat(*stripped_value, env_value);
+		env_value1 = ft_strcat(env_value, value + i);
+		temp = *std;
+		*std = ft_strcat(*std, env_value1);
 		free(temp);
+		free(env_value1);
 	}
 	else
 	{
-		if (ft_strchr(env_value, ' '))
-		{
-			env_value1 = ft_strcat(env_value, value + *i);
-			temp = *stripped_value;
-			*stripped_value = ft_strcat(*stripped_value, env_value1);
-			free(temp);
-			free(env_value1);
-		}
-		else
-		{
-			temp = *stripped_value;
-			*stripped_value = ft_strcat(*stripped_value, env_value);
-			free(temp);
-		}
+		temp = *std;
+		*std = ft_strcat(*std, env_value);
+		free(temp);
 	}
-	free(env_value);
+	return (i);
 }

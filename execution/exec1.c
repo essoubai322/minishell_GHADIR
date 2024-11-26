@@ -31,7 +31,7 @@ void	printf_error(char *str, char *cmd, int exit_status)
 	write(2, str, ft_strlen(str));
 	write(2, "\n", 1);
 	if (exit_status)
-		global.sts = exit_status;
+		g_glo.sts = exit_status;
 }
 
 int	check_redir(t_token *head, int f)

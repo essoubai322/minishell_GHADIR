@@ -6,13 +6,13 @@
 /*   By: asebaai <asebaai@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/26 10:25:46 by amoubine          #+#    #+#             */
-/*   Updated: 2024/11/23 17:12:40 by asebaai          ###   ########.fr       */
+/*   Updated: 2024/11/26 06:40:01 by asebaai          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
 
-g_global	global;
+g_global	g_glo;
 
 void	print_tokens_v2(t_token *head)
 {
@@ -121,9 +121,16 @@ void	loop_v2(char *input, t_list **lists)
 	{
 		new_head = convert_data(result.tokens, current2, new_token);
 		reorganize_cmd_to_start(&new_head);
+		if (heredoc(new_head, lists, 0, 0) == 0)
+		{
+			list_clear(&new_head);
+			write(1, "\n", 1);
+			return ;
+		}
 		print_tokens_v2(new_head);
 		if (!new_head)
 			return ;
+		
 		excution(&new_head, &lists[0], &lists[1]);
 	}
 	free_tokens(result.tokens);
@@ -136,7 +143,7 @@ void	loop_free(char *input, t_list **lists)
 	free(input);
 	free_list(lists[0]);
 	free_list(lists[1]);
-	free_arr(global.env);
+	free_arr(g_glo.env);
 }
 
 int	loop(char **env)
@@ -147,7 +154,7 @@ int	loop(char **env)
 	set_up_env_exp(&lists[0], &lists[1], env);
 	while (1)
 	{
-		global.env = convert_to_array_v2(lists[0], global.env);
+		g_glo.env = convert_to_array_v2(lists[0], g_glo.env);
 		signal_setup(2);
 		input = readline("APA@GOVOS> ");
 		if (!input)

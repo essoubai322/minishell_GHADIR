@@ -6,7 +6,7 @@
 /*   By: asebaai <asebaai@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/17 17:19:35 by asebaai           #+#    #+#             */
-/*   Updated: 2024/11/23 10:50:15 by asebaai          ###   ########.fr       */
+/*   Updated: 2024/11/25 01:35:29 by asebaai          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 char	*check_case_v1(char **input, int *i, int *k, char *result)
 {
 	char	quote;
-
+	
 	result = calloc(strlen(*input) + 1, sizeof(char));
 	while (isspace((*input)[*i]))
 		(*i)++;
@@ -79,7 +79,7 @@ int	expand_variable(const char *input, char *result, int *arr)
 	if (ft_strncmp(input + arr[0], "?", 1) == 0)
 	{
 		arr[0]++;
-		env_value = ft_itoa(global.sts);
+		env_value = ft_itoa(g_glo.sts);
 	}
 	else
 	{
@@ -93,7 +93,7 @@ int	expand_variable(const char *input, char *result, int *arr)
 			env_value[0] = input[arr[0] - 1];
 		}
 		else
-			env_value = ft_get_env(var_name, global.env);
+			env_value = ft_get_env(var_name, g_glo.env);
 	}
 	if (env_value)
 	{

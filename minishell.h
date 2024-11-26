@@ -6,7 +6,7 @@
 /*   By: asebaai <asebaai@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/26 10:22:04 by amoubine          #+#    #+#             */
-/*   Updated: 2024/11/23 17:12:57 by asebaai          ###   ########.fr       */
+/*   Updated: 2024/11/26 06:25:22 by asebaai          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,7 +47,7 @@ typedef struct global
     char *apa;
     char *str_cmd;
     int k;
-    char *stripped_value;
+    char *sdv;
     int o;
     char *env_value;
     char **env;
@@ -119,7 +119,7 @@ void inialize_global(void);
 char *ft_strcat(char *dest, char *src);
 void ft_free2(char ***dest);
 t_token2 *create_token(enum TokenType type, const char *value);
-void    add_token_env_value(char *env_value, char **stripped_value, char *value, int *i);
+void    add_tev(char *env_value, char **stripped_value, char *value, int *i);
 void add_token_innit_head(t_token2 **head, char *stripped_value, enum TokenType type);
 int add_token_check(t_token2 **head, char *stripped_value,enum TokenType type);
 char    *ft_get_value(int *i, char *value);
@@ -175,13 +175,12 @@ t_token *handle_pipe_and_redirects(t_token2 *current);
 void add_token_to_list(t_token **new_head, t_token **current2, 
     t_token *new_token);
 t_token *create_and_init_token(const char *value, t_type new_type);
-
-
+int	add_token_env_value_part(char	*env_value, char	**std, char	*value, int i);
+int ft_get_endo(char *value, int i, char **env_value, char * var_name);
 
 
 /*global variable*/
-extern int	g_status;
-extern g_global global;
+extern g_global g_glo;
 /*error.c*/
 void		error_func(int errnum, int exit_num);
 void		error_exit(char *str, int exit_num);
@@ -271,6 +270,16 @@ char	*get_path(t_list *envl);
 char	**split_paths(char *paths);
 char	*ft_get_env(char *name, char **env);
 void free_list(t_list *list);
+/*heredocs*/
+char	*ran_file(void);
+int		read_put(char *fn, char *del, int q, t_list *env);
+int		heredoc(t_token *head, t_list *list[2], t_token	*tmp, int status);
+void	fork_heredoc(char *fn, t_token *head, t_list *list[2], t_token	*tmp);
+void	free_re(t_token *head, char *file_name);
+char	*expand_h(char *str, t_list *env, int *q, char ***temp);
+int		is_q(char *str);
+int		ff_strncmp(const char *s1, const char *s2, size_t n);
+char	*get_heredoc(char *str, char *del);
 
 
 # ifndef DEFAULT_PATH_VALUE

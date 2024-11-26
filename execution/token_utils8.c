@@ -6,7 +6,7 @@
 /*   By: asebaai <asebaai@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/23 17:03:54 by asebaai           #+#    #+#             */
-/*   Updated: 2024/11/23 17:04:18 by asebaai          ###   ########.fr       */
+/*   Updated: 2024/11/23 19:33:40 by asebaai          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,33 +14,33 @@
 
 void	while_in_RED_input(char *input, t_token2 **head)
 {
-	if (input[global.i + 1] == '<')
+	if (input[g_glo.i + 1] == '<')
 	{
 		add_token(head, HEREDOC1, "<<");
-		global.i += 2;
-		global.apa = after_heredoc1(input, &global.i);
-		if (global.apa)
-			add_token_v2(head, WORD, global.apa);
-		free(global.apa);
+		g_glo.i += 2;
+		g_glo.apa = after_heredoc1(input, &g_glo.i);
+		if (g_glo.apa)
+			add_token_v2(head, WORD, g_glo.apa);
+		free(g_glo.apa);
 	}
 	else
 	{
 		add_token(head, REDIRECT_IN, "<");
-		global.i++;
+		g_glo.i++;
 	}
 }
 
 void	while_in_RED_output(char *input, t_token2 **head)
 {
-	if (input[global.i + 1] == '>')
+	if (input[g_glo.i + 1] == '>')
 	{
 		add_token(head, REDIRECT_APPEND, ">>");
-		global.i += 2;
+		g_glo.i += 2;
 	}
 	else
 	{
 		add_token(head, REDIRECT_OUT, ">");
-		global.i++;
+		g_glo.i++;
 	}
 }
 
@@ -48,61 +48,61 @@ void	while_in_quote_dquote(char *input, int f)
 {
 	if (!f)
 	{
-		global.in_quote = 1;
-		global.current_token[global.current_token_length++] = input[global.i];
-		global.i++;
+		g_glo.in_quote = 1;
+		g_glo.current_token[g_glo.current_token_length++] = input[g_glo.i];
+		g_glo.i++;
 	}
 	else
 	{
-		global.in_dquote = 1;
-		global.current_token[global.current_token_length++] = input[global.i];
-		global.i++;
+		g_glo.in_dquote = 1;
+		g_glo.current_token[g_glo.current_token_length++] = input[g_glo.i];
+		g_glo.i++;
 	}
 }
 
 void	while_in_check_RED_HEREDOC(char *input, t_token2 **head)
 {
-	if (input[global.i] == '|')
+	if (input[g_glo.i] == '|')
 	{
 		add_token(head, PIPE1, "|");
-		global.i++;
+		g_glo.i++;
 	}
-	else if (input[global.i] == '<')
+	else if (input[g_glo.i] == '<')
 		while_in_RED_input(input, head);
-	else if (input[global.i] == '>')
+	else if (input[g_glo.i] == '>')
 		while_in_RED_output(input, head);
-	else if (input[global.i] == '\'')
+	else if (input[g_glo.i] == '\'')
 		while_in_quote_dquote(input, 0);
-	else if (input[global.i] == '"')
+	else if (input[g_glo.i] == '"')
 		while_in_quote_dquote(input, 1);
-	else if (isspace(input[global.i]))
-		global.i++;
-	else if ((input[global.i - 1] == '\'' || input[global.i - 1] == '"')
-			&& input[global.i])
+	else if (isspace(input[g_glo.i]))
+		g_glo.i++;
+	else if ((input[g_glo.i - 1] == '\'' || input[g_glo.i - 1] == '"')
+			&& input[g_glo.i])
 	{
-		global.current_token[global.current_token_length++] = input[global.i];
-		global.i++;
+		g_glo.current_token[g_glo.current_token_length++] = input[g_glo.i];
+		g_glo.i++;
 	}
 }
 
 void	in_expand_variable(char *input, char *var_name, char **env_value, int k)
 {
-	if (ft_strncmp(input + global.i, "?", 1) == 0)
+	if (ft_strncmp(input + g_glo.i, "?", 1) == 0)
 	{
-		global.i++;
-		*env_value = ft_itoa(global.sts);
+		g_glo.i++;
+		*env_value = ft_itoa(g_glo.sts);
 	}
 	else
 	{
-		while (isalnum(input[global.i]) || input[global.i] == '_')
-			var_name[k++] = input[global.i++];
+		while (isalnum(input[g_glo.i]) || input[g_glo.i] == '_')
+			var_name[k++] = input[g_glo.i++];
 		var_name[k] = '\0';
 		if (k == 0)
 		{
 			*env_value = ft_calloc(2, sizeof(char));
-			*env_value[0] = input[global.i - 1];
+			*env_value[0] = input[g_glo.i - 1];
 		}
 		else
-			*env_value = ft_get_env(var_name, global.env);
+			*env_value = ft_get_env(var_name, g_glo.env);
 	}
 }
