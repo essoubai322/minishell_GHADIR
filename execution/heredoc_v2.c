@@ -6,7 +6,7 @@
 /*   By: asebaai <asebaai@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/26 05:30:03 by asebaai           #+#    #+#             */
-/*   Updated: 2024/11/26 06:43:54 by asebaai          ###   ########.fr       */
+/*   Updated: 2024/11/26 07:07:23 by asebaai          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,9 +48,7 @@ int	read_put(char *file_name, char *del, int q, t_list *env)
 	return (close(fd), 0);
 }
 
-// create function to remove quotes rm_quote(&head->next->args[0]) and without problem heap-buffer-overflow
-
-void rm_quote(char **str)
+char *rm_quote(char *str)
 {
 	int		i;
 	int		j;
@@ -58,25 +56,42 @@ void rm_quote(char **str)
 
 	i = 0;
 	j = 0;
-	tmp = calloc(sizeof(char) , (ft_strlen(*str) + 1));
-	while ((*str)[i])
+	tmp = ft_calloc(sizeof(char) ,(ft_strlen(str + 1)));
+	while (str[i])
 	{
-		if ((*str)[i] == '\'' || (*str)[i] == '"')
+		if (str[i] == '\'')
+		{
 			i++;
+			while (str[i] && str[i] != '\'')
+				tmp[j++] = str[i++];
+			i++;
+		}
+		else if (str[i] == '"')
+		{
+			i++;
+			while (str[i] && str[i] != '"')
+				tmp[j++] = str[i++];
+			i++;
+		}
 		else
-			tmp[j++] = (*str)[i++];
+			tmp[j++] = str[i++];
 	}
 	tmp[j] = '\0';
-	free(*str);
-	*str = tmp;
+	return (tmp);
 }
+
 
 void	fork_heredoc(char *fn, t_token *head, t_list *list[2], t_token	*tmp)
 {
+	char *delemiter;
 	signal_setup(1);
 	if (is_q(head->next->args[0]))
 	{
-		rm_quote(&head->next->args[0]);
+		delemiter = rm_quote(head->next->args[0]);
+		free(head->next->args[0]);
+		head->next->args[0] = delemiter;
+		
+		dprintf(2, "delemiter : %s\n", head->next->args[0]);
 		if (read_put(fn, head->next->args[0], 1, list[0]))
 		{
 			list_clear(&tmp);

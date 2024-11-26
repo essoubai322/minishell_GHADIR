@@ -6,13 +6,13 @@
 #    By: asebaai <asebaai@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/09/26 10:12:54 by amoubine          #+#    #+#              #
-#    Updated: 2024/11/26 06:26:29 by asebaai          ###   ########.fr        #
+#    Updated: 2024/11/26 06:54:33 by asebaai          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME = minishell
 CC = cc
-CFLAGS = -Wextra -Werror -Wall -g3 -fsanitize=address 
+CFLAGS = -Wextra -Werror -Wall -g3 #-fsanitize=address 
 INCLUDE = -lreadline
 
 # Directories
