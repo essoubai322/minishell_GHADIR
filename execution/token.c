@@ -6,7 +6,7 @@
 /*   By: asebaai <asebaai@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/26 10:25:46 by amoubine          #+#    #+#             */
-/*   Updated: 2024/11/26 06:40:01 by asebaai          ###   ########.fr       */
+/*   Updated: 2024/11/29 20:10:43 by asebaai          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,92 +14,10 @@
 
 g_global	g_glo;
 
-void	print_tokens_v2(t_token *head)
+void	print_error(char *str)
 {
-	t_token	*current;
-
-	current = head;
-	while (current != NULL)
-	{
-		if (current->type == CMD)
-		{
-			printf("CMD : args= ");
-			for (int i = 0; i < current->arg_size; i++)
-			{
-				printf("[%d] '%s'", i, current->args[i]);
-				if (i < current->arg_size - 1)
-					printf(" ");
-			}
-			printf("\n");
-		}
-		else if (current->type == PIPE)
-		{
-			printf("PIPE : args= ");
-			for (int i = 0; i < current->arg_size; i++)
-			{
-				printf("[%d] '%s'", i, current->args[i]);
-				if (i < current->arg_size - 1)
-					printf(" ");
-			}
-			printf("\n");
-		}
-		else if (current->type == RED)
-		{
-			printf("RED : args= ");
-			for (int i = 0; i < current->arg_size; i++)
-			{
-				printf("[%d] '%s'", i, current->args[i]);
-				if (i < current->arg_size - 1)
-					printf(" ");
-			}
-			printf("\n");
-		}
-		else if (current->type == HEREDOC)
-		{
-			printf("HEREDOC : args= ");
-			for (int i = 0; i < current->arg_size; i++)
-			{
-				printf("[%d] '%s'", i, current->args[i]);
-				if (i < current->arg_size - 1)
-					printf(" ");
-			}
-			printf("\n");
-		}
-		else if (current->type == FILE_N)
-		{
-			printf("FILE : args= ");
-			for (int i = 0; i < current->arg_size; i++)
-			{
-				printf("[%d] '%s'", i, current->args[i]);
-				if (i < current->arg_size - 1)
-					printf(" ");
-			}
-			printf("\n");
-		}
-		current = current->next;
-	}
-	printf("\n");
-}
-
-t_token	*create_and_init_token(const char *value, t_type new_type)
-{
-	t_token	*new_token;
-
-	new_token = malloc(sizeof(t_token));
-	if (!new_token)
-		return (NULL);
-	new_token->type = new_type;
-	new_token->arg_size = 1;
-	new_token->args = malloc(sizeof(char *) * 2);
-	if (!new_token->args)
-	{
-		free(new_token);
-		return (NULL);
-	}
-	new_token->args[0] = ft_strdup(value);
-	new_token->args[1] = NULL;
-	new_token->next = NULL;
-	return (new_token);
+	printf("%s\n", str);
+	free(str);
 }
 
 void	loop_v2(char *input, t_list **lists)
@@ -113,10 +31,7 @@ void	loop_v2(char *input, t_list **lists)
 	current2 = NULL;
 	new_token = NULL;
 	if (result.error_message)
-	{
-		printf("%s\n", result.error_message);
-		free(result.error_message);
-	}
+		print_error(result.error_message);
 	else
 	{
 		new_head = convert_data(result.tokens, current2, new_token);
@@ -127,14 +42,11 @@ void	loop_v2(char *input, t_list **lists)
 			write(1, "\n", 1);
 			return ;
 		}
-		print_tokens_v2(new_head);
 		if (!new_head)
 			return ;
-		
 		excution(&new_head, &lists[0], &lists[1]);
 	}
 	free_tokens(result.tokens);
-	free(input);
 }
 
 void	loop_free(char *input, t_list **lists)
@@ -169,6 +81,7 @@ int	loop(char **env)
 		}
 		add_history(input);
 		loop_v2(input, lists);
+		free(input);
 	}
 	loop_free(input, lists);
 	return (0);

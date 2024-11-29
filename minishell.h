@@ -6,7 +6,7 @@
 /*   By: asebaai <asebaai@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/26 10:22:04 by amoubine          #+#    #+#             */
-/*   Updated: 2024/11/26 06:25:22 by asebaai          ###   ########.fr       */
+/*   Updated: 2024/11/29 20:06:16 by asebaai          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -177,7 +177,7 @@ void add_token_to_list(t_token **new_head, t_token **current2,
 t_token *create_and_init_token(const char *value, t_type new_type);
 int	add_token_env_value_part(char	*env_value, char	**std, char	*value, int i);
 int ft_get_endo(char *value, int i, char **env_value, char * var_name);
-
+t_token	*create_and_init_token(const char *value, t_type new_type);
 
 /*global variable*/
 extern g_global g_glo;
@@ -276,7 +276,6 @@ int		read_put(char *fn, char *del, int q, t_list *env);
 int		heredoc(t_token *head, t_list *list[2], t_token	*tmp, int status);
 void	fork_heredoc(char *fn, t_token *head, t_list *list[2], t_token	*tmp);
 void	free_re(t_token *head, char *file_name);
-char	*expand_h(char *str, t_list *env, int *q, char ***temp);
 int		is_q(char *str);
 int		ff_strncmp(const char *s1, const char *s2, size_t n);
 char	*get_heredoc(char *str, char *del);

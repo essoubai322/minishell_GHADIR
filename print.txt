@@ -1,0 +1,67 @@
+
+// void	print_tokens_v2(t_token *head)
+// {
+// 	t_token	*current;
+
+// 	current = head;
+// 	while (current != NULL)
+// 	{
+// 		if (current->type == CMD)
+// 		{
+// 			printf("CMD : args= ");
+// 			for (int i = 0; i < current->arg_size; i++)
+// 			{
+// 				printf("[%d] '%s'", i, current->args[i]);
+// 				if (i < current->arg_size - 1)
+// 					printf(" ");
+// 			}
+// 			printf("\n");
+// 		}
+// 		else if (current->type == PIPE)
+// 		{
+// 			printf("PIPE : args= ");
+// 			for (int i = 0; i < current->arg_size; i++)
+// 			{
+// 				printf("[%d] '%s'", i, current->args[i]);
+// 				if (i < current->arg_size - 1)
+// 					printf(" ");
+// 			}
+// 			printf("\n");
+// 		}
+// 		else if (current->type == RED)
+// 		{
+// 			printf("RED : args= ");
+// 			for (int i = 0; i < current->arg_size; i++)
+// 			{
+// 				printf("[%d] '%s'", i, current->args[i]);
+// 				if (i < current->arg_size - 1)
+// 					printf(" ");
+// 			}
+// 			printf("\n");
+// 		}
+// 		else if (current->type == HEREDOC)
+// 		{
+// 			printf("HEREDOC : args= ");
+// 			for (int i = 0; i < current->arg_size; i++)
+// 			{
+// 				printf("[%d] '%s'", i, current->args[i]);
+// 				if (i < current->arg_size - 1)
+// 					printf(" ");
+// 			}
+// 			printf("\n");
+// 		}
+// 		else if (current->type == FILE_N)
+// 		{
+// 			printf("FILE : args= ");
+// 			for (int i = 0; i < current->arg_size; i++)
+// 			{
+// 				printf("[%d] '%s'", i, current->args[i]);
+// 				if (i < current->arg_size - 1)
+// 					printf(" ");
+// 			}
+// 			printf("\n");
+// 		}
+// 		current = current->next;
+// 	}
+// 	printf("\n");
+// }

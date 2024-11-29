@@ -6,24 +6,86 @@
 /*   By: asebaai <asebaai@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/26 05:30:03 by asebaai           #+#    #+#             */
-/*   Updated: 2024/11/26 07:07:23 by asebaai          ###   ########.fr       */
+/*   Updated: 2024/11/29 19:32:00 by asebaai          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
 
-void	set_int(int *i)
+char *var_name_heredoc(char *input, int *i)
 {
-	i[0] = 0;
-	i[1] = 0;
-	i[2] = 0;
+	char *var_name;
+	int c;
+	
+	c = 0;
+	var_name = ft_calloc(sizeof(char), 100000);
+	if (input[*i - 1] == '$' && ft_strncmp(input + *i, "?", 1) == 0)
+	{
+		(*i)++;
+		var_name = ft_itoa(g_glo.sts);
+	}
+	else
+	{
+		while (input[*i] && (isalnum(input[*i])
+				|| input[*i] == '_'))
+			var_name[c++] = input[(*i)++];
+		var_name[c] = '\0';
+	}
+	return (var_name);
 }
+
+void init_arr(int *arr)
+{
+	arr[0] = 0;
+	arr[1] = 0;
+	arr[2] = 0;
+}
+
+char *in_expand_variable_v2(char *s, t_list *env)
+{
+	char	*tmp;
+	char	*var_name;
+	char	*tmp2;
+	int		i[3];
+	
+	init_arr(i);
+	tmp = ft_calloc(sizeof(char) ,100000);
+	tmp2 = NULL;
+	while (s[i[0]])
+	{
+		if (s[i[0]] == '$')
+		{
+			i[0]++;
+			var_name = var_name_heredoc(s, i);
+			tmp2 = get_var(var_name, env);
+			free(var_name);
+			if (tmp2)
+			{
+				while (tmp2[i[2]])
+				{
+					tmp[i[1]] = tmp2[i[2]++];
+					i[1]++;
+				}
+				i[2] = 0;
+				free(tmp2);
+			}
+		}
+		else
+		{
+			tmp[i[1]] = s[i[0]++];
+			i[1]++;
+		}
+	}
+	return (free(s), tmp);
+}
+
+
 
 int	read_put(char *file_name, char *del, int q, t_list *env)
 {
 	char	*str;
-	int		i[3];
 	int		fd;
+	(void)q;
 
 	fd = open(file_name, O_CREAT | O_RDWR, 0777);
 	while (1)
@@ -38,9 +100,7 @@ int	read_put(char *file_name, char *del, int q, t_list *env)
 		if (ff_strncmp(str, del, ft_strlen(del)) || (ft_strlen(str) == 0
 				&& ft_strlen(del) == 0))
 			break ;
-		set_int(i);
-		if (q == 0)
-			// str = expand_h(str, env, i, NULL);
+		if (q == 0) str = in_expand_variable_v2(str, env);
 		write(fd, str, ft_strlen(str));
 		write(fd, "\n", 1);
 		free(str);
@@ -48,7 +108,7 @@ int	read_put(char *file_name, char *del, int q, t_list *env)
 	return (close(fd), 0);
 }
 
-char *rm_quote(char *str)
+char *rm_quote(char **str)
 {
 	int		i;
 	int		j;
@@ -56,41 +116,38 @@ char *rm_quote(char *str)
 
 	i = 0;
 	j = 0;
-	tmp = ft_calloc(sizeof(char) ,(ft_strlen(str + 1)));
-	while (str[i])
+	tmp = ft_calloc(sizeof(char) ,(ft_strlen((*str) + 1)));
+	while ((*str)[i])
 	{
-		if (str[i] == '\'')
+		if ((*str)[i] == '\'')
 		{
 			i++;
-			while (str[i] && str[i] != '\'')
-				tmp[j++] = str[i++];
+			while ((*str)[i] && (*str)[i] != '\'')
+				tmp[j++] = (*str)[i++];
 			i++;
 		}
-		else if (str[i] == '"')
+		else if ((*str)[i] == '"')
 		{
 			i++;
-			while (str[i] && str[i] != '"')
-				tmp[j++] = str[i++];
+			while ((*str)[i] && (*str)[i] != '"')
+				tmp[j++] = (*str)[i++];
 			i++;
 		}
 		else
-			tmp[j++] = str[i++];
+			tmp[j++] = (*str)[i++];
 	}
 	tmp[j] = '\0';
+	free(*str);
+	*str = tmp;
 	return (tmp);
 }
 
-
 void	fork_heredoc(char *fn, t_token *head, t_list *list[2], t_token	*tmp)
 {
-	char *delemiter;
 	signal_setup(1);
 	if (is_q(head->next->args[0]))
 	{
-		delemiter = rm_quote(head->next->args[0]);
-		free(head->next->args[0]);
-		head->next->args[0] = delemiter;
-		
+		rm_quote(&head->next->args[0]);
 		dprintf(2, "delemiter : %s\n", head->next->args[0]);
 		if (read_put(fn, head->next->args[0], 1, list[0]))
 		{
@@ -125,18 +182,3 @@ void	free_re(t_token *head, char *file_name)
 	head->next->args[0] = file_name;
 	head->next->type = FILE_N;
 }
-
-// char	*expand_h(char *str, t_list *env, int *q, char ***temp)
-// {
-// 	while (str && str[0] && str[q[2]])
-// 	{
-// 		if (str[q[2]] == '$' && str[q[2] + 1]
-// 			&& !ft_strchr("\\#=+-^[].,!@;*%~&{}() \t", str[q[2] + 1])
-// 			&& !(ft_strchr("\"", str[q[2] + 1]) && q[1]))
-// 			return (expand_h(vars_sub(str, q[2] + 1, env), env, q, temp));
-// 		q[2]++;
-// 	}
-// 	if (temp)
-// 		*temp = NULL;
-// 	return (str);
-// }

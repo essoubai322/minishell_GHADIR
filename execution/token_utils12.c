@@ -6,7 +6,7 @@
 /*   By: asebaai <asebaai@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/24 14:54:01 by asebaai           #+#    #+#             */
-/*   Updated: 2024/11/25 01:26:06 by asebaai          ###   ########.fr       */
+/*   Updated: 2024/11/29 20:06:03 by asebaai          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,3 +42,23 @@ int ft_get_endo(char *value, int i, char **env_value, char * var_name)
 	return (0);
 }
 
+t_token	*create_and_init_token(const char *value, t_type new_type)
+{
+	t_token	*new_token;
+
+	new_token = malloc(sizeof(t_token));
+	if (!new_token)
+		return (NULL);
+	new_token->type = new_type;
+	new_token->arg_size = 1;
+	new_token->args = malloc(sizeof(char *) * 2);
+	if (!new_token->args)
+	{
+		free(new_token);
+		return (NULL);
+	}
+	new_token->args[0] = ft_strdup(value);
+	new_token->args[1] = NULL;
+	new_token->next = NULL;
+	return (new_token);
+}

@@ -6,7 +6,7 @@
 /*   By: asebaai <asebaai@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/23 06:11:35 by asebaai           #+#    #+#             */
-/*   Updated: 2024/11/26 05:55:19 by asebaai          ###   ########.fr       */
+/*   Updated: 2024/11/29 12:01:04 by asebaai          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@ char	*after_heredoc1(char *input, int *i)
 	int		k = 0, flag;
 	int		after;
 
-	result = calloc(100000, 1);
+	result = ft_calloc(100000, 1);
 	k = 0, flag = 0;
 	after = *i;
 	skip_whitespace(input, i);

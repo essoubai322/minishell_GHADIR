@@ -6,7 +6,7 @@
 /*   By: asebaai <asebaai@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/17 17:19:35 by asebaai           #+#    #+#             */
-/*   Updated: 2024/11/25 01:35:29 by asebaai          ###   ########.fr       */
+/*   Updated: 2024/11/29 18:07:34 by asebaai          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,7 +73,7 @@ int	expand_variable(const char *input, char *result, int *arr)
 	int		s;
 
 	c = 0;
-	var_name = calloc(strlen(input) + 1, sizeof(char));
+	var_name = ft_calloc(strlen(input) + 1, sizeof(char));
 	env_value = NULL;
 	(arr[0])++;
 	if (ft_strncmp(input + arr[0], "?", 1) == 0)
