@@ -6,7 +6,7 @@
 /*   By: asebaai <asebaai@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/17 17:19:35 by asebaai           #+#    #+#             */
-/*   Updated: 2024/11/29 18:07:34 by asebaai          ###   ########.fr       */
+/*   Updated: 2024/12/01 04:40:26 by asebaai          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,11 +16,13 @@ char	*check_case_v1(char **input, int *i, int *k, char *result)
 {
 	char	quote;
 	
-	result = calloc(strlen(*input) + 1, sizeof(char));
+	result = ft_calloc(strlen(*input) + 1, sizeof(char));
 	while (isspace((*input)[*i]))
 		(*i)++;
 	while ((*input)[*i] && !isspace((*input)[*i]))
 	{
+		if ((*input)[*i] == '|' || (*input)[*i] == '<' || (*input)[*i] == '>')
+			return (free(result), NULL);
 		if ((*input)[*i] == '\'' || (*input)[*i] == '"')
 		{
 			quote = (*input)[*i];

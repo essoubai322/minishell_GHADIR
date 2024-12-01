@@ -101,13 +101,12 @@ void	unset(t_list **envl, char *var_name, int flag)
 
 	env = *envl;
 	prev = NULL;
-	var_name = ft_strjoin(var_name, "=");
-	if (unset_errors(var_name, flag))
-		return ;
+	(void)flag;
 	while (env)
 	{
 		if (!ft_strncmp((char *)env->content, var_name, ft_strlen(var_name)))
 		{
+			dprintf(2,"env->content: %s\n", (char *)env->content);
 			if (!prev)
 				(*envl) = env->next;
 			else
@@ -119,5 +118,27 @@ void	unset(t_list **envl, char *var_name, int flag)
 		prev = env;
 		env = env->next;
 	}
-	free(var_name);
+}
+
+void	unset_v2(t_list **envl, char **var, int flag)
+{
+	t_list	*env;
+	t_list	*prev;
+	char 	*var_name;
+	int i;
+
+	env = *envl;
+	prev = NULL;
+	var_name = NULL;
+	i = 1;
+
+	while (var[i] && var[i][0] != '\0')
+	{
+		var_name = ft_strjoin(var[i], "=");
+		if (unset_errors(var_name, flag))
+			return ;
+		unset(envl, var_name, flag);
+		free(var_name);
+		i++;
+	}
 }

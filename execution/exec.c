@@ -49,17 +49,19 @@ char	*check_cmd(char *cmd, char **paths)
 		perror("minishell");
 		return (NULL);
 	}
+	else if (!access(cmd, F_OK | X_OK) && !paths)
+		return (cmd);
 	else if ((cmd[0] == '.' || cmd[0] == '/') && !access(cmd, F_OK | X_OK))
 		return (cmd);
 	else if (!paths)
-		return (write(2, "minishell: : No such file or directory\n", 40), NULL);
+		return (write(2, "minishell:1 : No such file or directory\n", 40), NULL);
 	tmp = search_path(cmd, paths, &num);
 	if (tmp)
 		return (tmp);
 	if (num == -1 && check_builtin(cmd))
 	{
 		printf_error("command not found", cmd, 127);
-		cmd = NULL;
+		return (NULL);
 	}
 	return (cmd);
 }
@@ -69,7 +71,7 @@ int	builtin(t_token *head, t_list **envl, t_list **exp_list)
 	if (!head->args[0])
 		return (1);
 	if (!ft_strncmp(head->args[0], "cd", 3))
-		return (cd(head->args, envl, exp_list, NULL));
+		return (cd(head->args, envl, exp_list, NULL), 0);
 	else if (!ft_strncmp(head->args[0], "echo", 5))
 		return (echo(head->args), 0);
 	else if (!ft_strncmp(head->args[0], "export", 7))
@@ -80,8 +82,8 @@ int	builtin(t_token *head, t_list **envl, t_list **exp_list)
 	}
 	else if (!ft_strncmp(head->args[0], "unset", 6))
 	{
-		unset(envl, head->args[1], 0);
-		unset(exp_list, head->args[1], 1);
+		unset_v2(envl, head->args, 0);
+		unset_v2(exp_list, head->args, 1);
 		return (0);
 	}
 	else if (!ft_strncmp(head->args[0], "env", 4) && !head->args[1])

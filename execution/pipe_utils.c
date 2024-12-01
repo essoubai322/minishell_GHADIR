@@ -71,11 +71,11 @@ void	excution(t_token **head, t_list **envl, t_list **exp_list)
 void	clear_child(t_token *head, t_list **envl, t_list **exp_list,
 		char **paths)
 {
-	(void)head;
 	free_arr(paths);
 	ft_lstclear(envl, &del);
 	ft_lstclear(exp_list, &del);
 	list_clear(&head);
+	free_arr(g_glo.env);
 }
 
 void	free_str(char **str1, char **str2)

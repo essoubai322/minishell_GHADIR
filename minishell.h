@@ -6,7 +6,7 @@
 /*   By: asebaai <asebaai@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/26 10:22:04 by amoubine          #+#    #+#             */
-/*   Updated: 2024/11/29 20:06:16 by asebaai          ###   ########.fr       */
+/*   Updated: 2024/12/01 07:14:14 by asebaai          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,8 +36,14 @@
 # include <unistd.h>
 # include <malloc.h>
 
+#define BLUE "\001\033[34m\002"
+#define PURPLE "\001\033[35m\002"
+#define RESET "\001\033[0m\002"
+#define BOLD "\001\033[1m\002"
+
 typedef struct global 
 {
+    int RED;
     int i;
     char *current_token;
     int current_token_length;
@@ -78,14 +84,14 @@ enum TokenType {
 
 
 typedef struct Token {
-    enum TokenType type;
-    char *value;
-    struct Token *next;
+    enum TokenType  type;
+    char            *value;
+    struct Token    *next;
 } t_token2;
 
 typedef struct LexerResult {
-    t_token2 *tokens;
-    char *error_message;
+    t_token2        *tokens;
+    char            *error_message;
 } t_lexer;
 
 typedef struct s_token
@@ -93,7 +99,7 @@ typedef struct s_token
 	char			**args;
 	t_type			type;
 	int				arg_size;
-    int heredoc;
+    int             heredoc;
 	struct s_token	*next;
 }					t_token;
 
@@ -142,7 +148,6 @@ void skip_whitespace(const char *input, int *i);
 char *string_command(const char *input, int *i);
 char *after_heredoc1(char *input, int *i);
 t_lexer tokenize(char *input);
-void free_tokens(t_token2 *head);
 t_type check_last_token(t_token *current);
 char	*ft_get_env(char *name, char **env);
 char	**convert_to_array_v2(t_list *envl,char **global_env);
@@ -160,7 +165,6 @@ void while_in_quote_dquote(char *input, int f);
 void while_in_RED_output(char *input, t_token2 **head);
 void while_in_RED_input(char *input, t_token2 **head);
 void check_syntax_error_v1(t_token2 *current, char **error);
-void while_loop(char *input, t_token2 **head);
 void while_in_check_quote_dquote(char *input, t_token2 **head);
 void while_in_expand_variables(char *input);
 void while_in_expand_variable(char *input);
@@ -207,6 +211,7 @@ int			check_var(char *var_name);
 void		print_export(t_list *exp_list);
 void		while_print_export(t_list *exp_list);
 void		free_v_n(char *v_n, int flag);
+void	unset_v2(t_list **envl, char **var, int flag);
 /*pipes.c*/
 typedef struct s_pipe
 {

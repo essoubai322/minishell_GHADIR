@@ -6,7 +6,7 @@
 /*   By: asebaai <asebaai@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/26 10:25:46 by amoubine          #+#    #+#             */
-/*   Updated: 2024/11/29 20:10:43 by asebaai          ###   ########.fr       */
+/*   Updated: 2024/12/01 07:32:58 by asebaai          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,21 @@ void	print_error(char *str)
 {
 	printf("%s\n", str);
 	free(str);
+}
+
+void	free_result(t_lexer *result)
+{
+	t_token2	*current;
+	t_token2	*tmp;
+
+	current = result->tokens;
+	while (current)
+	{
+		tmp = current->next;
+		free(current->value);
+		free(current);
+		current = tmp;
+	}
 }
 
 void	loop_v2(char *input, t_list **lists)
@@ -35,6 +50,7 @@ void	loop_v2(char *input, t_list **lists)
 	else
 	{
 		new_head = convert_data(result.tokens, current2, new_token);
+		free_tokens(result.tokens);
 		reorganize_cmd_to_start(&new_head);
 		if (heredoc(new_head, lists, 0, 0) == 0)
 		{
@@ -46,7 +62,6 @@ void	loop_v2(char *input, t_list **lists)
 			return ;
 		excution(&new_head, &lists[0], &lists[1]);
 	}
-	free_tokens(result.tokens);
 }
 
 void	loop_free(char *input, t_list **lists)
@@ -68,11 +83,12 @@ int	loop(char **env)
 	{
 		g_glo.env = convert_to_array_v2(lists[0], g_glo.env);
 		signal_setup(2);
-		input = readline("APA@GOVOS> ");
+		input = readline(PURPLE "APA@GOVOS" BOLD "> " RESET);
 		if (!input)
 		{
 			printf("exit\n");
-			exit(0);
+			loop_free(input, lists);
+			exit(g_glo.sts);
 		}
 		if (ft_strlen(input) == 0)
 		{

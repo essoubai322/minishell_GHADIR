@@ -6,7 +6,7 @@
 /*   By: asebaai <asebaai@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/23 06:21:06 by asebaai           #+#    #+#             */
-/*   Updated: 2024/11/23 19:33:40 by asebaai          ###   ########.fr       */
+/*   Updated: 2024/12/01 03:33:58 by asebaai          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -138,7 +138,7 @@ char	**convert_to_array_v2(t_list *envl, char **g_glo_env)
 	i = 0;
 	while (envl)
 	{
-		cenv[i++] = ft_strdup((char *)envl->content);
+		cenv[i++] = ft_strdup((const char *)envl->content);
 		envl = envl->next;
 	}
 	cenv[i] = 0;

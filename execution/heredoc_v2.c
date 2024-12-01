@@ -6,7 +6,7 @@
 /*   By: asebaai <asebaai@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/26 05:30:03 by asebaai           #+#    #+#             */
-/*   Updated: 2024/11/29 19:32:00 by asebaai          ###   ########.fr       */
+/*   Updated: 2024/12/01 07:31:43 by asebaai          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -148,7 +148,6 @@ void	fork_heredoc(char *fn, t_token *head, t_list *list[2], t_token	*tmp)
 	if (is_q(head->next->args[0]))
 	{
 		rm_quote(&head->next->args[0]);
-		dprintf(2, "delemiter : %s\n", head->next->args[0]);
 		if (read_put(fn, head->next->args[0], 1, list[0]))
 		{
 			list_clear(&tmp);

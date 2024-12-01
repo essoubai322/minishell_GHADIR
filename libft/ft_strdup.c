@@ -22,14 +22,10 @@ char	*ft_strdup(const char *s)
 	len = 0;
 	i = 0;
 	while (s[len])
-	{
 		len++;
-	}
-	ptr = ft_calloc(len + 1, sizeof(char));
-	if (ptr == NULL)
-	{
+	ptr = (char *)ft_calloc(len + 1, sizeof(char));
+	if (!ptr)
 		return (0);
-	}
 	while (i < len)
 	{
 		ptr[i] = s[i];

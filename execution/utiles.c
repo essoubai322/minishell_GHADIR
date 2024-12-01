@@ -17,6 +17,8 @@ void	free_arr(char **arr)
 	int	i;
 
 	i = 0;
+	if (!arr )
+        return;
 	while (arr && arr[i])
 	{
 		free(arr[i]);
@@ -112,6 +114,7 @@ void	list_clear(t_token **head)
 		tmp = (*head)->next;
 		free_arr((*head)->args);
 		(*head)->args = NULL;
+		(*head) = tmp;
 		free((*head));
 		(*head) = tmp;
 	}

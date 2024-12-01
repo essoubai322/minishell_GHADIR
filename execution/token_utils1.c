@@ -6,7 +6,7 @@
 /*   By: asebaai <asebaai@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/17 17:18:04 by asebaai           #+#    #+#             */
-/*   Updated: 2024/11/25 01:32:04 by asebaai          ###   ########.fr       */
+/*   Updated: 2024/12/01 06:10:07 by asebaai          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,6 +39,13 @@ int	add_token_check(t_token2 **head, char *stripped_value, enum TokenType type)
 	s = 0;
 	while (arg_space && arg_space[s])
 		s++;
+	if (g_glo.RED)
+	{
+		add_token_innit_head(head, stripped_value, type);
+		g_glo.RED = 0;
+		s = 1;
+		return (ft_free2(&arg_space), free(stripped_value), 1);
+	}
 	if (s > 1)
 	{
 		s = 0;
@@ -47,12 +54,9 @@ int	add_token_check(t_token2 **head, char *stripped_value, enum TokenType type)
 			add_token_innit_head(head, arg_space[s], type);
 			s++;
 		}
-		ft_free2(&arg_space);
-		free(stripped_value);
-		return (1);
+		return (ft_free2(&arg_space), free(stripped_value), 1);
 	}
-	ft_free2(&arg_space);
-	return (0);
+	return (ft_free2(&arg_space), 0);
 }
 
 char	*ft_get_value(int *i, char *value)

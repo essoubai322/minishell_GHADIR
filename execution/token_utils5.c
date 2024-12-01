@@ -6,7 +6,7 @@
 /*   By: asebaai <asebaai@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/23 06:11:35 by asebaai           #+#    #+#             */
-/*   Updated: 2024/11/29 12:01:04 by asebaai          ###   ########.fr       */
+/*   Updated: 2024/12/01 05:12:45 by asebaai          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,13 +44,13 @@ t_lexer	tokenize(char *input)
 
 	head = NULL;
 	inialize_global();
-	g_glo.current_token = calloc(ft_strlen(input) + 1, \
+	g_glo.current_token = ft_calloc(ft_strlen(input) + 1, \
 		sizeof(g_glo.current_token));
 	while (input[g_glo.i] != '\0')
 		while_loop(input, &head);
 	if (g_glo.current_token_length > 0)
 	{
-		if (input[g_glo.i - 1] == '"')
+		if (input[g_glo.i - 1] == '\"')
 			add_token(&head, DQUOTE, g_glo.current_token);
 		else if (input[g_glo.i - 1] == '\'')
 			add_token(&head, DQUOTE, g_glo.current_token);
@@ -91,9 +91,9 @@ t_type	check_last_token(t_token *current)
 
 char	*ft_get_env(char *name, char **env)
 {
-	int	i;
-	int	j;
-	int	len;
+	int		i;
+	int		j;
+	size_t	len;
 
 	i = 0;
 	if (!name || !env || !*env)
@@ -105,7 +105,11 @@ char	*ft_get_env(char *name, char **env)
 			j++;
 		len = j;
 		if (ft_strncmp(name, env[i], len) == 0)
+		{
+			if (ft_strlen(name) != len)
+				return (NULL);
 			return (ft_strdup(env[i] + len + 1));
+		}
 		i++;
 	}
 	return (NULL);

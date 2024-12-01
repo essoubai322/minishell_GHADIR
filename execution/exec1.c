@@ -41,9 +41,7 @@ int	check_redir(t_token *head, int f)
 		if (head->args[0] && head->args[0][0] == '>' && !f)
 			return (head->arg_size);
 		if (head->args[0] && head->args[0][0] == '<' && f)
-		{
 			return (1);
-		}
 		head = head->next;
 	}
 	return (0);
@@ -61,20 +59,24 @@ void	execve_error(char *cmd, t_token *head, t_list **lists[2], char **paths)
 		ft_lstclear(lists[1], &del);
 		list_clear(&head);
 		free_arr(paths);
+		free_arr(g_glo.env);
 		exit(126);
 	}
 	else if (access(cmd, F_OK) == 0)
 	{
+		printf_error("command not found", cmd, 127);
 		ft_lstclear(lists[0], &del);
 		ft_lstclear(lists[1], &del);
 		list_clear(&head);
 		free_arr(paths);
-		exit(0);
+		free_arr(g_glo.env);
+		exit(127);
 	}
 	ft_lstclear(lists[0], &del);
 	ft_lstclear(lists[1], &del);
 	list_clear(&head);
 	free_arr(paths);
+	free_arr(g_glo.env);
 	exit(EXIT_FAILURE);
 }
 

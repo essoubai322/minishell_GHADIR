@@ -40,12 +40,21 @@ char	*last_io(t_token *head, int type)
 int	redir_output(char *filename, int flag)
 {
 	int	fd;
+	char	**arg_space;
+	int		s;
 
-	if (flag == 1)
+	arg_space = ft_split(filename, ' ');
+	s = 0;
+	fd = 0;
+	while (arg_space && arg_space[s])
+		s++;
+	printf("filename = %s\n", filename);
+	ft_free2(&arg_space);
+	if (flag == 1 && s == 1)
 		fd = open(filename, O_CREAT | O_RDWR | O_TRUNC, 0644);
-	else
+	else if (s <= 1)
 		fd = open(filename, O_CREAT | O_APPEND | O_RDWR, 0644);
-	if (dup2(fd, 1) == -1)
+	if (s > 1 || fd == -1)
 	{
 		write(2, "minishell: Ambiguous redirect or permission denied\n", 52);
 		g_glo.sts = 1;
@@ -97,7 +106,7 @@ void	while_redir(t_token *head, int *flag, int r)
 			ret = redir_output(tmp->next->args[0], check_redir(tmp, 0));
 			if (ret == -1)
 			{
-				*flag += (ret == -1) * -1;
+				*flag += 1;
 				break ;
 			}
 		}
@@ -120,11 +129,11 @@ void	redirection(t_token *head, t_list **envl, t_list **exp_list)
 		flag = redir_input(input);
 	r = check_redir(head, 0);
 	if (r)
-	{
 		while_redir(head, &flag, r);
-	}
 	if (flag != -1)
 		run_cmd(head, envl, exp_list, split_paths(get_path(*envl)));
 	dup2(old_fd[0], STDIN_FILENO);
 	dup2(old_fd[1], STDOUT_FILENO);
+	close(old_fd[0]);
+	close(old_fd[1]);
 }
