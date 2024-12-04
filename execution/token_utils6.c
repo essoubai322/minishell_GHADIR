@@ -6,7 +6,7 @@
 /*   By: asebaai <asebaai@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/23 06:21:06 by asebaai           #+#    #+#             */
-/*   Updated: 2024/12/01 03:33:58 by asebaai          ###   ########.fr       */
+/*   Updated: 2024/12/04 10:53:21 by asebaai          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,14 +16,13 @@ t_token	*duplicate_list(t_token *head)
 {
 	t_token	*new_head;
 	t_token	*current;
-	t_token	*tail;
 	t_token	*new_token;
 	int		i;
 
 	i = -1;
 	new_head = NULL;
 	current = head;
-	tail = NULL;
+	g_glo.tail = NULL;
 	while (current != NULL)
 	{
 		if (initialize_token(&new_token, current))
@@ -35,8 +34,8 @@ t_token	*duplicate_list(t_token *head)
 		if (!new_head)
 			new_head = new_token;
 		else
-			tail->next = new_token;
-		tail = new_token;
+			g_glo.tail->next = new_token;
+		g_glo.tail = new_token;
 		current = current->next;
 	}
 	return (new_head);
@@ -44,8 +43,6 @@ t_token	*duplicate_list(t_token *head)
 
 void	cmd_to_start(t_token **current, t_token *pipe_section, t_token *prev)
 {
-	t_start	start;
-
 	if ((*current) && (*current)->type == PIPE)
 	{
 		pipe_section = (*current);
@@ -57,15 +54,15 @@ void	cmd_to_start(t_token **current, t_token *pipe_section, t_token *prev)
 			{
 				if (prev && prev->type == PIPE)
 					break ;
-				start.cmd_token = (*current);
-				start.cmd_prev = prev;
-				while (start.cmd_prev
-					&& start.cmd_prev->next != start.cmd_token)
-					start.cmd_prev = start.cmd_prev->next;
-				start.cmd_prev->next = start.cmd_token->next;
-				start.cmd_token->next = pipe_section->next;
-				pipe_section->next = start.cmd_token;
-				(*current) = start.cmd_token;
+				g_glo.start.cmd_token = (*current);
+				g_glo.start.cmd_prev = prev;
+				while (g_glo.start.cmd_prev
+					&& g_glo.start.cmd_prev->next != g_glo.start.cmd_token)
+					g_glo.start.cmd_prev = g_glo.start.cmd_prev->next;
+				g_glo.start.cmd_prev->next = g_glo.start.cmd_token->next;
+				g_glo.start.cmd_token->next = pipe_section->next;
+				pipe_section->next = g_glo.start.cmd_token;
+				(*current) = g_glo.start.cmd_token;
 			}
 			prev = (*current);
 			(*current) = (*current)->next;

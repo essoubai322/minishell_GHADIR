@@ -6,7 +6,7 @@
 /*   By: asebaai <asebaai@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/24 14:54:01 by asebaai           #+#    #+#             */
-/*   Updated: 2024/11/29 20:06:03 by asebaai          ###   ########.fr       */
+/*   Updated: 2024/12/04 09:37:06 by asebaai          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@ void	add_tev(char *env_value, char **stripped_value, char *value,
 int *i)
 {
 	char	*temp;
-	
+
 	if (value[*i] == '$' || ft_strchr(value + *i, '$'))
 	{
 		temp = *stripped_value;
@@ -30,7 +30,7 @@ int *i)
 	free(env_value);
 }
 
-int ft_get_endo(char *value, int i, char **env_value, char * var_name)
+int	ft_get_endo(char *value, int i, char **env_value, char *var_name)
 {
 	if (ft_strncmp(value + i, "?", 1) == 0)
 	{
@@ -61,4 +61,50 @@ t_token	*create_and_init_token(const char *value, t_type new_type)
 	new_token->args[1] = NULL;
 	new_token->next = NULL;
 	return (new_token);
+}
+
+void	unset_v2(t_list **envl, char **var, int flag)
+{
+	t_list	*env;
+	t_list	*prev;
+	char	*var_name;
+	int		i;
+
+	env = *envl;
+	prev = NULL;
+	var_name = NULL;
+	i = 1;
+	while (var[i] && var[i][0] != '\0')
+	{
+		var_name = ft_strjoin(var[i], "=");
+		if (unset_errors(var_name, flag))
+			return ;
+		unset(envl, var_name, flag);
+		free(var_name);
+		i++;
+	}
+}
+
+void	redirection(t_token *head, t_list **envl, t_list **exp_list)
+{
+	int		old_fd[2];
+	char	*input;
+	int		r;
+	int		flag;
+
+	flag = 0;
+	input = last_io(head, 1);
+	old_fd[0] = dup(STDIN_FILENO);
+	old_fd[1] = dup(STDOUT_FILENO);
+	if (input)
+		flag = redir_input(input);
+	r = check_redir(head, 0);
+	if (r)
+		while_redir(head, &flag, r);
+	if (flag != -1)
+		run_cmd(head, envl, exp_list, split_paths(get_path(*envl)));
+	dup2(old_fd[0], STDIN_FILENO);
+	dup2(old_fd[1], STDOUT_FILENO);
+	close(old_fd[0]);
+	close(old_fd[1]);
 }

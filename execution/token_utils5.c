@@ -6,7 +6,7 @@
 /*   By: asebaai <asebaai@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/23 06:11:35 by asebaai           #+#    #+#             */
-/*   Updated: 2024/12/01 05:12:45 by asebaai          ###   ########.fr       */
+/*   Updated: 2024/12/04 10:44:41 by asebaai          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,17 +15,19 @@
 char	*after_heredoc1(char *input, int *i)
 {
 	char	*result;
-	int		k = 0, flag;
+	int		k;
+	int		flag;
 	int		after;
 
 	result = ft_calloc(100000, 1);
-	k = 0, flag = 0;
+	k = 0;
+	flag = 0;
 	after = *i;
 	skip_whitespace(input, i);
 	while (input[*i] && !isspace(input[*i]) && input[*i] != '|'
 		&& input[*i] != '>' && input[*i] != '<')
 	{
-			parse_unquoted_heredoc1(input, i, result, &k);
+		parse_unquoted_heredoc1(input, i, result, &k);
 	}
 	if (!flag && strlen(result) == 0)
 	{

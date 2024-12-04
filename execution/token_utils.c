@@ -6,7 +6,7 @@
 /*   By: asebaai <asebaai@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/17 17:13:57 by asebaai           #+#    #+#             */
-/*   Updated: 2024/12/01 06:04:12 by asebaai          ###   ########.fr       */
+/*   Updated: 2024/12/04 11:12:00 by asebaai          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 void	inialize_global(void)
 {
-	g_glo.RED = 0;
+	g_glo.red = 0;
 	g_glo.i = 0;
 	g_glo.current_token = NULL;
 	g_glo.current_token_length = 0;
@@ -27,6 +27,7 @@ void	inialize_global(void)
 	g_glo.sdv = NULL;
 	g_glo.env_value = NULL;
 	g_glo.o = 0;
+	g_glo.fd_herdoc = 0;
 }
 
 char	*ft_strcat(char *dest, char *src)
@@ -70,7 +71,7 @@ void	ft_free2(char ***dest)
 	*dest = NULL;
 }
 
-t_token2	*create_token(enum TokenType type, const char *value)
+t_token2	*create_token(enum e_t type, const char *value)
 {
 	t_token2	*new_token;
 

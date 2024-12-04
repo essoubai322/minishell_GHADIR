@@ -6,13 +6,13 @@
 /*   By: asebaai <asebaai@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/23 17:03:54 by asebaai           #+#    #+#             */
-/*   Updated: 2024/12/01 06:04:49 by asebaai          ###   ########.fr       */
+/*   Updated: 2024/12/04 11:10:49 by asebaai          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
 
-void	while_in_RED_input(char *input, t_token2 **head)
+void	while_in_red_input(char *input, t_token2 **head)
 {
 	if (input[g_glo.i + 1] == '<')
 	{
@@ -30,7 +30,7 @@ void	while_in_RED_input(char *input, t_token2 **head)
 	}
 }
 
-void	while_in_RED_output(char *input, t_token2 **head)
+void	while_in_red_output(char *input, t_token2 **head)
 {
 	if (input[g_glo.i + 1] == '>')
 	{
@@ -40,7 +40,7 @@ void	while_in_RED_output(char *input, t_token2 **head)
 	else
 	{
 		add_token(head, REDIRECT_OUT, ">");
-		g_glo.RED = 1;
+		g_glo.red = 1;
 		g_glo.i++;
 	}
 }
@@ -61,7 +61,7 @@ void	while_in_quote_dquote(char *input, int f)
 	}
 }
 
-void	while_in_check_RED_HEREDOC(char *input, t_token2 **head)
+void	while_in_check_red_heredoc(char *input, t_token2 **head)
 {
 	if (input[g_glo.i] == '|')
 	{
@@ -69,9 +69,9 @@ void	while_in_check_RED_HEREDOC(char *input, t_token2 **head)
 		g_glo.i++;
 	}
 	else if (input[g_glo.i] == '<')
-		while_in_RED_input(input, head);
+		while_in_red_input(input, head);
 	else if (input[g_glo.i] == '>')
-		while_in_RED_output(input, head);
+		while_in_red_output(input, head);
 	else if (input[g_glo.i] == '\'')
 		while_in_quote_dquote(input, 0);
 	else if (input[g_glo.i] == '"')
@@ -79,7 +79,7 @@ void	while_in_check_RED_HEREDOC(char *input, t_token2 **head)
 	else if (isspace(input[g_glo.i]))
 		g_glo.i++;
 	else if ((input[g_glo.i - 1] == '\'' || input[g_glo.i - 1] == '"')
-			&& input[g_glo.i])
+		&& input[g_glo.i])
 	{
 		g_glo.current_token[g_glo.current_token_length++] = input[g_glo.i];
 		g_glo.i++;

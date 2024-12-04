@@ -68,3 +68,11 @@ void	print_and_exit(char *msg, int status)
 	write(2, msg, ft_strlen(msg));
 	exit(status);
 }
+
+char	*check_case_v1(char **u, int *i, int *k, char *result)
+{
+	result = ft_calloc(strlen(*u) + 1, sizeof(char));
+	while (isspace((*u)[*i]))
+		(*i)++;
+	return (handle_token_parsing(u, i, k, result));
+}

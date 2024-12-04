@@ -6,7 +6,7 @@
 /*   By: asebaai <asebaai@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/17 17:18:51 by asebaai           #+#    #+#             */
-/*   Updated: 2024/11/25 01:37:36 by asebaai          ###   ########.fr       */
+/*   Updated: 2024/12/04 11:12:00 by asebaai          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,13 +31,13 @@ void	add_token_v0(char *value, int *i, char **stripped_value, int *k)
 	}
 }
 
-void	add_token_v1(t_token2 **head, enum TokenType type)
+void	add_token_v1(t_token2 **head, enum e_t type)
 {
 	add_token_innit_head(head, g_glo.sdv, type);
 	free(g_glo.sdv);
 }
 
-void	add_token(t_token2 **head, enum TokenType type, char *v)
+void	add_token(t_token2 **head, enum e_t type, char *v)
 {
 	g_glo.sdv = get_stripped_value(type, v, g_glo.sdv);
 	if (type == WORD)
@@ -66,7 +66,7 @@ void	add_token(t_token2 **head, enum TokenType type, char *v)
 	add_token_v1(head, type);
 }
 
-void	add_token_v2(t_token2 **head, enum TokenType type, const char *value)
+void	add_token_v2(t_token2 **head, enum e_t type, const char *value)
 {
 	t_token2	*new_token;
 	t_token2	*current;

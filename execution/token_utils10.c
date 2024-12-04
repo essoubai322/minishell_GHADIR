@@ -6,7 +6,7 @@
 /*   By: asebaai <asebaai@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/23 17:06:42 by asebaai           #+#    #+#             */
-/*   Updated: 2024/12/01 03:13:06 by asebaai          ###   ########.fr       */
+/*   Updated: 2024/12/04 09:34:31 by asebaai          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,9 +21,10 @@ void	check_syntax_error_v2(t_token2 *current, char **error)
 		{
 			if (current->next == NULL || ((current->next->type != WORD)
 					&& (current->next->type != DQUOTE)
-					&& (current->next->type = QUOTE)))
+					&& (current->next->type != QUOTE)))
 			{
-				*error = ft_strdup("bash: syntax error near unexpected token `newline'");
+				*error = ft_strdup
+					("bash: syntax error near unexpected token `newline'");
 				break ;
 			}
 		}
@@ -42,12 +43,14 @@ void	check_syntax_error_v3(t_token2 *head, t_token2 *current, char **error,
 			if (pipe1_count > 0 && current->next != NULL
 				&& current->next->type == PIPE1)
 			{
-				*error = ft_strdup("bash: syntax error near unexpected token `|'");
+				*error = ft_strdup
+					("bash: syntax error near unexpected token `|'");
 				break ;
 			}
 			if (current == head || current->next == NULL)
 			{
-				*error = ft_strdup("bash: syntax error near unexpected token `|'");
+				*error = ft_strdup
+					("bash: syntax error near unexpected token `|'");
 				break ;
 			}
 		}
@@ -101,32 +104,29 @@ void	*ft_realloc(void *ptr, size_t size)
 
 t_token	*convert_data(t_token2 *head, t_token *current2, t_token *new_token)
 {
-	t_token2 *current;
-	t_token *new_head;
-
-	current = head;
-	new_head = NULL;
+	g_glo.cur = head;
+	g_glo.new_head = NULL;
 	current2 = NULL;
-	while (current != NULL && current->type != END)
+	while (g_glo.cur != NULL && g_glo.cur->type != END)
 	{
-		new_token = handle_pipe_and_redirects(current);
+		new_token = handle_pipe_and_redirects(g_glo.cur);
 		if (!new_token)
-			new_token = handle_word_types(current, new_head);
-		if (!new_token && (current->type == WORD || current->type == QUOTE
-				|| current->type == DQUOTE))
+			new_token = handle_word_types(g_glo.cur, g_glo.new_head);
+		if (!new_token && (g_glo.cur->type == WORD || g_glo.cur->type == QUOTE
+				|| g_glo.cur->type == DQUOTE))
 		{
-			new_token = handle_cmd(current, current2);
+			new_token = handle_cmd(g_glo.cur, current2);
 			if (!new_token && current2)
 			{
-				if (!handle_cmd_args(current2, current->value))
+				if (!handle_cmd_args(current2, g_glo.cur->value))
 					return (NULL);
-				current = current->next;
+				g_glo.cur = g_glo.cur->next;
 				continue ;
 			}
 		}
 		if (new_token)
-			add_token_to_list(&new_head, &current2, new_token);
-		current = current->next;
+			add_token_to_list(&g_glo.new_head, &current2, new_token);
+		g_glo.cur = g_glo.cur->next;
 	}
-	return (new_head);
+	return (g_glo.new_head);
 }

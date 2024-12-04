@@ -6,7 +6,7 @@
 /*   By: asebaai <asebaai@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/23 06:10:09 by asebaai           #+#    #+#             */
-/*   Updated: 2024/11/26 05:43:18 by asebaai          ###   ########.fr       */
+/*   Updated: 2024/12/04 10:43:32 by asebaai          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,10 @@ char	*string_command(const char *input, int *i)
 		&& input[*i] != '>' && input[*i] != '<')
 	{
 		if (input[*i] == '\'' || input[*i] == '"')
-			parse_quoted(input, i, result, &k, input[*i]);
+		{
+			g_glo.quote = input[*i];
+			parse_quoted(input, i, result, &k);
+		}
 		else
 			parse_unquoted(input, i, result, &k);
 	}
@@ -61,8 +64,8 @@ int	parse_double_quote(const char *input, int *i, char *result, int *k)
 
 void	parse_unquoted_heredoc1(const char *input, int *i, char *result, int *k)
 {
-	while (input[*i] && !isspace(input[*i]) && input[*i] != '|' && input[*i] != '>'
-		&& input[*i] != '<')
+	while (input[*i] && !isspace(input[*i]) && input[*i] != '|'
+		&& input[*i] != '>' && input[*i] != '<')
 	{
 		result[(*k)++] = input[(*i)++];
 	}

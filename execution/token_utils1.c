@@ -6,14 +6,14 @@
 /*   By: asebaai <asebaai@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/17 17:18:04 by asebaai           #+#    #+#             */
-/*   Updated: 2024/12/01 06:10:07 by asebaai          ###   ########.fr       */
+/*   Updated: 2024/12/04 11:12:00 by asebaai          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
 
 void	add_token_innit_head(t_token2 **head, char *stripped_value,
-		enum TokenType type)
+		enum e_t type)
 {
 	t_token2	*new_token;
 	t_token2	*current;
@@ -30,7 +30,7 @@ void	add_token_innit_head(t_token2 **head, char *stripped_value,
 	}
 }
 
-int	add_token_check(t_token2 **head, char *stripped_value, enum TokenType type)
+int	add_token_check(t_token2 **head, char *stripped_value, enum e_t type)
 {
 	char	**arg_space;
 	int		s;
@@ -39,10 +39,10 @@ int	add_token_check(t_token2 **head, char *stripped_value, enum TokenType type)
 	s = 0;
 	while (arg_space && arg_space[s])
 		s++;
-	if (g_glo.RED)
+	if (g_glo.red)
 	{
 		add_token_innit_head(head, stripped_value, type);
-		g_glo.RED = 0;
+		g_glo.red = 0;
 		s = 1;
 		return (ft_free2(&arg_space), free(stripped_value), 1);
 	}
@@ -108,7 +108,7 @@ void	add_token_else(char *value, int *i, char **stripped_value, int *k)
 	free(var_name);
 }
 
-char	*get_stripped_value(enum TokenType type, char *value,
+char	*get_stripped_value(enum e_t type, char *value,
 		char *stripped_value)
 {
 	int	len;

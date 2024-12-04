@@ -6,33 +6,18 @@
 /*   By: asebaai <asebaai@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/26 10:25:46 by amoubine          #+#    #+#             */
-/*   Updated: 2024/12/01 07:32:58 by asebaai          ###   ########.fr       */
+/*   Updated: 2024/12/04 11:12:53 by asebaai          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
 
-g_global	g_glo;
+t_global	g_glo;
 
 void	print_error(char *str)
 {
 	printf("%s\n", str);
 	free(str);
-}
-
-void	free_result(t_lexer *result)
-{
-	t_token2	*current;
-	t_token2	*tmp;
-
-	current = result->tokens;
-	while (current)
-	{
-		tmp = current->next;
-		free(current->value);
-		free(current);
-		current = tmp;
-	}
 }
 
 void	loop_v2(char *input, t_list **lists)
@@ -81,8 +66,8 @@ int	loop(char **env)
 	set_up_env_exp(&lists[0], &lists[1], env);
 	while (1)
 	{
-		g_glo.env = convert_to_array_v2(lists[0], g_glo.env);
 		signal_setup(2);
+		g_glo.env = convert_to_array_v2(lists[0], g_glo.env);
 		input = readline(PURPLE "APA@GOVOS" BOLD "> " RESET);
 		if (!input)
 		{
@@ -96,8 +81,7 @@ int	loop(char **env)
 			continue ;
 		}
 		add_history(input);
-		loop_v2(input, lists);
-		free(input);
+		(loop_v2(input, lists), free(input));
 	}
 	loop_free(input, lists);
 	return (0);

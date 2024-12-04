@@ -6,7 +6,7 @@
 /*   By: asebaai <asebaai@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/23 17:05:18 by asebaai           #+#    #+#             */
-/*   Updated: 2024/11/23 19:33:40 by asebaai          ###   ########.fr       */
+/*   Updated: 2024/12/04 11:04:13 by asebaai          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,6 @@ void	while_in_expand_variable(char *input)
 	char	*var_name;
 	int		k;
 
-	;
 	k = 0;
 	g_glo.i++;
 	env_value = NULL;
@@ -57,11 +56,11 @@ void	while_in_check_quote_dquote(char *input, t_token2 **head)
 	if (input[g_glo.i] == '|' || input[g_glo.i] == '<'
 		|| input[g_glo.i] == '>' || input[g_glo.i] == '\''
 		|| input[g_glo.i] == '"' || isspace(input[g_glo.i]) || (g_glo.i > 0
-		&& (input[g_glo.i - 1] == '\'' || input[g_glo.i - 1] == '"')
-		&& input[g_glo.i]))
+			&& (input[g_glo.i - 1] == '\'' || input[g_glo.i - 1] == '"')
+			&& input[g_glo.i]))
 	{
 		while_in_current_bigger_than_zero(input, head);
-		while_in_check_RED_HEREDOC(input, head);
+		while_in_check_red_heredoc(input, head);
 	}
 	else
 		g_glo.current_token[g_glo.current_token_length++] = input[g_glo.i++];
@@ -102,7 +101,7 @@ void	check_syntax_error_v1(t_token2 *current, char **error)
 				|| current->type == REDIRECT_APPEND
 				|| current->type == HEREDOC1) && ((current->next->type != WORD)
 				&& (current->next->type != DQUOTE)
-				&& (current->next->type = QUOTE)))
+				&& (current->next->type != QUOTE)))
 		{
 			*error = ft_strdup("bash: syntax error near unexpected token");
 			break ;

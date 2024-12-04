@@ -54,7 +54,8 @@ char	*check_cmd(char *cmd, char **paths)
 	else if ((cmd[0] == '.' || cmd[0] == '/') && !access(cmd, F_OK | X_OK))
 		return (cmd);
 	else if (!paths)
-		return (write(2, "minishell:1 : No such file or directory\n", 40), NULL);
+		return (write(2, "minishell:1 : No such file or directory\n", 40),
+			NULL);
 	tmp = search_path(cmd, paths, &num);
 	if (tmp)
 		return (tmp);
@@ -139,7 +140,7 @@ void	run_cmd(t_token *head, t_list **envl, t_list **exp_list, char **paths)
 		signal_setup(3);
 		if (execve(cmd, head->args, env) != 0)
 		{
-			free(env);
+			(free_arr(g_glo.env), free(env));
 			execve_error(cmd, head, lists, paths);
 		}
 	}

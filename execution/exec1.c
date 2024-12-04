@@ -59,7 +59,6 @@ void	execve_error(char *cmd, t_token *head, t_list **lists[2], char **paths)
 		ft_lstclear(lists[1], &del);
 		list_clear(&head);
 		free_arr(paths);
-		free_arr(g_glo.env);
 		exit(126);
 	}
 	else if (access(cmd, F_OK) == 0)
@@ -69,14 +68,11 @@ void	execve_error(char *cmd, t_token *head, t_list **lists[2], char **paths)
 		ft_lstclear(lists[1], &del);
 		list_clear(&head);
 		free_arr(paths);
-		free_arr(g_glo.env);
 		exit(127);
 	}
 	ft_lstclear(lists[0], &del);
 	ft_lstclear(lists[1], &del);
-	list_clear(&head);
-	free_arr(paths);
-	free_arr(g_glo.env);
+	(list_clear(&head), free_arr(paths));
 	exit(EXIT_FAILURE);
 }
 

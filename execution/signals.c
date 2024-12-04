@@ -26,6 +26,13 @@ void	sighandler(int signum)
 
 void	sig_exit(int num)
 {
+	if (g_glo.fd_herdoc)
+	{
+		ft_lstclear(&g_glo.list[0], free);
+		ft_lstclear(&g_glo.list[1], free);
+		close(g_glo.fd_herdoc);
+		g_glo.fd_herdoc = 0;
+	}
 	(void)num;
 	exit(5);
 }
@@ -52,4 +59,28 @@ void	signal_setup(int n)
 		signal(SIGINT, SIG_IGN);
 		signal(SIGQUIT, SIG_IGN);
 	}
+}
+
+void	signal_heredoc(t_list *list[2])
+{
+	g_glo.list[0] = list[0];
+	g_glo.list[1] = list[1];
+	signal(SIGINT, sig_exit);
+	signal(SIGQUIT, SIG_IGN);
+}
+
+int	handle_quoted_section(char **u, int *i, int *k, char *result)
+{
+	char	quote;
+
+	quote = (*u)[*i];
+	result[(*k)++] = '`';
+	(*i)++;
+	while ((*u)[*i] && (*u)[*i] != quote)
+		result[(*k)++] = (*u)[(*i)++];
+	if (!(*u)[*i])
+		return (0);
+	result[(*k)++] = '`';
+	(*i)++;
+	return (1);
 }

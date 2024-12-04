@@ -6,7 +6,7 @@
 /*   By: asebaai <asebaai@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/26 05:27:46 by asebaai           #+#    #+#             */
-/*   Updated: 2024/11/26 05:28:53 by asebaai          ###   ########.fr       */
+/*   Updated: 2024/12/04 03:35:09 by asebaai          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,7 +81,6 @@ int	heredoc(t_token *head, t_list *list[2], t_token	*tmp, int status)
 	tmp = head;
 	while (head)
 	{
-		signal_setup(0);
 		if (head->type == HEREDOC)
 		{
 			file_name = ran_file();
@@ -89,6 +88,7 @@ int	heredoc(t_token *head, t_list *list[2], t_token	*tmp, int status)
 			if (fork() == 0)
 			{
 				free(file_name);
+				free_arr(g_glo.env);
 				fork_heredoc(fn, head, list, tmp);
 			}
 			wait(&status);

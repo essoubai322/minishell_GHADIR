@@ -46,3 +46,38 @@ void	setup_lists(t_list **lists[2], t_list **envl, t_list **exp_list)
 	lists[0] = envl;
 	lists[1] = exp_list;
 }
+
+void	free_result(t_lexer *result)
+{
+	t_token2	*current;
+	t_token2	*tmp;
+
+	current = result->tokens;
+	while (current)
+	{
+		tmp = current->next;
+		free(current->value);
+		free(current);
+		current = tmp;
+	}
+}
+
+char	*handle_token_parsing(char **u, int *i, int *k, char *result)
+{
+	while ((*u)[*i] && !isspace((*u)[*i]))
+	{
+		if ((*u)[*i] == '|' || (*u)[*i] == '<' || (*u)[*i] == '>')
+			return (free(result), NULL);
+		if ((*u)[*i] == '\'' || (*u)[*i] == '"')
+		{
+			if (!handle_quoted_section(u, i, k, result))
+				return (free(result), NULL);
+		}
+		else
+		{
+			if (!handle_unquoted_section(u, i, k, result))
+				break ;
+		}
+	}
+	return (result);
+}

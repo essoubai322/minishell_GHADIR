@@ -6,7 +6,7 @@
 /*   By: asebaai <asebaai@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/23 17:11:11 by asebaai           #+#    #+#             */
-/*   Updated: 2024/11/26 05:35:40 by asebaai          ###   ########.fr       */
+/*   Updated: 2024/12/04 09:35:17 by asebaai          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,7 +42,8 @@ t_token	*handle_pipe_and_redirects(t_token2 *current)
 t_token	*handle_word_types(t_token2 *current, t_token *new_head)
 {
 	if ((current->type == WORD || current->type == QUOTE
-			|| current->type == DQUOTE) && (check_last_token(new_head) == RED || check_last_token(new_head) == HEREDOC))
+			|| current->type == DQUOTE) && (check_last_token(new_head) == RED
+			|| check_last_token(new_head) == HEREDOC))
 		return (create_and_init_token(current->value, FILE_N));
 	return (NULL);
 }

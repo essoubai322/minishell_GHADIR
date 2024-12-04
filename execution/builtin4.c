@@ -47,3 +47,33 @@ void	free_v_n(char *v_n, int flag)
 	if (flag)
 		free(v_n);
 }
+
+void	free_re(t_token *head, char *file_name)
+{
+	head->args = malloc(sizeof(char *) * 2);
+	head->args[0] = ft_strdup("<");
+	head->args[1] = NULL;
+	head->type = RED;
+	head->arg_size = 1;
+	free(head->next->args[0]);
+	head->next->args[0] = file_name;
+	head->next->type = FILE_N;
+}
+
+char	*handle_single_quote(char **str, int *i, char *tmp, int *j)
+{
+	(*i)++;
+	while ((*str)[*i] && (*str)[*i] != '\'')
+		tmp[(*j)++] = (*str)[(*i)++];
+	(*i)++;
+	return (tmp);
+}
+
+char	*handle_double_quote(char **str, int *i, char *tmp, int *j)
+{
+	(*i)++;
+	while ((*str)[*i] && (*str)[*i] != '"')
+		tmp[(*j)++] = (*str)[(*i)++];
+	(*i)++;
+	return (tmp);
+}

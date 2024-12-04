@@ -39,7 +39,7 @@ char	*last_io(t_token *head, int type)
 
 int	redir_output(char *filename, int flag)
 {
-	int	fd;
+	int		fd;
 	char	**arg_space;
 	int		s;
 
@@ -48,7 +48,6 @@ int	redir_output(char *filename, int flag)
 	fd = 0;
 	while (arg_space && arg_space[s])
 		s++;
-	printf("filename = %s\n", filename);
 	ft_free2(&arg_space);
 	if (flag == 1 && s == 1)
 		fd = open(filename, O_CREAT | O_RDWR | O_TRUNC, 0644);
@@ -65,10 +64,37 @@ int	redir_output(char *filename, int flag)
 	return (0);
 }
 
+int	warning_input(int s, int fd)
+{
+	if (s > 1 || s == 0)
+	{
+		write(2, "minishell: Ambiguous redirect\n", 52);
+		g_glo.sts = 1;
+		close(fd);
+		return (-1);
+	}
+	else if (fd == -1)
+	{
+		write(2, "minishell: no such file or directory\n", 38);
+		g_glo.sts = 1;
+		close(fd);
+		return (-1);
+	}
+	return (0);
+}
+
 int	redir_input(char *filename)
 {
-	int	fd;
+	int		fd;
+	char	**arg_space;
+	int		s;
 
+	arg_space = ft_split(filename, ' ');
+	s = 0;
+	fd = 0;
+	while (arg_space && arg_space[s])
+		s++;
+	ft_free2(&arg_space);
 	if (!access(filename, F_OK) && access(filename, F_OK | R_OK) == -1)
 	{
 		write(2, "minishell: Permission denied\n", 29);
@@ -76,12 +102,8 @@ int	redir_input(char *filename)
 		return (-1);
 	}
 	fd = open(filename, O_RDONLY);
-	if (fd == -1)
-	{
-		write(2, "minishell: no such file or directory\n", 38);
-		g_glo.sts = 1;
+	if (warning_input(s, fd) == -1)
 		return (-1);
-	}
 	dup2(fd, STDIN_FILENO);
 	close(fd);
 	return (0);
@@ -106,34 +128,10 @@ void	while_redir(t_token *head, int *flag, int r)
 			ret = redir_output(tmp->next->args[0], check_redir(tmp, 0));
 			if (ret == -1)
 			{
-				*flag += 1;
+				*flag += (ret == -1) * -1;
 				break ;
 			}
 		}
 		tmp = tmp->next;
 	}
-}
-
-void	redirection(t_token *head, t_list **envl, t_list **exp_list)
-{
-	int		old_fd[2];
-	char	*input;
-	int		r;
-	int		flag;
-
-	flag = 0;
-	input = last_io(head, 1);
-	old_fd[0] = dup(STDIN_FILENO);
-	old_fd[1] = dup(STDOUT_FILENO);
-	if (input)
-		flag = redir_input(input);
-	r = check_redir(head, 0);
-	if (r)
-		while_redir(head, &flag, r);
-	if (flag != -1)
-		run_cmd(head, envl, exp_list, split_paths(get_path(*envl)));
-	dup2(old_fd[0], STDIN_FILENO);
-	dup2(old_fd[1], STDOUT_FILENO);
-	close(old_fd[0]);
-	close(old_fd[1]);
 }

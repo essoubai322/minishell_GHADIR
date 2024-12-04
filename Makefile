@@ -6,7 +6,7 @@
 #    By: asebaai <asebaai@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/09/26 10:12:54 by amoubine          #+#    #+#              #
-#    Updated: 2024/11/29 20:33:29 by asebaai          ###   ########.fr        #
+#    Updated: 2024/12/04 10:37:12 by asebaai          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -27,7 +27,7 @@ EXEC_SRCS = token.c builtin.c builtin1.c builtin2.c builtin3.c builtin_utils.c \
 		signals.c token_utils.c token_utils1.c token_utils2.c token_utils3.c \
 		token_utils4.c token_utils5.c token_utils6.c token_utils7.c token_utils8.c \
 		token_utils9.c token_utils10.c token_utils11.c token_utils12.c heredoc.c \
-		heredoc_v2.c 
+		heredoc_v2.c token_utils13.c token_utils14.c 
 
 # Create full paths for source and object files
 SRCS = $(addprefix $(SRC_DIR_E)/, $(EXEC_SRCS))
