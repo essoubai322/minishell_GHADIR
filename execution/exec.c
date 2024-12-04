@@ -72,7 +72,7 @@ int	builtin(t_token *head, t_list **envl, t_list **exp_list)
 	if (!head->args[0])
 		return (1);
 	if (!ft_strncmp(head->args[0], "cd", 3))
-		return (cd(head->args, envl, exp_list, NULL), 0);
+		return (cd(head->args, envl, exp_list, NULL));
 	else if (!ft_strncmp(head->args[0], "echo", 5))
 		return (echo(head->args), 0);
 	else if (!ft_strncmp(head->args[0], "export", 7))
