@@ -51,7 +51,7 @@ int	redir_output(char *filename, int flag)
 	ft_free2(&arg_space);
 	if (flag == 1 && s == 1)
 		fd = open(filename, O_CREAT | O_RDWR | O_TRUNC, 0644);
-	else
+	else if (s <= 1)
 		fd = open(filename, O_CREAT | O_APPEND | O_RDWR, 0644);
 	if (s > 1 || dup2(fd, 1) == -1)
 	{
@@ -70,7 +70,8 @@ int	warning_input(int s, int fd)
 	{
 		write(2, "minishell: Ambiguous redirect\n", 31);
 		g_glo.sts = 1;
-		close(fd);
+		if (fd != -1)
+			close(fd);
 		return (-1);
 	}
 	else if (fd == -1)

@@ -50,9 +50,9 @@ char	*check_cmd(char *cmd, char **paths)
 		return (NULL);
 	}
 	else if (!access(cmd, F_OK | X_OK) && !paths)
-		return (cmd);
+		return (ft_strdup(cmd));
 	else if ((cmd[0] == '.' || cmd[0] == '/') && !access(cmd, F_OK | X_OK))
-		return (cmd);
+		return (ft_strdup(cmd));
 	else if (!paths)
 		return (write(2, "minishell: : No such file or directory\n", 40),
 			NULL);
@@ -64,7 +64,7 @@ char	*check_cmd(char *cmd, char **paths)
 		printf_error("command not found", cmd, 127);
 		return (NULL);
 	}
-	return (cmd);
+	return (ft_strdup(cmd));
 }
 
 int	builtin(t_token *head, t_list **envl, t_list **exp_list)

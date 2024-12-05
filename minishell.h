@@ -6,7 +6,7 @@
 /*   By: asebaai <asebaai@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/26 10:22:04 by amoubine          #+#    #+#             */
-/*   Updated: 2024/12/05 10:23:40 by asebaai          ###   ########.fr       */
+/*   Updated: 2024/12/05 21:09:55 by asebaai          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -114,6 +114,9 @@ typedef struct global
 	t_token			*tail;
 	t_start			start;
 	t_token			*tmp;
+	t_token			*list0;
+	t_token			*list1;
+	char			**env_pipe;
 }					t_global;
 
 /*token with utils*/
@@ -263,6 +266,10 @@ void				ft_exit_pipe(t_token *head, t_list **envl,
 						t_list **exp_list, char **paths);
 void				clear_child(t_token *head, t_list **envl, t_list **exp_list,
 						char **paths);
+int					exec_pipes(t_token *list[2], t_list **envl,
+						t_list **exp_list, char **paths);
+t_pipe				*init_pipes(int p);
+
 /*exec.c*/
 int					check_pipe(t_token *list);
 void				run_cmd(t_token *head, t_list **envl, t_list **exp_list,

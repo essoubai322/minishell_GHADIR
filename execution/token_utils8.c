@@ -6,7 +6,7 @@
 /*   By: asebaai <asebaai@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/23 17:03:54 by asebaai           #+#    #+#             */
-/*   Updated: 2024/12/04 11:10:49 by asebaai          ###   ########.fr       */
+/*   Updated: 2024/12/05 17:42:51 by asebaai          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,7 @@ void	while_in_red_input(char *input, t_token2 **head)
 	else
 	{
 		add_token(head, REDIRECT_IN, "<");
+		g_glo.red = 1;
 		g_glo.i++;
 	}
 }

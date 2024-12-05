@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   pipes.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: asebaai <asebaai@student.42.fr>          +#+  +:+       +#+        */
+/*   By: asebaai <asebaai@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/07/31 20:50:47 by asebaai          #+#    #+#             */
-/*   Updated: 2024/09/16 14:59:59 by asebaai         ###   ########.fr       */
+/*   Created: 2024/12/05 12:38:08 by asebaai           #+#    #+#             */
+/*   Updated: 2024/12/05 21:04:44 by asebaai          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,67 +58,63 @@ void	pipe_redirection(t_token *head)
 	}
 }
 
-void	check_invalid_cmd(t_token *head)
+void	check_invalid_cmd(t_token *head, t_list **envl,
+		t_list **exp_list, char **paths)
 {
 	if (!head->args[0] || (head->args[0] && head->args[0][0] == '>')
 		|| (head->args[0] && head->args[0][0] == '<'))
-		exit(0);
+	{
+		clear_child(head, envl, exp_list, paths);
+		exit(1);
+	}
 }
 
-void	run(t_token *list[2], t_list **envl, t_list **exp_list, char **paths)
+void	exe_v2(char *cmd)
+{
+	struct stat	st;
+
+	stat(cmd, &st);
+	if (S_ISDIR(st.st_mode))
+	{
+		printf_error("is a directory", cmd, 126);
+		free(cmd);
+		exit(126);
+	}
+	else if (access(cmd, F_OK) == 0)
+	{
+		printf_error("command not found", cmd, 127);
+		free(cmd);
+		exit(127);
+	}
+	free(cmd);
+	exit(EXIT_FAILURE);
+}
+
+void	run(t_token *list[2], t_list **envl, t_list **et, char **paths)
 {
 	char	*cmd;
 	char	**env;
 
 	signal_setup(1);
 	pipe_redirection(list[1]);
-	check_invalid_redirection(list[1], envl, exp_list, paths);
-	check_invalid_cmd(list[1]);
+	check_invalid_redirection(list[1], envl, et, paths);
+	check_invalid_cmd(list[0], envl, et, paths);
 	if (ft_strnstr(list[1]->args[0], "exit", ft_strlen("exit")))
-		ft_exit_pipe(list[0], envl, exp_list, paths);
-	else if (!builtin(list[1], envl, exp_list))
+		ft_exit_pipe(list[0], envl, et, paths);
+	else if (!builtin(list[1], envl, et))
 	{
-		clear_child(list[0], envl, exp_list, paths);
+		clear_child(list[0], envl, et, paths);
 		exit(0);
 	}
 	cmd = check_cmd(list[1]->args[0], paths);
 	if (!cmd)
 	{
-		clear_child(list[0], envl, exp_list, paths);
+		clear_child(list[0], envl, et, paths);
 		exit(127);
 	}
 	env = convert_to_array(*envl);
 	if (execve(cmd, list[1]->args, env) == -1)
 	{
-		error_and_exit(1);
+		(clear_child(list[0], envl, et, paths), free(env), exe_v2(cmd));
 	}
-}
-
-int	exec_pipes(t_token *list[2], t_list **envl, t_list **exp_list, char **paths)
-{
-	int		i[5];
-	t_pipe	*fdt;
-
-	init_var_pipe(list[0], i);
-	fdt = init_pipes(i[3]);
-	while (i[0] <= i[3])
-	{
-		i[1] = fork();
-		if (!i[1])
-		{
-			if (i[0] != i[3])
-				dup2(fdt[i[0]].fd[1], STDOUT_FILENO);
-			if (i[0] > 0)
-				dup2(fdt[i[0] - 1].fd[0], STDIN_FILENO);
-			close_unused_fd(fdt, i[3]);
-			run(list, envl, exp_list, paths);
-		}
-		else if (i[0] == i[3])
-			i[4] = i[1];
-		next_cmd(&list[1]);
-		i[0]++;
-	}
-	close_unused_fd(fdt, i[3]);
-	free_and_wait(fdt, i[3], i[4]);
-	return (free_arr(paths), 0);
 }

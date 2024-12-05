@@ -58,6 +58,7 @@ void	check_invalid_redirection(t_token *head, t_list **envl,
 	ret = check_while_input_redirection(head);
 	if (ret)
 	{
+		list_clear(&g_glo.list0);
 		clear_child(head, envl, exp_list, paths);
 		exit(1);
 	}
