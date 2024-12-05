@@ -6,13 +6,80 @@
 /*   By: asebaai <asebaai@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/26 10:25:46 by amoubine          #+#    #+#             */
-/*   Updated: 2024/12/04 11:12:53 by asebaai          ###   ########.fr       */
+/*   Updated: 2024/12/05 12:23:14 by asebaai          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
 
 t_global	g_glo;
+
+// void	print_tokens_v2(t_token *head)
+// {
+// 	t_token	*current;
+
+// 	current = head;
+// 	while (current != NULL)
+// 	{
+// 		if (current->type == CMD)
+// 		{
+// 			printf("CMD : args= ");
+// 			for (int i = 0; i < current->arg_size; i++)
+// 			{
+// 				printf("[%d] '%s'", i, current->args[i]);
+// 				if (i < current->arg_size - 1)
+// 					printf(" ");
+// 			}
+// 			printf("\n");
+// 		}
+// 		else if (current->type == PIPE)
+// 		{
+// 			printf("PIPE : args= ");
+// 			for (int i = 0; i < current->arg_size; i++)
+// 			{
+// 				printf("[%d] '%s'", i, current->args[i]);
+// 				if (i < current->arg_size - 1)
+// 					printf(" ");
+// 			}
+// 			printf("\n");
+// 		}
+// 		else if (current->type == RED)
+// 		{
+// 			printf("RED : args= ");
+// 			for (int i = 0; i < current->arg_size; i++)
+// 			{
+// 				printf("[%d] '%s'", i, current->args[i]);
+// 				if (i < current->arg_size - 1)
+// 					printf(" ");
+// 			}
+// 			printf("\n");
+// 		}
+// 		else if (current->type == HEREDOC)
+// 		{
+// 			printf("HEREDOC : args= ");
+// 			for (int i = 0; i < current->arg_size; i++)
+// 			{
+// 				printf("[%d] '%s'", i, current->args[i]);
+// 				if (i < current->arg_size - 1)
+// 					printf(" ");
+// 			}
+// 			printf("\n");
+// 		}
+// 		else if (current->type == FILE_N)
+// 		{
+// 			printf("FILE : args= ");
+// 			for (int i = 0; i < current->arg_size; i++)
+// 			{
+// 				printf("[%d] '%s'", i, current->args[i]);
+// 				if (i < current->arg_size - 1)
+// 					printf(" ");
+// 			}
+// 			printf("\n");
+// 		}
+// 		current = current->next;
+// 	}
+// 	printf("\n");
+// }
 
 void	print_error(char *str)
 {

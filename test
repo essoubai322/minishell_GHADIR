@@ -1,4 +1,9 @@
-still reacheble (heredoc)
-cd exit status cd /
-cd /root
 _ << hani blati 3lik
+
+./execution/ | ls
+
+export xx yy=mm nn
+
+. pp | ls
+
+cat | cat | cat << p << e | cat << w | grep x | sort > c (output c)

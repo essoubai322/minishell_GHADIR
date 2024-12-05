@@ -89,7 +89,9 @@ void	run(t_token *list[2], t_list **envl, t_list **exp_list, char **paths)
 	}
 	env = convert_to_array(*envl);
 	if (execve(cmd, list[1]->args, env) == -1)
+	{
 		error_and_exit(1);
+	}
 }
 
 int	exec_pipes(t_token *list[2], t_list **envl, t_list **exp_list, char **paths)

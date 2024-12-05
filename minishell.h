@@ -6,7 +6,7 @@
 /*   By: asebaai <asebaai@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/26 10:22:04 by amoubine          #+#    #+#             */
-/*   Updated: 2024/12/04 11:13:36 by asebaai          ###   ########.fr       */
+/*   Updated: 2024/12/05 10:23:40 by asebaai          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -113,6 +113,7 @@ typedef struct global
 	char			quote;
 	t_token			*tail;
 	t_start			start;
+	t_token			*tmp;
 }					t_global;
 
 /*token with utils*/
@@ -204,7 +205,6 @@ int					ft_get_endo(char *value, int i, char **env_value,
 						char *var_name);
 t_token				*create_and_init_token(const char *value, t_type new_type);
 int					unset_errors(char *var_name, int flag);
-void				signal_heredoc(t_list *list[2]);
 void				while_redir(t_token *head, int *flag, int r);
 char				*handle_token_parsing(char **u, int *i, int *k,
 						char *result);
@@ -326,7 +326,7 @@ int					ff_strncmp(const char *s1, const char *s2, size_t n);
 char				*get_heredoc(char *str, char *del);
 void				signal_setup(int n);
 void				sig_exit(int num);
-void				signal_heredoc(t_list *list[2]);
+void				signal_heredoc(t_list *list[2], t_token *tmp);
 char				*rm_quote(char **str);
 char				*handle_double_quote(char **str, int *i, char *tmp, int *j);
 char				*handle_single_quote(char **str, int *i, char *tmp, int *j);

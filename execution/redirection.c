@@ -51,9 +51,9 @@ int	redir_output(char *filename, int flag)
 	ft_free2(&arg_space);
 	if (flag == 1 && s == 1)
 		fd = open(filename, O_CREAT | O_RDWR | O_TRUNC, 0644);
-	else if (s <= 1)
+	else
 		fd = open(filename, O_CREAT | O_APPEND | O_RDWR, 0644);
-	if (s > 1 || fd == -1)
+	if (s > 1 || dup2(fd, 1) == -1)
 	{
 		write(2, "minishell: Ambiguous redirect or permission denied\n", 52);
 		g_glo.sts = 1;
@@ -68,7 +68,7 @@ int	warning_input(int s, int fd)
 {
 	if (s > 1 || s == 0)
 	{
-		write(2, "minishell: Ambiguous redirect\n", 52);
+		write(2, "minishell: Ambiguous redirect\n", 31);
 		g_glo.sts = 1;
 		close(fd);
 		return (-1);
@@ -77,7 +77,6 @@ int	warning_input(int s, int fd)
 	{
 		write(2, "minishell: no such file or directory\n", 38);
 		g_glo.sts = 1;
-		close(fd);
 		return (-1);
 	}
 	return (0);

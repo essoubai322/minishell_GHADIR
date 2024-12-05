@@ -6,7 +6,7 @@
 /*   By: asebaai <asebaai@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/24 14:54:01 by asebaai           #+#    #+#             */
-/*   Updated: 2024/12/04 09:37:06 by asebaai          ###   ########.fr       */
+/*   Updated: 2024/12/05 12:09:38 by asebaai          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,13 +65,9 @@ t_token	*create_and_init_token(const char *value, t_type new_type)
 
 void	unset_v2(t_list **envl, char **var, int flag)
 {
-	t_list	*env;
-	t_list	*prev;
 	char	*var_name;
 	int		i;
 
-	env = *envl;
-	prev = NULL;
 	var_name = NULL;
 	i = 1;
 	while (var[i] && var[i][0] != '\0')

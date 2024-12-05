@@ -28,6 +28,7 @@ void	sig_exit(int num)
 {
 	if (g_glo.fd_herdoc)
 	{
+		list_clear(&g_glo.tmp);
 		ft_lstclear(&g_glo.list[0], free);
 		ft_lstclear(&g_glo.list[1], free);
 		close(g_glo.fd_herdoc);
@@ -61,8 +62,9 @@ void	signal_setup(int n)
 	}
 }
 
-void	signal_heredoc(t_list *list[2])
+void	signal_heredoc(t_list *list[2], t_token *tmp)
 {
+	g_glo.tmp = tmp;
 	g_glo.list[0] = list[0];
 	g_glo.list[1] = list[1];
 	signal(SIGINT, sig_exit);

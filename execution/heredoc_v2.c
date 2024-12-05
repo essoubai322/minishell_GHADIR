@@ -6,7 +6,7 @@
 /*   By: asebaai <asebaai@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/26 05:30:03 by asebaai           #+#    #+#             */
-/*   Updated: 2024/12/04 08:45:46 by asebaai          ###   ########.fr       */
+/*   Updated: 2024/12/05 10:20:25 by asebaai          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,7 +88,7 @@ int	read_put(char *file_name, char *del, int q, t_list *env)
 
 void	fork_heredoc(char *fn, t_token *head, t_list *list[2], t_token	*tmp)
 {
-	signal_heredoc(list);
+	signal_heredoc(list, tmp);
 	if (is_q(head->next->args[0]))
 	{
 		rm_quote(&head->next->args[0]);
