@@ -6,7 +6,7 @@
 /*   By: asebaai <asebaai@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/17 17:18:04 by asebaai           #+#    #+#             */
-/*   Updated: 2024/12/04 11:12:00 by asebaai          ###   ########.fr       */
+/*   Updated: 2024/12/06 21:56:16 by asebaai          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,9 @@ void	add_token_innit_head(t_token2 **head, char *stripped_value,
 	t_token2	*new_token;
 	t_token2	*current;
 
+	dprintf(2, "stripped_value: %s\n", stripped_value);
+	if (stripped_value == NULL)
+		return ;
 	new_token = create_token(type, stripped_value);
 	if (*head == NULL)
 		*head = new_token;
@@ -66,7 +69,7 @@ char	*ft_get_value(int *i, char *value)
 	int		k;
 
 	env_value = NULL;
-	var_name = calloc(ft_strlen(value) + 1, sizeof(char));
+	var_name = ft_calloc(ft_strlen(value) + 1, sizeof(char));
 	(*i)++;
 	k = 0;
 	if (ft_get_endo(value, *i, &env_value, var_name))
@@ -76,13 +79,14 @@ char	*ft_get_value(int *i, char *value)
 	var_name[k] = '\0';
 	if (k == 0)
 	{
-		env_value = calloc(2, sizeof(char));
+		env_value = ft_calloc(2, sizeof(char));
 		env_value[0] = value[*i - 1];
 		free(var_name);
 		return (env_value);
 	}
 	if (var_name)
 		env_value = ft_get_env(var_name, g_glo.env);
+	dprintf(2, "env_value: %s\n", env_value);
 	free(var_name);
 	return (env_value);
 }
@@ -92,7 +96,7 @@ void	add_token_else(char *value, int *i, char **stripped_value, int *k)
 	char	*var_name;
 	char	*temp;
 
-	var_name = calloc(ft_strlen(value), sizeof(char));
+	var_name = ft_calloc(ft_strlen(value), sizeof(char));
 	while (value[*i] && value[*i] != '$')
 	{
 		var_name[*k] = value[(*i)++];
@@ -115,21 +119,21 @@ char	*get_stripped_value(enum e_t type, char *value,
 
 	g_glo.o = 0;
 	g_glo.k = 0;
-	stripped_value = calloc(1200500, sizeof(char));
+	stripped_value = ft_calloc(1200500, sizeof(char));
 	if (type == QUOTE || type == DQUOTE)
 	{
 		len = ft_strlen(value);
 		if (len > 2)
 		{
-			strncpy(stripped_value, value + 1, len - 2);
+			ft_strncpy(stripped_value, value + 1, len - 2);
 			stripped_value[len - 2] = '\0';
 		}
 		else
-			strcpy(stripped_value, "");
+			ft_strcpy(stripped_value, "");
 	}
 	else if (type == WORD)
 		return (stripped_value);
 	else
-		strcpy(stripped_value, value);
+		ft_strcpy(stripped_value, value);
 	return (stripped_value);
 }

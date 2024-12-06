@@ -6,7 +6,7 @@
 /*   By: asebaai <asebaai@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/17 17:18:51 by asebaai           #+#    #+#             */
-/*   Updated: 2024/12/04 11:12:00 by asebaai          ###   ########.fr       */
+/*   Updated: 2024/12/06 21:22:46 by asebaai          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@ void	add_token_v0(char *value, int *i, char **stripped_value, int *k)
 
 	if (value[0] != '$')
 	{
-		name = calloc(ft_strlen(value), sizeof(char));
+		name = ft_calloc(ft_strlen(value), sizeof(char));
 		while (value[*i] && value[*i] != '$')
 			name[(*k)++] = value[(*i)++];
 		name[*k] = '\0';
@@ -42,7 +42,7 @@ void	add_token(t_token2 **head, enum e_t type, char *v)
 	g_glo.sdv = get_stripped_value(type, v, g_glo.sdv);
 	if (type == WORD)
 	{
-		if (v && strchr(v, '$') != 0)
+		if (v && ft_strchr(v, '$') != 0)
 		{
 			add_token_v0(v, &g_glo.o, &g_glo.sdv, &g_glo.k);
 			while (v[g_glo.o] != '\0')
@@ -61,7 +61,7 @@ void	add_token(t_token2 **head, enum e_t type, char *v)
 			}
 		}
 		else
-			strcpy(g_glo.sdv, v);
+			ft_strcpy(g_glo.sdv, v);
 	}
 	add_token_v1(head, type);
 }

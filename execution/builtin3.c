@@ -48,6 +48,7 @@ int	cd_operands(char **args, t_list **envl, t_list **exp_list, char **path)
 {
 	char	*tmp;
 
+	tmp = NULL;
 	if (!args[1] || (args[1][0] == '~' && !args[1][1]))
 	{
 		*path = fenv(*envl, "HOME=");
@@ -67,6 +68,8 @@ int	cd_operands(char **args, t_list **envl, t_list **exp_list, char **path)
 		pwd(1, *envl);
 		return (0);
 	}
+	else if (args[1][0] == '\0')
+		return (free(tmp), 0);
 	return (1);
 }
 

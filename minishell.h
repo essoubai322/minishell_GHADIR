@@ -6,7 +6,7 @@
 /*   By: asebaai <asebaai@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/26 10:22:04 by amoubine          #+#    #+#             */
-/*   Updated: 2024/12/05 21:09:55 by asebaai          ###   ########.fr       */
+/*   Updated: 2024/12/06 21:24:12 by asebaai          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -215,6 +215,8 @@ int					handle_quoted_section(char **u, int *i, int *k,
 						char *result);
 int					handle_unquoted_section(char **u, int *i, int *k,
 						char *result);
+char				*ft_strcpy(char *s1, char *s2);
+void				ft_strncpy(char *dest, char *src, int n);
 
 /*global variable*/
 

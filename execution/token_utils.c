@@ -6,7 +6,7 @@
 /*   By: asebaai <asebaai@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/17 17:13:57 by asebaai           #+#    #+#             */
-/*   Updated: 2024/12/06 00:16:58 by asebaai          ###   ########.fr       */
+/*   Updated: 2024/12/06 21:21:19 by asebaai          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,7 @@ char	*ft_strcat(char *dest, char *src)
 
 	i = 0;
 	j = 0;
-	result = calloc(ft_strlen(dest) + ft_strlen(src) + 1, sizeof(char));
+	result = ft_calloc(ft_strlen(dest) + ft_strlen(src) + 1, sizeof(char));
 	while (dest && dest[i])
 	{
 		result[i] = dest[i];

@@ -6,7 +6,7 @@
 /*   By: asebaai <asebaai@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/23 06:11:35 by asebaai           #+#    #+#             */
-/*   Updated: 2024/12/04 10:44:41 by asebaai          ###   ########.fr       */
+/*   Updated: 2024/12/06 21:26:20 by asebaai          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,7 @@ char	*after_heredoc1(char *input, int *i)
 	{
 		parse_unquoted_heredoc1(input, i, result, &k);
 	}
-	if (!flag && strlen(result) == 0)
+	if (!flag && ft_strlen(result) == 0)
 	{
 		*i = after;
 		free(result);

@@ -6,7 +6,7 @@
 /*   By: asebaai <asebaai@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/04 10:34:32 by asebaai           #+#    #+#             */
-/*   Updated: 2024/12/06 00:18:45 by asebaai          ###   ########.fr       */
+/*   Updated: 2024/12/06 21:23:36 by asebaai          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,4 +73,35 @@ int	exec_pipes(t_token *list[2], t_list **envl, t_list **exp_list, char **paths)
 	close_unused_fd(fdt, i[3]);
 	free_and_wait(fdt, i[3], i[4]);
 	return (free_arr(paths), 0);
+}
+
+char	*ft_strcpy(char *s1, char *s2)
+{
+	int	i;
+
+	i = 0;
+	if (!s1 || !s2)
+		return (NULL);
+	while (s2[i])
+	{
+		s1[i] = s2[i];
+		i++;
+	}
+	s1[i] = '\0';
+	return (s1);
+}
+
+void	ft_strncpy(char *dest, char *src, int n)
+{
+	int	i;
+
+	i = 0;
+	if (!dest || !src)
+		return ;
+	while (src[i] && i < n)
+	{
+		dest[i] = src[i];
+		i++;
+	}
+	dest[i] = '\0';
 }

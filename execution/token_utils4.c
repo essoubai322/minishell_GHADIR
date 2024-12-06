@@ -6,7 +6,7 @@
 /*   By: asebaai <asebaai@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/23 06:10:09 by asebaai           #+#    #+#             */
-/*   Updated: 2024/12/04 10:43:32 by asebaai          ###   ########.fr       */
+/*   Updated: 2024/12/06 21:21:47 by asebaai          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@ char	*string_command(const char *input, int *i)
 	char	*result;
 	int		k;
 
-	result = calloc(10000000, sizeof(char));
+	result = ft_calloc(10000000, sizeof(char));
 	k = 0;
 	while (isspace(input[*i]))
 		(*i)++;

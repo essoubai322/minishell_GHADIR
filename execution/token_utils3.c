@@ -6,7 +6,7 @@
 /*   By: asebaai <asebaai@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/17 17:19:35 by asebaai           #+#    #+#             */
-/*   Updated: 2024/12/04 10:40:42 by asebaai          ###   ########.fr       */
+/*   Updated: 2024/12/06 21:26:09 by asebaai          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,7 +61,7 @@ int	expand_variable(const char *input, char *result, int *arr, char *env_value)
 {
 	char	*var_name;
 
-	var_name = ft_calloc(strlen(input) + 1, sizeof(char));
+	var_name = ft_calloc(ft_strlen(input) + 1, sizeof(char));
 	(arr[0])++;
 	if (ft_strncmp(input + arr[0], "?", 1) == 0)
 	{
@@ -83,7 +83,7 @@ int	expand_variable(const char *input, char *result, int *arr, char *env_value)
 			env_value = ft_get_env(var_name, g_glo.env);
 	}
 	return ((arr[2] = expand_cat(env_value, result, arr), free(env_value), free
-			(var_name), arr[1] = strlen(result)), arr[3]);
+			(var_name), arr[1] = ft_strlen(result)), arr[3]);
 }
 
 void	parse_quoted(const char *input, int *i, char *result, int *k)
