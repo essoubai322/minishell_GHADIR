@@ -63,12 +63,8 @@ void	change_var_and_free(char *var_name, char *var_value, char *str,
 		t_list *tmpl)
 {
 	char	*tmp;
-	char	*tmp1;
 
-	(void)tmp1;
-	(void)tmp;
 	tmp = str;
-	tmp1 = var_value;
 	var_value = ft_strjoin(ft_strchr(str, '=') + 1, var_value);
 	tmpl->content = ft_strjoin(var_name, var_value);
 	free(tmp);

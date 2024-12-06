@@ -6,7 +6,7 @@
 /*   By: asebaai <asebaai@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/26 10:25:46 by amoubine          #+#    #+#             */
-/*   Updated: 2024/12/05 21:03:18 by asebaai          ###   ########.fr       */
+/*   Updated: 2024/12/06 21:11:17 by asebaai          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -98,7 +98,7 @@ void	loop_v2(char *input, t_list **lists)
 	current2 = NULL;
 	new_token = NULL;
 	if (result.error_message)
-		print_error(result.error_message);
+		(print_error(result.error_message), free_tokens(result.tokens));
 	else
 	{
 		new_head = convert_data(result.tokens, current2, new_token);

@@ -6,7 +6,7 @@
 /*   By: asebaai <asebaai@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/05 12:38:08 by asebaai           #+#    #+#             */
-/*   Updated: 2024/12/05 21:04:44 by asebaai          ###   ########.fr       */
+/*   Updated: 2024/12/06 20:51:58 by asebaai          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -106,7 +106,7 @@ void	run(t_token *list[2], t_list **envl, t_list **et, char **paths)
 		clear_child(list[0], envl, et, paths);
 		exit(0);
 	}
-	cmd = check_cmd(list[1]->args[0], paths);
+	cmd = check_cmd(list[0]->args[0], paths);
 	if (!cmd)
 	{
 		clear_child(list[0], envl, et, paths);

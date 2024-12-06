@@ -6,7 +6,7 @@
 /*   By: asebaai <asebaai@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/17 17:13:57 by asebaai           #+#    #+#             */
-/*   Updated: 2024/12/04 11:12:00 by asebaai          ###   ########.fr       */
+/*   Updated: 2024/12/06 00:16:58 by asebaai          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,7 +75,7 @@ t_token2	*create_token(enum e_t type, const char *value)
 {
 	t_token2	*new_token;
 
-	new_token = malloc(sizeof(t_token));
+	new_token = malloc(sizeof(t_token2));
 	if (!new_token)
 		return (NULL);
 	new_token->type = type;

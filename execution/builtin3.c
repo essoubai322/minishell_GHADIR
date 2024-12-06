@@ -28,6 +28,7 @@ char	*pwd(int i, t_list *envl)
 	{
 		printf("%s\n", pwd);
 		free(pwd);
+		return (NULL);
 	}
 	return (pwd);
 }

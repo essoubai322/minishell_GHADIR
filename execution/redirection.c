@@ -91,7 +91,6 @@ int	redir_input(char *filename)
 
 	arg_space = ft_split(filename, ' ');
 	s = 0;
-	fd = 0;
 	while (arg_space && arg_space[s])
 		s++;
 	ft_free2(&arg_space);

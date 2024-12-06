@@ -6,7 +6,7 @@
 /*   By: asebaai <asebaai@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/04 10:34:32 by asebaai           #+#    #+#             */
-/*   Updated: 2024/12/05 21:07:44 by asebaai          ###   ########.fr       */
+/*   Updated: 2024/12/06 00:18:45 by asebaai          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,6 @@ char	**split_paths(char *paths)
 	i = 0;
 	if (paths == NULL)
 		return (NULL);
-	i = 0;
 	while (paths[i] && paths[i] != '=')
 		i++;
 	first_part = ft_substr(&paths[i + 1], 0, ft_strlen(paths));
