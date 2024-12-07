@@ -53,7 +53,7 @@ int	cd_operands(char **args, t_list **envl, t_list **exp_list, char **path)
 	{
 		*path = fenv(*envl, "HOME=");
 		if (!*path)
-			return (write(2, "cd: HOME not set", 17), 1);
+			return (write(2, "cd: HOME not set\n", 17), 0);
 		export(exp_list, envl, "OLDPWD=", tmp = pwd(0, *envl));
 		free(tmp);
 		chdir(*path + 5);

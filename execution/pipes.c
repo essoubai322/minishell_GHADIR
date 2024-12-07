@@ -6,7 +6,7 @@
 /*   By: asebaai <asebaai@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/05 12:38:08 by asebaai           #+#    #+#             */
-/*   Updated: 2024/12/06 20:51:58 by asebaai          ###   ########.fr       */
+/*   Updated: 2024/12/07 08:17:58 by asebaai          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -98,7 +98,7 @@ void	run(t_token *list[2], t_list **envl, t_list **et, char **paths)
 	signal_setup(1);
 	pipe_redirection(list[1]);
 	check_invalid_redirection(list[1], envl, et, paths);
-	check_invalid_cmd(list[0], envl, et, paths);
+	check_invalid_cmd(list[1], envl, et, paths);
 	if (ft_strnstr(list[1]->args[0], "exit", ft_strlen("exit")))
 		ft_exit_pipe(list[0], envl, et, paths);
 	else if (!builtin(list[1], envl, et))
@@ -106,7 +106,7 @@ void	run(t_token *list[2], t_list **envl, t_list **et, char **paths)
 		clear_child(list[0], envl, et, paths);
 		exit(0);
 	}
-	cmd = check_cmd(list[0]->args[0], paths);
+	cmd = check_cmd(list[1]->args[0], paths);
 	if (!cmd)
 	{
 		clear_child(list[0], envl, et, paths);
@@ -114,7 +114,5 @@ void	run(t_token *list[2], t_list **envl, t_list **et, char **paths)
 	}
 	env = convert_to_array(*envl);
 	if (execve(cmd, list[1]->args, env) == -1)
-	{
 		(clear_child(list[0], envl, et, paths), free(env), exe_v2(cmd));
-	}
 }

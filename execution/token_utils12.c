@@ -6,7 +6,7 @@
 /*   By: asebaai <asebaai@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/24 14:54:01 by asebaai           #+#    #+#             */
-/*   Updated: 2024/12/05 12:09:38 by asebaai          ###   ########.fr       */
+/*   Updated: 2024/12/07 09:00:54 by asebaai          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,7 +50,10 @@ t_token	*create_and_init_token(const char *value, t_type new_type)
 	if (!new_token)
 		return (NULL);
 	new_token->type = new_type;
-	new_token->arg_size = 1;
+	if (new_type == RED && strcmp(value, ">>") == 0)
+		new_token->arg_size = 2;
+	else
+		new_token->arg_size = 1;
 	new_token->args = malloc(sizeof(char *) * 2);
 	if (!new_token->args)
 	{

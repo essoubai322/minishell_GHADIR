@@ -53,7 +53,10 @@ char	*process_variable(char *s, t_list *env, char *tmp, int *i)
 	j = i[1];
 	i[0]++;
 	var_name = var_name_heredoc(s, i);
-	var_value = get_var(var_name, env);
+	if (var_name[0] != '$')
+		var_value = get_var(var_name, env);
+	else
+		var_value = ft_strdup("$");
 	free(var_name);
 	if (var_value)
 	{

@@ -6,7 +6,7 @@
 /*   By: asebaai <asebaai@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/17 17:18:04 by asebaai           #+#    #+#             */
-/*   Updated: 2024/12/06 21:56:16 by asebaai          ###   ########.fr       */
+/*   Updated: 2024/12/06 23:20:26 by asebaai          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,6 @@ void	add_token_innit_head(t_token2 **head, char *stripped_value,
 	t_token2	*new_token;
 	t_token2	*current;
 
-	dprintf(2, "stripped_value: %s\n", stripped_value);
 	if (stripped_value == NULL)
 		return ;
 	new_token = create_token(type, stripped_value);
@@ -86,7 +85,6 @@ char	*ft_get_value(int *i, char *value)
 	}
 	if (var_name)
 		env_value = ft_get_env(var_name, g_glo.env);
-	dprintf(2, "env_value: %s\n", env_value);
 	free(var_name);
 	return (env_value);
 }

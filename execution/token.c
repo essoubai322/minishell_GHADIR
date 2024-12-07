@@ -6,80 +6,13 @@
 /*   By: asebaai <asebaai@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/26 10:25:46 by amoubine          #+#    #+#             */
-/*   Updated: 2024/12/06 21:11:17 by asebaai          ###   ########.fr       */
+/*   Updated: 2024/12/07 09:01:58 by asebaai          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
 
 t_global	g_glo;
-
-// void	print_tokens_v2(t_token *head)
-// {
-// 	t_token	*current;
-
-// 	current = head;
-// 	while (current != NULL)
-// 	{
-// 		if (current->type == CMD)
-// 		{
-// 			printf("CMD : args= ");
-// 			for (int i = 0; i < current->arg_size; i++)
-// 			{
-// 				printf("[%d] '%s'", i, current->args[i]);
-// 				if (i < current->arg_size - 1)
-// 					printf(" ");
-// 			}
-// 			printf("\n");
-// 		}
-// 		else if (current->type == PIPE)
-// 		{
-// 			printf("PIPE : args= ");
-// 			for (int i = 0; i < current->arg_size; i++)
-// 			{
-// 				printf("[%d] '%s'", i, current->args[i]);
-// 				if (i < current->arg_size - 1)
-// 					printf(" ");
-// 			}
-// 			printf("\n");
-// 		}
-// 		else if (current->type == RED)
-// 		{
-// 			printf("RED : args= ");
-// 			for (int i = 0; i < current->arg_size; i++)
-// 			{
-// 				printf("[%d] '%s'", i, current->args[i]);
-// 				if (i < current->arg_size - 1)
-// 					printf(" ");
-// 			}
-// 			printf("\n");
-// 		}
-// 		else if (current->type == HEREDOC)
-// 		{
-// 			printf("HEREDOC : args= ");
-// 			for (int i = 0; i < current->arg_size; i++)
-// 			{
-// 				printf("[%d] '%s'", i, current->args[i]);
-// 				if (i < current->arg_size - 1)
-// 					printf(" ");
-// 			}
-// 			printf("\n");
-// 		}
-// 		else if (current->type == FILE_N)
-// 		{
-// 			printf("FILE : args= ");
-// 			for (int i = 0; i < current->arg_size; i++)
-// 			{
-// 				printf("[%d] '%s'", i, current->args[i]);
-// 				if (i < current->arg_size - 1)
-// 					printf(" ");
-// 			}
-// 			printf("\n");
-// 		}
-// 		current = current->next;
-// 	}
-// 	printf("\n");
-// }
 
 void	print_error(char *str)
 {
@@ -135,7 +68,7 @@ int	loop(char **env)
 	{
 		signal_setup(2);
 		g_glo.env = convert_to_array_v2(lists[0], g_glo.env);
-		input = readline(PURPLE "APA@GOVOS" BOLD "> " RESET);
+		input = readline("APA@GOVOS >");
 		if (!input)
 		{
 			printf("exit\n");

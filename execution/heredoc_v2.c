@@ -6,7 +6,7 @@
 /*   By: asebaai <asebaai@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/26 05:30:03 by asebaai           #+#    #+#             */
-/*   Updated: 2024/12/05 10:20:25 by asebaai          ###   ########.fr       */
+/*   Updated: 2024/12/07 09:24:45 by asebaai          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,12 @@ char	*var_name_heredoc(char *input, int *i)
 				|| input[*i] == '_'))
 			var_name[c++] = input[(*i)++];
 		var_name[c] = '\0';
+		if (c == 0)
+		{
+			free(var_name);
+			var_name = ft_calloc(2, sizeof(char));
+			var_name[0] = input[*i - 1];
+		}
 	}
 	return (var_name);
 }
