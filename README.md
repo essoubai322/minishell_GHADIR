@@ -37,7 +37,7 @@ For example:
 - -la -> type: WORD
 - | -> type: PIPE
 - cat -> type: WORD
-- > -> type: RED
+- '>' -> type: RED
 - file.txt -> type: WORD.
 **Quotes and Escapes:**
 
@@ -56,4 +56,89 @@ Tokens are grouped into a structured form, like a parse tree, which defines the 
 Example:
 - ls -la is the first command.
 - | indicates a pipe to cat.
-- > redirects cat's output to file.txt.
+- '>' redirects cat's output to file.txt.
+
+## 2. Execution
+The right side of the chart is labeled as "Execution" and details how commands are executed once parsed. Key elements include:
+
+**Forking:**
+
+A new process is created for executing the command using fork().
+Redirection:
+
+Input/output redirection (>, <) is handled by duplicating file descriptors.
+**Example:**
+> old_fd[0] = dup(STDIN_FILENO) for input redirection.
+> old_fd[1] = dup(STDOUT_FILENO) for output redirection.
+**Builtin Commands:**
+
+Some commands (like cd or exit) are executed directly within the shell without forking.
+Execve:
+
+For non-builtin commands, the program uses execve() to replace the current process with the command to be executed.
+If the execve() call fails, it falls back to error handling.
+Signal Handling:
+
+Signals like ctrl-c and ctrl-\ are set up to handle interruptions and terminate processes appropriately.
+Why is this important?
+This flowchart provides a clear visual overview of how a shell processes user input from the moment it is typed to the execution of commands. Understanding this flow is essential for debugging or implementing your own shell. It explains:
+
+> The structure of a shell program.
+> How tokens are created and validated.
+> How processes are managed using forking and redirection.
+> How errors are handled at various stages.
+
+# EXECUTION Phase (Right Side)
+***Signal Setup:***
+
+Signals like ctrl-c (to interrupt) and ctrl-\ (to quit) are configured.
+Redirection Handling:
+
+Input and output redirections (>, <) are processed.
+Duplicates file descriptors (dup2) to link files or streams correctly.
+Handles errors in redirection (e.g., invalid files).
+Forking:
+
+- The shell creates a child process using fork().
+- The parent process remains active to manage the shell.
+- The child process executes the command.
+**Built-in Commands:**
+
+If the command is built-in (e.g., cd, exit), it is executed directly without forking.
+External Commands:
+
+For external commands, the child process:
+Searches for the command's binary in the system's PATH.
+Uses execve() to replace the current process image with the command's image.
+**Error Handling:**
+
+If execve() fails (e.g., command not found), an error message is displayed.
+Piping:
+
+If there’s a pipe (|), the output of the first command becomes the input of the second:
+Example:
+ls -la | cat: Output of ls -la is passed to cat.
+**Final Execution:**
+
+After handling all steps, the process executes the command or pipeline.
+
+ey Flow Example:
+For ls -la | cat > file.txt:
+
+Parsing Phase:
+
+- ls → WORD
+- -la → WORD
+- | → PIPE
+- cat → WORD
+- '>' → RED
+- file.txt → WORD.
+****Parse tree groups commands as:****
+- ls -la → first command.
+- Pipe to cat.
+- Redirect cat output to file.txt.
+**Execution Phase:**
+
+> ls -la runs in a child process.
+> Its output is piped to cat in another process.
+> cat redirects its output to file.txt.
