@@ -12,7 +12,8 @@ The left side of the chart is labeled as "Parsing" and represents the steps invo
 
 Commands are split into tokens (e.g., commands, options, redirections).
 
-Example: ls -la | cat > file.txt is broken down into:
+Example: 
+-- ls -la | cat > file.txt is broken down into:
 
 - value: ls, type: WORD
 - value: -la, type: WORD
