@@ -11,16 +11,18 @@ The left side of the chart is labeled as "Parsing" and represents the steps invo
 **Tokenization:**
 
 Commands are split into tokens (e.g., commands, options, redirections).
+
 Example: ls -la | cat > file.txt is broken down into:
-value: ls, type: WORD
-value: -la, type: WORD
-value: |, type: PIPE
-and so on.
+
+- value: ls, type: WORD
+- value: -la, type: WORD
+- value: |, type: PIPE
+***and so on.***
 Double Quotes & Escaping:
 
 Handling of special cases such as quoted strings ("some text") and escaped characters (\).
 Example: Parsing between single and double quotes, ensuring tokens retain their intended value.
-Validation:
+**Validation:**
 
 Checks for invalid syntax, such as unmatched quotes or improper token sequences.
 
