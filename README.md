@@ -69,7 +69,9 @@ Redirection:
 Input/output redirection (>, <) is handled by duplicating file descriptors.
 **Example:**
 > old_fd[0] = dup(STDIN_FILENO) for input redirection.
+> 
 > old_fd[1] = dup(STDOUT_FILENO) for output redirection.
+> 
 **Builtin Commands:**
 
 Some commands (like cd or exit) are executed directly within the shell without forking.
@@ -84,8 +86,11 @@ Why is this important?
 This flowchart provides a clear visual overview of how a shell processes user input from the moment it is typed to the execution of commands. Understanding this flow is essential for debugging or implementing your own shell. It explains:
 
 > The structure of a shell program.
+> 
 > How tokens are created and validated.
+> 
 > How processes are managed using forking and redirection.
+> 
 > How errors are handled at various stages.
 
 # EXECUTION Phase (Right Side)
