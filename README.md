@@ -140,5 +140,7 @@ Parsing Phase:
 **Execution Phase:**
 
 > ls -la runs in a child process.
+> 
 > Its output is piped to cat in another process.
+> 
 > cat redirects its output to file.txt.
